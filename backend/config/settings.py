@@ -1,10 +1,15 @@
 """Django settings. Every value that differs between machines comes from the environment."""
 
 import os
+from datetime import timedelta
 from pathlib import Path
 
+import django_stubs_ext
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
+
+# Lets classes such as ModelAdmin[User] be subscripted at runtime, as the type stubs expect.
+django_stubs_ext.monkeypatch()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -41,6 +46,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_spectacular",
     "core",
+    "accounts",
 ]
 
 MIDDLEWARE = [
@@ -86,6 +92,8 @@ DATABASES = {
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+AUTH_USER_MODEL = "accounts.User"
+
 AUTH_PASSWORD_VALIDATORS: list[dict[str, str]] = []
 
 # Languages: English, Italian and Spanish from the first version.
@@ -110,7 +118,30 @@ REDIS_URL = env("REDIS_URL", "redis://localhost:6379/0")
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_TASK_ALWAYS_EAGER = env_bool("CELERY_TASK_ALWAYS_EAGER")
-CELERY_BEAT_SCHEDULE: dict[str, dict[str, object]] = {}
+CELERY_BEAT_SCHEDULE: dict[str, dict[str, object]] = {
+    "clear-expired-login-codes": {
+        "task": "accounts.tasks.clear_expired_login_codes",
+        "schedule": timedelta(hours=1),
+    },
+}
+
+# Rate limits and other short-lived counters.
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": env("REDIS_CACHE_URL", REDIS_URL),
+        "KEY_PREFIX": "delibird",
+    }
+}
+
+# Sign-in. Links in sign-in emails open the app at APP_URL.
+APP_URL = env("APP_URL", "http://localhost:8081")
+LOGIN_CODE_LIFETIME = timedelta(minutes=10)
+LOGIN_CODE_MAX_ATTEMPTS = 5
+# (requests, window): how often a code can be requested, and verify attempted, before the API answers 429.
+LOGIN_CODE_RATE_PER_EMAIL = (5, timedelta(minutes=15))
+LOGIN_CODE_RATE_PER_IP = (20, timedelta(hours=1))
+LOGIN_VERIFY_RATE_PER_IP = (30, timedelta(minutes=15))
 
 MAILERS = {
     "default": {
@@ -128,8 +159,8 @@ DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", "Delibird <noreply@localhost>")
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    "DEFAULT_AUTHENTICATION_CLASSES": [],
-    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
+    "DEFAULT_AUTHENTICATION_CLASSES": ["accounts.authentication.BearerTokenAuthentication"],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
 }
 
 SPECTACULAR_SETTINGS = {
@@ -137,6 +168,8 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "API for the Delibird wishlist app.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "SERVE_AUTHENTICATION": [],
+    "COMPONENT_SPLIT_REQUEST": True,
 }
 
 LOGGING = {

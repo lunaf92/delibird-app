@@ -2,28 +2,133 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: delibird\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-07 20:07+0000\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: config/settings.py
+#: accounts/admin.py:32
+msgid "Permissions"
+msgstr "Permisos"
+
+#: accounts/admin.py:35
+msgid "Dates"
+msgstr "Fechas"
+
+#: accounts/authentication.py:26 accounts/authentication.py:30
+msgid "Invalid authorization header."
+msgstr "Cabecera de autorización no válida."
+
+#: accounts/authentication.py:34
+msgid "Your session has ended. Sign in again."
+msgstr "Tu sesión ha terminado. Vuelve a entrar."
+
+#: accounts/models.py:19 config/settings.py:102
 msgid "English"
 msgstr "Inglés"
 
-#: config/settings.py
+#: accounts/models.py:20 config/settings.py:103
 msgid "Italian"
 msgstr "Italiano"
 
-#: config/settings.py
+#: accounts/models.py:21 config/settings.py:104
 msgid "Spanish"
 msgstr "Español"
 
-#: core/views.py
+#: accounts/models.py:42
+msgid "email"
+msgstr "correo electrónico"
+
+#: accounts/models.py:43
+msgid "display name"
+msgstr "nombre visible"
+
+#: accounts/models.py:44
+msgid "language"
+msgstr "idioma"
+
+#: accounts/models.py:45
+msgid "staff status"
+msgstr "es staff"
+
+#: accounts/models.py:46
+msgid "active"
+msgstr "activo"
+
+#: accounts/models.py:47
+msgid "date joined"
+msgstr "fecha de alta"
+
+#: accounts/models.py:56
+msgid "user"
+msgstr "usuario"
+
+#: accounts/models.py:57
+msgid "users"
+msgstr "usuarios"
+
+#: accounts/serializers.py:24
+msgid "Send either an email and a code, or a token."
+msgstr "Envía un correo y un código, o un token."
+
+#: accounts/tasks.py:22
+#, python-format
+msgid "Your Delibird sign-in code: %(code)s"
+msgstr "Tu código para entrar en Delibird: %(code)s"
+
+#: accounts/templates/accounts/email/sign_in.html:9
+#: accounts/templates/accounts/email/sign_in.txt:1
+msgid "Hello,"
+msgstr "Hola:"
+
+#: accounts/templates/accounts/email/sign_in.html:10
+#: accounts/templates/accounts/email/sign_in.txt:3
+msgid "Your code to sign in to Delibird is:"
+msgstr "Tu código para entrar en Delibird es:"
+
+#: accounts/templates/accounts/email/sign_in.html:14
+#: accounts/templates/accounts/email/sign_in.txt:7
+msgid "Or open this link on the device you're signing in on:"
+msgstr "O abre este enlace en el dispositivo con el que estás entrando:"
+
+#: accounts/templates/accounts/email/sign_in.html:17
+msgid "Sign in to Delibird"
+msgstr "Entrar en Delibird"
+
+#: accounts/templates/accounts/email/sign_in.html:22
+#: accounts/templates/accounts/email/sign_in.txt:10
+#, python-format
+msgid "The code and the link expire in %(minutes)s minute and work only once."
+msgid_plural ""
+"The code and the link expire in %(minutes)s minutes and work only once."
+msgstr[0] "El código y el enlace caducan en %(minutes)s minuto y solo funcionan una vez."
+msgstr[1] "El código y el enlace caducan en %(minutes)s minutos y solo funcionan una vez."
+
+#: accounts/templates/accounts/email/sign_in.html:27
+#: accounts/templates/accounts/email/sign_in.txt:15
+msgid "If you didn't ask to sign in, you can ignore this email."
+msgstr "Si no has pedido entrar, puedes ignorar este correo."
+
+#: accounts/views.py:56
+msgid "Too many attempts. Wait a few minutes and try again."
+msgstr "Demasiados intentos. Espera unos minutos y vuelve a intentarlo."
+
+#: accounts/views.py:83
+#, python-format
+msgid "We've emailed you a sign-in code. It expires in %(minutes)d minutes."
+msgstr "Te hemos enviado un código para entrar por correo. Caduca en %(minutes)d minutos."
+
+#: accounts/views.py:113
+msgid "That code is wrong or has expired."
+msgstr "El código es incorrecto o ha caducado."
+
+#: core/views.py:41
 msgid "The server is running."
 msgstr "El servidor está funcionando."
 
-#: core/views.py
+#: core/views.py:41
 msgid "The server has a problem."
 msgstr "El servidor tiene un problema."

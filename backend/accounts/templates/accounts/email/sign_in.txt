@@ -1,0 +1,16 @@
+{% load i18n %}{% autoescape off %}{% translate "Hello," %}
+
+{% translate "Your code to sign in to Delibird is:" %}
+
+    {{ code }}
+
+{% translate "Or open this link on the device you're signing in on:" %}
+{{ link }}
+
+{% blocktranslate count minutes=minutes trimmed %}
+The code and the link expire in {{ minutes }} minute and work only once.
+{% plural %}
+The code and the link expire in {{ minutes }} minutes and work only once.
+{% endblocktranslate %}
+{% translate "If you didn't ask to sign in, you can ignore this email." %}
+{% endautoescape %}
