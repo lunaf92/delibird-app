@@ -2,6 +2,7 @@ from django.utils.translation import get_language
 from django.utils.translation import gettext as _
 from drf_spectacular.utils import extend_schema, inline_serializer
 from rest_framework import serializers, status
+from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,6 +12,9 @@ from core import health
 
 class HealthView(APIView):
     """Reports whether the API can reach its database and Redis."""
+
+    authentication_classes = ()
+    permission_classes = (AllowAny,)
 
     @extend_schema(
         responses=inline_serializer(
