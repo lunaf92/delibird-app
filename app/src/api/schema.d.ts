@@ -106,6 +106,132 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/items/{id}/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description One item. Sending another of your lists as `wishlist` moves the item to the end of that list. */
+    get: operations['items_retrieve'];
+    put?: never;
+    post?: never;
+    /** @description One item. Sending another of your lists as `wishlist` moves the item to the end of that list. */
+    delete: operations['items_destroy'];
+    options?: never;
+    head?: never;
+    /** @description One item. Sending another of your lists as `wishlist` moves the item to the end of that list. */
+    patch: operations['items_partial_update'];
+    trace?: never;
+  };
+  '/api/v1/items/{id}/image/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Adds or replaces an item's picture (multipart upload), or removes it. */
+    put: operations['items_image_update'];
+    post?: never;
+    /** @description Adds or replaces an item's picture (multipart upload), or removes it. */
+    delete: operations['items_image_destroy'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/lists/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The signed-in person's lists, default list included, in their chosen order. */
+    get: operations['lists_list'];
+    put?: never;
+    /** @description The signed-in person's lists, default list included, in their chosen order. */
+    post: operations['lists_create'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/lists/{id}/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description One list with its items. The default list can be renamed but not deleted. */
+    get: operations['lists_retrieve'];
+    put?: never;
+    post?: never;
+    /** @description One list with its items. The default list can be renamed but not deleted. */
+    delete: operations['lists_destroy'];
+    options?: never;
+    head?: never;
+    /** @description One list with its items. The default list can be renamed but not deleted. */
+    patch: operations['lists_partial_update'];
+    trace?: never;
+  };
+  '/api/v1/lists/{id}/items/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The items on one list, in order. New items go to the end. */
+    get: operations['lists_items_list'];
+    put?: never;
+    /** @description The items on one list, in order. New items go to the end. */
+    post: operations['lists_items_create'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/lists/{id}/items/reorder/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Sets the order of all the items on one list. */
+    post: operations['lists_items_reorder_create'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/lists/reorder/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Sets the order of all the signed-in person's lists. */
+    post: operations['lists_reorder_create'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/me/': {
     parameters: {
       query?: never;
@@ -139,6 +265,43 @@ export interface components {
       language: string;
       message: string;
     };
+    ImageUploadRequest: {
+      /**
+       * Format: binary
+       * @description JPEG, PNG, WebP or GIF, up to 10 MB.
+       */
+      image: string;
+    };
+    Item: {
+      readonly id: number;
+      wishlist: number;
+      name: string;
+      /** Link */
+      url: string;
+      description: string;
+      rating: number | null;
+      /** @description Absolute URL of the item's picture, if it has one. */
+      readonly image: string | null;
+      /** Format: decimal */
+      price: string | null;
+      currency: string;
+      readonly position: number;
+      /** Format: date-time */
+      readonly created_at: string;
+      /** Format: date-time */
+      readonly updated_at: string;
+    };
+    ItemRequest: {
+      wishlist?: number;
+      name: string;
+      /** Link */
+      url?: string;
+      description?: string;
+      rating?: number | null;
+      /** Format: decimal */
+      price?: string | null;
+      currency?: string;
+    };
     /**
      * @description * `en` - English
      *     * `it` - Italian
@@ -146,9 +309,27 @@ export interface components {
      * @enum {string}
      */
     LanguageEnum: 'en' | 'it' | 'es';
+    PatchedItemRequest: {
+      wishlist?: number;
+      name?: string;
+      /** Link */
+      url?: string;
+      description?: string;
+      rating?: number | null;
+      /** Format: decimal */
+      price?: string | null;
+      currency?: string;
+    };
     PatchedUserRequest: {
       display_name?: string;
       language?: components['schemas']['LanguageEnum'];
+    };
+    PatchedWishlistDetailRequest: {
+      name?: string;
+    };
+    ReorderRequest: {
+      /** @description Every id, in the new order. */
+      ids: number[];
     };
     RequestCodeRequest: {
       /** Format: email */
@@ -188,6 +369,34 @@ export interface components {
       code?: string;
       token?: string;
       device_name?: string;
+    };
+    Wishlist: {
+      readonly id: number;
+      name: string;
+      readonly is_default: boolean;
+      readonly position: number;
+      /** @description How many items the list holds. */
+      readonly item_count: number;
+      /** Format: date-time */
+      readonly created_at: string;
+      /** Format: date-time */
+      readonly updated_at: string;
+    };
+    WishlistDetail: {
+      readonly id: number;
+      name: string;
+      readonly is_default: boolean;
+      readonly position: number;
+      /** @description How many items the list holds. */
+      readonly item_count: number;
+      /** Format: date-time */
+      readonly created_at: string;
+      /** Format: date-time */
+      readonly updated_at: string;
+      readonly items: components['schemas']['Item'][];
+    };
+    WishlistRequest: {
+      name: string;
     };
   };
   responses: never;
@@ -346,6 +555,330 @@ export interface operations {
         content: {
           'application/json': components['schemas']['Health'];
         };
+      };
+    };
+  };
+  items_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Item'];
+        };
+      };
+    };
+  };
+  items_destroy: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  items_partial_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PatchedItemRequest'];
+        'application/x-www-form-urlencoded': components['schemas']['PatchedItemRequest'];
+        'multipart/form-data': components['schemas']['PatchedItemRequest'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Item'];
+        };
+      };
+    };
+  };
+  items_image_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'multipart/form-data': components['schemas']['ImageUploadRequest'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Item'];
+        };
+      };
+    };
+  };
+  items_image_destroy: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Item'];
+        };
+      };
+    };
+  };
+  lists_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Wishlist'][];
+        };
+      };
+    };
+  };
+  lists_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['WishlistRequest'];
+        'application/x-www-form-urlencoded': components['schemas']['WishlistRequest'];
+        'multipart/form-data': components['schemas']['WishlistRequest'];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Wishlist'];
+        };
+      };
+    };
+  };
+  lists_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['WishlistDetail'];
+        };
+      };
+    };
+  };
+  lists_destroy: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  lists_partial_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PatchedWishlistDetailRequest'];
+        'application/x-www-form-urlencoded': components['schemas']['PatchedWishlistDetailRequest'];
+        'multipart/form-data': components['schemas']['PatchedWishlistDetailRequest'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['WishlistDetail'];
+        };
+      };
+    };
+  };
+  lists_items_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Item'][];
+        };
+      };
+    };
+  };
+  lists_items_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ItemRequest'];
+        'application/x-www-form-urlencoded': components['schemas']['ItemRequest'];
+        'multipart/form-data': components['schemas']['ItemRequest'];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Item'];
+        };
+      };
+    };
+  };
+  lists_items_reorder_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ReorderRequest'];
+        'application/x-www-form-urlencoded': components['schemas']['ReorderRequest'];
+        'multipart/form-data': components['schemas']['ReorderRequest'];
+      };
+    };
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  lists_reorder_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ReorderRequest'];
+        'application/x-www-form-urlencoded': components['schemas']['ReorderRequest'];
+        'multipart/form-data': components['schemas']['ReorderRequest'];
+      };
+    };
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

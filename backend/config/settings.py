@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "core",
     "accounts",
+    "wishlists",
 ]
 
 MIDDLEWARE = [
@@ -170,6 +171,10 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
     "SERVE_AUTHENTICATION": [],
     "COMPONENT_SPLIT_REQUEST": True,
+    "POSTPROCESSING_HOOKS": [
+        "drf_spectacular.hooks.postprocess_schema_enums",
+        "core.schema.responses_have_every_field",
+    ],
 }
 
 LOGGING = {

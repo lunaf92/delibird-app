@@ -50,6 +50,10 @@ at http://localhost:8025. The first sign-in with a new address creates the accou
 app only runs on the home network). Settings has your display name, language, signed-in devices, sign out and
 account deletion.
 
+Each account starts with a default list. You can add more lists, reorder them, and fill them with items (name,
+link, notes, a 1–5 star rating, price and currency, and a picture). Uploaded pictures are re-encoded on the server
+(JPEG, at most 1600 px, metadata removed) and kept in `backend/media/` during development.
+
 Magic links open `APP_URL` from `.env` (default `http://localhost:8081`, the web app). For phones on the home Wi-Fi,
 set it to the web app's LAN address, for example `http://192.168.1.50:8081`.
 

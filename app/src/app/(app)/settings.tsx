@@ -6,6 +6,7 @@ import { deleteMe, endSession, fetchSessions, updateMe, type Session, type UserU
 import { errorMessage, isUnauthorized } from '@/api/errors';
 import { useSignedIn } from '@/auth/context';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { ServerStatus } from '@/components/server-status';
 import { Body, Button, Card, Heading, Message, Screen, TextField } from '@/components/ui';
 import type { Language } from '@/i18n';
 
@@ -187,6 +188,8 @@ export default function SettingsScreen() {
           onPress={() => setConfirmingDelete(true)}
         />
       )}
+
+      <ServerStatus />
     </Screen>
   );
 }

@@ -14,6 +14,14 @@ export type UserUpdate = Schemas['PatchedUserRequest'];
 export type Session = Schemas['Session'];
 export type SignedIn = Schemas['SignedIn'];
 export type VerifyRequest = Schemas['VerifyRequest'];
+export type Wishlist = Schemas['Wishlist'];
+export type WishlistDetail = Schemas['WishlistDetail'];
+export type Item = Schemas['Item'];
+export type ItemInput = Schemas['ItemRequest'];
+export type ItemUpdate = Schemas['PatchedItemRequest'];
+
+/** A picture chosen on the device: a File on the web, a local file URI on phones. */
+export type PickedImage = { uri: string; name: string; type: string; file?: Blob };
 
 /** The server answered with an error status. `detail` is its message, already in the request's language. */
 export class ApiError extends Error {
@@ -27,7 +35,7 @@ export class ApiError extends Error {
 }
 
 type RequestOptions = {
-  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
+  method?: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
   body?: unknown;
   token?: string | null;
   language: string;
@@ -38,13 +46,15 @@ async function request<T>(
   { method = 'GET', body, token, language }: RequestOptions,
 ): Promise<T> {
   const headers: Record<string, string> = { Accept: 'application/json', 'Accept-Language': language };
-  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  const isForm = typeof FormData !== 'undefined' && body instanceof FormData;
+  // Multipart bodies set their own Content-Type, with the boundary.
+  if (body !== undefined && !isForm) headers['Content-Type'] = 'application/json';
   if (token) headers.Authorization = `Bearer ${token}`;
 
   const response = await fetch(`${API_URL}/api/v1/${path}`, {
     method,
     headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
+    body: body === undefined ? undefined : isForm ? (body as FormData) : JSON.stringify(body),
   });
   if (response.status === 204) return undefined as T;
   const data: unknown = await response.json().catch(() => null);
@@ -99,4 +109,70 @@ export function fetchSessions(token: string, language: string): Promise<Session[
 
 export function endSession(token: string, id: number, language: string): Promise<void> {
   return request(`auth/sessions/${id}/`, { method: 'DELETE', token, language });
+}
+
+export function fetchLists(token: string, language: string): Promise<Wishlist[]> {
+  return request('lists/', { token, language });
+}
+
+export function createList(token: string, name: string, language: string): Promise<Wishlist> {
+  return request('lists/', { method: 'POST', body: { name }, token, language });
+}
+
+export function fetchList(token: string, id: number, language: string): Promise<WishlistDetail> {
+  return request(`lists/${id}/`, { token, language });
+}
+
+export function renameList(
+  token: string,
+  id: number,
+  name: string,
+  language: string,
+): Promise<WishlistDetail> {
+  return request(`lists/${id}/`, { method: 'PATCH', body: { name }, token, language });
+}
+
+export function deleteList(token: string, id: number, language: string): Promise<void> {
+  return request(`lists/${id}/`, { method: 'DELETE', token, language });
+}
+
+export function reorderLists(token: string, ids: number[], language: string): Promise<void> {
+  return request('lists/reorder/', { method: 'POST', body: { ids }, token, language });
+}
+
+export function createItem(token: string, listId: number, item: ItemInput, language: string): Promise<Item> {
+  return request(`lists/${listId}/items/`, { method: 'POST', body: item, token, language });
+}
+
+export function reorderItems(token: string, listId: number, ids: number[], language: string): Promise<void> {
+  return request(`lists/${listId}/items/reorder/`, { method: 'POST', body: { ids }, token, language });
+}
+
+export function fetchItem(token: string, id: number, language: string): Promise<Item> {
+  return request(`items/${id}/`, { token, language });
+}
+
+export function updateItem(token: string, id: number, changes: ItemUpdate, language: string): Promise<Item> {
+  return request(`items/${id}/`, { method: 'PATCH', body: changes, token, language });
+}
+
+export function deleteItem(token: string, id: number, language: string): Promise<void> {
+  return request(`items/${id}/`, { method: 'DELETE', token, language });
+}
+
+export function uploadItemImage(
+  token: string,
+  id: number,
+  image: PickedImage,
+  language: string,
+): Promise<Item> {
+  const form = new FormData();
+  if (image.file) form.append('image', image.file, image.name);
+  // React Native's FormData takes a { uri, name, type } object for local files.
+  else form.append('image', { uri: image.uri, name: image.name, type: image.type } as unknown as Blob);
+  return request(`items/${id}/image/`, { method: 'PUT', body: form, token, language });
+}
+
+export function deleteItemImage(token: string, id: number, language: string): Promise<Item> {
+  return request(`items/${id}/image/`, { method: 'DELETE', token, language });
 }

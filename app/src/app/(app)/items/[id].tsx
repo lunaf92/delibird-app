@@ -1,0 +1,89 @@
+import { router, useLocalSearchParams } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+
+import { deleteItem, fetchItem, fetchLists, updateItem } from '@/api/client';
+import { errorMessage } from '@/api/errors';
+import { saveImage } from '@/api/items';
+import { useApi, useResource } from '@/api/use-api';
+import { ItemForm, type ImageChange, type ItemValues } from '@/components/item-form';
+import { Body, Button, Card, Heading, Message, Screen, Title } from '@/components/ui';
+
+export default function EditItemScreen() {
+  const { t } = useTranslation();
+  const api = useApi();
+  const id = Number(useLocalSearchParams<{ id: string }>().id);
+  const { data: item, error: loadError } = useResource(
+    useCallback((token: string, language: string) => fetchItem(token, id, language), [id]),
+  );
+  const { data: lists } = useResource(fetchLists);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+
+  const submit = async (values: ItemValues, image: ImageChange) => {
+    setBusy(true);
+    setError(null);
+    try {
+      const saved = await api((token, language) => updateItem(token, id, values, language));
+      await saveImage(api, saved, image);
+      router.back();
+    } catch (failure) {
+      setError(errorMessage(failure, t));
+      setBusy(false);
+    }
+  };
+
+  const remove = async () => {
+    setBusy(true);
+    try {
+      await api((token, language) => deleteItem(token, id, language));
+      router.back();
+    } catch (failure) {
+      setError(errorMessage(failure, t));
+      setBusy(false);
+    }
+  };
+
+  if (!item || !lists) {
+    return <Screen>{loadError ? <Message tone="error">{loadError}</Message> : <ActivityIndicator />}</Screen>;
+  }
+
+  return (
+    <Screen>
+      <Title>{t('items.editTitle')}</Title>
+      {/* Keyed by id so the form starts from the loaded item. */}
+      <ItemForm
+        key={item.id}
+        item={item}
+        lists={lists}
+        submitLabel={t('items.save')}
+        busy={busy}
+        error={error}
+        onSubmit={submit}
+      />
+
+      <Heading>{t('items.deleteTitle')}</Heading>
+      {confirmingDelete ? (
+        <Card>
+          <Body>{t('items.deleteWarning', { name: item.name })}</Body>
+          <View style={styles.row}>
+            <Button variant="danger" label={t('items.deleteConfirm')} onPress={remove} busy={busy} />
+            <Button
+              variant="secondary"
+              label={t('settings.cancel')}
+              onPress={() => setConfirmingDelete(false)}
+            />
+          </View>
+        </Card>
+      ) : (
+        <Button variant="link" label={t('items.delete')} onPress={() => setConfirmingDelete(true)} />
+      )}
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create({
+  row: { flexDirection: 'row', gap: 12, flexWrap: 'wrap' },
+});

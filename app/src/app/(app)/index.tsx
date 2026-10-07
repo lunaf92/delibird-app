@@ -1,68 +1,129 @@
-import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { Link, router, Stack } from 'expo-router';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 
-import { API_URL, fetchHealth, type Health } from '@/api/client';
+import { createList, fetchLists, reorderLists, type Wishlist } from '@/api/client';
+import { errorMessage } from '@/api/errors';
+import { useApi, useResource } from '@/api/use-api';
 import { useAuth } from '@/auth/context';
-import { Body, Button, Card, Heading, Message, Screen, Title } from '@/components/ui';
+import { MoveButtons, moved } from '@/components/move-buttons';
+import { Body, BLUE, Button, Card, Heading, Message, Screen, TextField, Title } from '@/components/ui';
 
-type Result = { key: string; health: Health } | { key: string; failed: true };
-
-export default function HomeScreen() {
-  const { t, i18n } = useTranslation();
+/** Home: the signed-in person's lists, in their order. */
+export default function ListsScreen() {
+  const { t } = useTranslation();
   const { user } = useAuth();
-  const language = i18n.language;
-  const [attempt, setAttempt] = useState(0);
-  const [result, setResult] = useState<Result | null>(null);
-
-  // Ask again whenever the language changes or the user retries.
-  const requestKey = `${language}:${attempt}`;
-  useEffect(() => {
-    let active = true;
-    fetchHealth(language).then(
-      (health) => active && setResult({ key: requestKey, health }),
-      () => active && setResult({ key: requestKey, failed: true }),
-    );
-    return () => {
-      active = false;
-    };
-  }, [language, requestKey]);
-
-  const current = result?.key === requestKey ? result : null;
+  const api = useApi();
+  const { data: lists, setData: setLists, error, reload } = useResource(fetchLists);
+  const [newName, setNewName] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
   const name = user?.display_name || user?.email;
+
+  const create = async () => {
+    const trimmed = newName.trim();
+    if (!trimmed) return;
+    setCreating(true);
+    setActionError(null);
+    try {
+      const list = await api((token, language) => createList(token, trimmed, language));
+      setNewName('');
+      setLists((current) => [...(current ?? []), list]);
+    } catch (failure) {
+      setActionError(errorMessage(failure, t));
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const move = async (from: number, to: number) => {
+    if (!lists) return;
+    const next = moved(lists, from, to);
+    setLists(next);
+    try {
+      await api((token, language) =>
+        reorderLists(
+          token,
+          next.map((list) => list.id),
+          language,
+        ),
+      );
+    } catch (failure) {
+      setActionError(errorMessage(failure, t));
+      reload();
+    }
+  };
 
   return (
     <Screen>
+      <Stack.Screen
+        options={{
+          headerRight: () => (
+            <Link href="/settings" style={styles.headerLink} accessibilityRole="button">
+              {t('settings.title')}
+            </Link>
+          ),
+        }}
+      />
       <Title>{name ? t('home.greeting', { name }) : t('home.greetingNoName')}</Title>
-      <Body>{t('home.title')}</Body>
+      <Heading>{t('lists.title')}</Heading>
 
-      <Card>
-        <Heading>{t('home.server')}</Heading>
-        {current === null && (
-          <View style={styles.row}>
-            <ActivityIndicator />
-            <Body>{t('home.checking')}</Body>
-          </View>
-        )}
-        {current && 'health' in current && (
-          <Message tone={current.health.status === 'ok' ? 'success' : 'error'}>
-            {current.health.message}
-          </Message>
-        )}
-        {current && 'failed' in current && (
-          <>
-            <Message tone="error">{t('home.unreachable', { url: API_URL })}</Message>
-            <Button variant="link" label={t('home.retry')} onPress={() => setAttempt((n) => n + 1)} />
-          </>
-        )}
-      </Card>
+      {lists === null && !error && <ActivityIndicator />}
+      <Message tone="error">{error ?? actionError}</Message>
+      {lists?.map((list, index) => (
+        <ListRow key={list.id} list={list} index={index} count={lists.length} onMove={move} />
+      ))}
 
-      <Button variant="secondary" label={t('settings.title')} onPress={() => router.push('/settings')} />
+      <Heading>{t('lists.new')}</Heading>
+      <TextField
+        label={t('lists.name')}
+        value={newName}
+        onChangeText={setNewName}
+        onSubmitEditing={create}
+        placeholder={t('lists.namePlaceholder')}
+        maxLength={100}
+        returnKeyType="done"
+      />
+      <Button label={t('lists.create')} onPress={create} busy={creating} disabled={!newName.trim()} />
     </Screen>
+  );
+}
+
+function ListRow({
+  list,
+  index,
+  count,
+  onMove,
+}: {
+  list: Wishlist;
+  index: number;
+  count: number;
+  onMove: (from: number, to: number) => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <Card>
+      <View style={styles.row}>
+        <Pressable
+          accessibilityRole="link"
+          accessibilityLabel={list.name}
+          style={styles.grow}
+          onPress={() => router.push({ pathname: '/lists/[id]', params: { id: String(list.id) } })}>
+          <Body>{list.name}</Body>
+          <Body muted>
+            {t('lists.itemCount', { count: list.item_count })}
+            {list.is_default ? ` · ${t('lists.default')}` : ''}
+          </Body>
+        </Pressable>
+        <MoveButtons name={list.name} index={index} count={count} onMove={onMove} />
+      </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  grow: { flex: 1, gap: 2 },
+  headerLink: { color: BLUE, fontSize: 16, fontWeight: '600', paddingHorizontal: 8 },
 });
