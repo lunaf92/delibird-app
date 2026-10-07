@@ -27,6 +27,9 @@ cp .env.example .env            # then set DJANGO_SECRET_KEY and POSTGRES_PASSWO
 docker compose up --build       # Postgres, Redis, API, worker, beat and Mailpit
 ```
 
+If port 8000 is already in use on your machine, set `API_PORT` in `.env` (for example `API_PORT=8001`), use that
+port in the addresses below, and set `EXPO_PUBLIC_API_URL` in `app/.env` to match.
+
 - API health: http://localhost:8000/api/v1/health/
 - API docs (Swagger): http://localhost:8000/api/v1/docs/
 - Django admin: http://localhost:8000/admin/ (create a user with `docker compose exec api python manage.py createsuperuser`)

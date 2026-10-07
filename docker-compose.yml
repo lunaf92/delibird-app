@@ -1,5 +1,5 @@
 # Local development stack: docker compose up
-# API on http://localhost:8000, Mailpit on http://localhost:8025.
+# API on http://localhost:8000 (or API_PORT from .env), Mailpit on http://localhost:8025.
 # The Expo app runs outside Docker: cd app && npx expo start
 
 x-backend: &backend
@@ -43,7 +43,7 @@ services:
     <<: *backend
     command: python manage.py runserver 0.0.0.0:8000
     ports:
-      - "8000:8000"
+      - "${API_PORT:-8000}:8000"
 
   worker:
     <<: *backend
