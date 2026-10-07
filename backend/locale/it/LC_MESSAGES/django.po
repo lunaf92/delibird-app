@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: delibird\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-07 21:31+0000\n"
+"POT-Creation-Date: 2026-10-07 21:56+0000\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,15 +26,15 @@ msgstr "Intestazione di autorizzazione non valida."
 msgid "Your session has ended. Sign in again."
 msgstr "La tua sessione è terminata. Accedi di nuovo."
 
-#: accounts/models.py:19 config/settings.py:103
+#: accounts/models.py:19 config/settings.py:104
 msgid "English"
 msgstr "Inglese"
 
-#: accounts/models.py:20 config/settings.py:104
+#: accounts/models.py:20 config/settings.py:105
 msgid "Italian"
 msgstr "Italiano"
 
-#: accounts/models.py:21 config/settings.py:105
+#: accounts/models.py:21 config/settings.py:106
 msgid "Spanish"
 msgstr "Spagnolo"
 
@@ -139,8 +139,28 @@ msgstr "Il server è in funzione."
 msgid "The server has a problem."
 msgstr "Il server ha un problema."
 
+#: sharing/views.py:58
+msgid "This list is already shared with that address."
+msgstr "Questa lista è già condivisa con questo indirizzo."
+
+#: sharing/views.py:89 sharing/views.py:122
+msgid "This link doesn't work any more. Ask for a new one."
+msgstr "Questo link non funziona più. Chiedine uno nuovo."
+
+#: sharing/views.py:126
+msgid "This is your own list."
+msgstr "Questa è la tua lista."
+
+#: sharing/views.py:128
+msgid "Someone else already accepted this link. Ask for your own."
+msgstr "Qualcun altro ha già accettato questo link. Chiedine uno tutto tuo."
+
+#: sharing/views.py:178
+msgid "Someone else is already getting this."
+msgstr "Qualcun altro lo sta già prendendo."
+
 #: wishlists/migrations/0002_default_wishlists_for_existing_users.py:12
-#: wishlists/signals.py:15
+#: wishlists/signals.py:19
 msgid "My wishlist"
 msgstr "La mia lista dei desideri"
 
@@ -176,18 +196,18 @@ msgstr "valuta"
 msgid "Use a three-letter currency code, such as EUR."
 msgstr "Usa un codice valuta di tre lettere, come EUR."
 
-#: wishlists/views.py:50
+#: wishlists/views.py:55
 msgid "Send every id exactly once, in the new order."
 msgstr "Invia ogni id una sola volta, nel nuovo ordine."
 
-#: wishlists/views.py:82
+#: wishlists/views.py:87
 msgid "Your default list can't be deleted."
 msgstr "La tua lista predefinita non si può eliminare."
 
-#: wishlists/views.py:153
+#: wishlists/views.py:163
 msgid "Choose a picture to upload."
 msgstr "Scegli un'immagine da caricare."
 
-#: wishlists/views.py:158
+#: wishlists/views.py:168
 msgid "Use a JPEG, PNG, WebP or GIF picture of up to 10 MB."
 msgstr "Usa un'immagine JPEG, PNG, WebP o GIF fino a 10 MB."

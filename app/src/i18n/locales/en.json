@@ -107,10 +107,51 @@
     "deleteTitle": "Delete item",
     "delete": "Delete item…",
     "deleteWarning": "Delete “{{name}}”? It can't be undone.",
-    "deleteConfirm": "Delete item"
+    "deleteConfirm": "Delete item",
+    "sharedWarning": "Someone may already have bought this. Continue?",
+    "continue": "Continue"
   },
   "reorder": {
     "up": "Move {{name}} up",
     "down": "Move {{name}} down"
+  },
+  "sharing": {
+    "title": "Sharing",
+    "intro": "Each person gets their own link. They can see this list and quietly mark what they're getting; you'll never see what's taken.",
+    "add": "Share with someone",
+    "email": "Their email",
+    "createLink": "Create their link",
+    "linkFor": "Link for {{email}}:",
+    "linkOnce": "Send it to them now: for safety it's shown only once. If it gets lost, stop sharing and add them again.",
+    "copy": "Copy link",
+    "copied": "Copied",
+    "send": "Send…",
+    "people": "People with a link",
+    "nobody": "Not shared with anyone yet.",
+    "joinedAs": "Opened by {{name}}",
+    "notJoined": "Not opened yet",
+    "stop": "Stop sharing…",
+    "stopWarning": "{{email}}'s link will stop working.",
+    "stopConfirm": "Stop sharing",
+    "manage": "Share this list…",
+    "isShared": "Shared with people who have a link.",
+    "notShared": "Only you can see this list."
+  },
+  "shared": {
+    "from": "From {{name}}",
+    "signInToReserve": "Sign in to see what's already taken and to mark what you'll get. {{owner}} won't see it.",
+    "signIn": "Sign in",
+    "joinExplained": "Add this list to your Shared with me to mark what you'll get.",
+    "join": "Add to Shared with me",
+    "openInSharedWithMe": "Open in Shared with me",
+    "ownerNote": "This is your list. This is what people with the link see; what they reserve stays hidden from you.",
+    "empty": "This list is empty for now.",
+    "openLink": "Open link",
+    "withMe": "Shared with me",
+    "secret": "{{name}} can't see what anyone is getting.",
+    "reserve": "I'll get this",
+    "yours": "You're getting this.",
+    "cancel": "I won't get it after all",
+    "takenBy": "{{name}} is getting this."
   }
 }

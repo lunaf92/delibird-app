@@ -107,10 +107,51 @@
     "deleteTitle": "Elimina elemento",
     "delete": "Elimina elemento…",
     "deleteWarning": "Eliminare “{{name}}”? Non si può annullare.",
-    "deleteConfirm": "Elimina elemento"
+    "deleteConfirm": "Elimina elemento",
+    "sharedWarning": "Qualcuno potrebbe averlo già comprato. Continuare?",
+    "continue": "Continua"
   },
   "reorder": {
     "up": "Sposta {{name}} in su",
     "down": "Sposta {{name}} in giù"
+  },
+  "sharing": {
+    "title": "Condivisione",
+    "intro": "Ogni persona riceve il suo link. Può vedere questa lista e segnare di nascosto cosa prende; tu non vedrai mai cosa è stato preso.",
+    "add": "Condividi con qualcuno",
+    "email": "La sua email",
+    "createLink": "Crea il suo link",
+    "linkFor": "Link per {{email}}:",
+    "linkOnce": "Invialo adesso: per sicurezza viene mostrato una sola volta. Se va perso, smetti di condividere e aggiungi di nuovo la persona.",
+    "copy": "Copia link",
+    "copied": "Copiato",
+    "send": "Invia…",
+    "people": "Persone con un link",
+    "nobody": "Non ancora condivisa con nessuno.",
+    "joinedAs": "Aperto da {{name}}",
+    "notJoined": "Non ancora aperto",
+    "stop": "Smetti di condividere…",
+    "stopWarning": "Il link di {{email}} smetterà di funzionare.",
+    "stopConfirm": "Smetti di condividere",
+    "manage": "Condividi questa lista…",
+    "isShared": "Condivisa con le persone che hanno un link.",
+    "notShared": "Solo tu puoi vedere questa lista."
+  },
+  "shared": {
+    "from": "Da {{name}}",
+    "signInToReserve": "Accedi per vedere cosa è già stato preso e per segnare cosa prenderai. {{owner}} non lo vedrà.",
+    "signIn": "Accedi",
+    "joinExplained": "Aggiungi questa lista a Condivise con me per segnare cosa prenderai.",
+    "join": "Aggiungi a Condivise con me",
+    "openInSharedWithMe": "Apri in Condivise con me",
+    "ownerNote": "Questa è la tua lista. Così la vedono le persone con il link; quello che prenotano resta nascosto a te.",
+    "empty": "Per ora questa lista è vuota.",
+    "openLink": "Apri il link",
+    "withMe": "Condivise con me",
+    "secret": "{{name}} non può vedere cosa prende ciascuno.",
+    "reserve": "Lo prendo io",
+    "yours": "Lo prendi tu.",
+    "cancel": "Alla fine non lo prendo",
+    "takenBy": "Lo prende {{name}}."
   }
 }

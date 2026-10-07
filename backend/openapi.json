@@ -420,6 +420,71 @@
                 }
             }
         },
+        "/api/v1/items/{id}/reservation/": {
+            "post": {
+                "operationId": "items_reservation_create",
+                "description": "Reserve an item on a list shared with you, or cancel your reservation. For anyone who can't\nreserve the item, the owner included, the answer is the same 404 as for an item that doesn't exist.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "items"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    },
+                    "404": {
+                        "description": "No response body"
+                    },
+                    "409": {
+                        "description": "No response body"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "items_reservation_destroy",
+                "description": "Reserve an item on a list shared with you, or cancel your reservation. For anyone who can't\nreserve the item, the owner included, the answer is the same 404 as for an item that doesn't exist.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "items"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    },
+                    "404": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
         "/api/v1/lists/": {
             "get": {
                 "operationId": "lists_list",
@@ -751,6 +816,99 @@
                 }
             }
         },
+        "/api/v1/lists/{id}/shares/": {
+            "get": {
+                "operationId": "lists_shares_list",
+                "description": "The people a list is shared with. Adding someone returns their personal link, once.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "lists"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Share"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "post": {
+                "operationId": "lists_shares_create",
+                "description": "The people a list is shared with. Adding someone returns their personal link, once.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "lists"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NewShareRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NewShareRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/NewShareRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NewShare"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/v1/lists/reorder/": {
             "post": {
                 "operationId": "lists_reorder_create",
@@ -875,6 +1033,182 @@
                     }
                 }
             }
+        },
+        "/api/v1/shared-with-me/": {
+            "get": {
+                "operationId": "shared_with_me_list",
+                "description": "Lists other people shared with you, once you accepted their link.",
+                "tags": [
+                    "shared-with-me"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ViewerListSummary"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/v1/shared-with-me/{id}/": {
+            "get": {
+                "operationId": "shared_with_me_retrieve",
+                "description": "One list shared with you, with which items are free, yours, or taken and by whom.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "shared-with-me"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ViewerList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/v1/shared/{token}/": {
+            "get": {
+                "operationId": "shared_retrieve",
+                "description": "A list opened through someone's link. Needs no account, and never says which items are taken:\nsigned-in viewers see that in \"Shared with me\". The owner gets the same owner-safe view.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "shared"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    },
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SharedList"
+                                }
+                            }
+                        },
+                        "description": ""
+                    },
+                    "404": {
+                        "description": "Unknown link"
+                    }
+                }
+            }
+        },
+        "/api/v1/shared/{token}/join/": {
+            "post": {
+                "operationId": "shared_join_create",
+                "description": "Accepts a link: the list then appears under \"Shared with me\" and its items can be reserved.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "shared"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ViewerListSummary"
+                                }
+                            }
+                        },
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "It's your own list"
+                    },
+                    "403": {
+                        "description": "Someone else already accepted this link"
+                    }
+                }
+            }
+        },
+        "/api/v1/shares/{id}/": {
+            "delete": {
+                "operationId": "shares_destroy",
+                "description": "Stops sharing with one person. Their link stops working.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "shares"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -894,7 +1228,7 @@
                 "type": "object",
                 "properties": {
                     "status": {
-                        "$ref": "#/components/schemas/StatusEnum"
+                        "$ref": "#/components/schemas/HealthStatusEnum"
                     },
                     "database": {
                         "type": "boolean"
@@ -916,6 +1250,14 @@
                     "redis",
                     "status"
                 ]
+            },
+            "HealthStatusEnum": {
+                "enum": [
+                    "ok",
+                    "degraded"
+                ],
+                "type": "string",
+                "description": "* `ok` - ok\n* `degraded` - degraded"
             },
             "ImageUploadRequest": {
                 "type": "object",
@@ -1076,6 +1418,63 @@
                 "type": "string",
                 "description": "* `en` - English\n* `it` - Italian\n* `es` - Spanish"
             },
+            "NewShare": {
+                "type": "object",
+                "description": "A share as its owner sees it.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "joined": {
+                        "type": "boolean",
+                        "readOnly": true,
+                        "description": "Whether someone has accepted the link."
+                    },
+                    "joined_as": {
+                        "type": "string",
+                        "nullable": true,
+                        "readOnly": true,
+                        "description": "The name of whoever accepted the link."
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "link": {
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "The person's own link. It is shown only once."
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "email",
+                    "id",
+                    "joined",
+                    "joined_as",
+                    "link"
+                ]
+            },
+            "NewShareRequest": {
+                "type": "object",
+                "description": "A share as its owner sees it.",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "minLength": 1
+                    }
+                },
+                "required": [
+                    "email"
+                ]
+            },
             "PatchedItemRequest": {
                 "type": "object",
                 "properties": {
@@ -1175,6 +1574,41 @@
                     "email"
                 ]
             },
+            "ReservationState": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "$ref": "#/components/schemas/ReservationStateStatusEnum"
+                    },
+                    "by": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Who is getting it, when someone else is."
+                    }
+                },
+                "required": [
+                    "by",
+                    "status"
+                ]
+            },
+            "ReservationStateStatusEnum": {
+                "enum": [
+                    "free",
+                    "mine",
+                    "taken"
+                ],
+                "type": "string",
+                "description": "* `free` - free\n* `mine` - mine\n* `taken` - taken"
+            },
+            "RoleEnum": {
+                "enum": [
+                    "owner",
+                    "viewer",
+                    "invited",
+                    "anonymous"
+                ],
+                "type": "string"
+            },
             "Session": {
                 "type": "object",
                 "properties": {
@@ -1209,6 +1643,148 @@
                     "last_used_at"
                 ]
             },
+            "Share": {
+                "type": "object",
+                "description": "A share as its owner sees it.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "joined": {
+                        "type": "boolean",
+                        "readOnly": true,
+                        "description": "Whether someone has accepted the link."
+                    },
+                    "joined_as": {
+                        "type": "string",
+                        "nullable": true,
+                        "readOnly": true,
+                        "description": "The name of whoever accepted the link."
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "email",
+                    "id",
+                    "joined",
+                    "joined_as"
+                ]
+            },
+            "SharedItem": {
+                "type": "object",
+                "description": "An item as people the list is shared with see it, without anything about reservations.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "url": {
+                        "title": "Link",
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "format": "uri",
+                                "maxLength": 2000
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 0
+                            }
+                        ]
+                    },
+                    "description": {
+                        "type": "string",
+                        "maxLength": 2000
+                    },
+                    "rating": {
+                        "type": "integer",
+                        "maximum": 5,
+                        "minimum": 1,
+                        "nullable": true
+                    },
+                    "image": {
+                        "type": "string",
+                        "nullable": true,
+                        "readOnly": true
+                    },
+                    "price": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,8}(?:\\.\\d{0,2})?$",
+                        "nullable": true
+                    },
+                    "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$",
+                        "maxLength": 3
+                    }
+                },
+                "required": [
+                    "currency",
+                    "description",
+                    "id",
+                    "image",
+                    "name",
+                    "price",
+                    "rating",
+                    "url"
+                ]
+            },
+            "SharedList": {
+                "type": "object",
+                "description": "A list opened through a share link. `role` says how the requester relates to it.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "owner_name": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "role": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/RoleEnum"
+                            }
+                        ],
+                        "description": "owner: it's your list. viewer: you accepted this link. invited: sign in or accept to reserve. anonymous: not signed in.",
+                        "readOnly": true
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SharedItem"
+                        },
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "id",
+                    "items",
+                    "name",
+                    "owner_name",
+                    "role"
+                ]
+            },
             "SignedIn": {
                 "type": "object",
                 "properties": {
@@ -1224,14 +1800,6 @@
                     "token",
                     "user"
                 ]
-            },
-            "StatusEnum": {
-                "enum": [
-                    "ok",
-                    "degraded"
-                ],
-                "type": "string",
-                "description": "* `ok` - ok\n* `degraded` - degraded"
             },
             "User": {
                 "type": "object",
@@ -1285,6 +1853,141 @@
                     }
                 }
             },
+            "ViewerItem": {
+                "type": "object",
+                "description": "An item as a signed-in viewer sees it: with whether it is taken, and by whom.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 200
+                    },
+                    "url": {
+                        "title": "Link",
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "format": "uri",
+                                "maxLength": 2000
+                            },
+                            {
+                                "type": "string",
+                                "maxLength": 0
+                            }
+                        ]
+                    },
+                    "description": {
+                        "type": "string",
+                        "maxLength": 2000
+                    },
+                    "rating": {
+                        "type": "integer",
+                        "maximum": 5,
+                        "minimum": 1,
+                        "nullable": true
+                    },
+                    "image": {
+                        "type": "string",
+                        "nullable": true,
+                        "readOnly": true
+                    },
+                    "price": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,8}(?:\\.\\d{0,2})?$",
+                        "nullable": true
+                    },
+                    "currency": {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$",
+                        "maxLength": 3
+                    },
+                    "reservation": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ReservationState"
+                            }
+                        ],
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "currency",
+                    "description",
+                    "id",
+                    "image",
+                    "name",
+                    "price",
+                    "rating",
+                    "reservation",
+                    "url"
+                ]
+            },
+            "ViewerList": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "owner_name": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "item_count": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ViewerItem"
+                        },
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "id",
+                    "item_count",
+                    "items",
+                    "name",
+                    "owner_name"
+                ]
+            },
+            "ViewerListSummary": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "owner_name": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "item_count": {
+                        "type": "integer",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "id",
+                    "item_count",
+                    "name",
+                    "owner_name"
+                ]
+            },
             "Wishlist": {
                 "type": "object",
                 "properties": {
@@ -1309,6 +2012,11 @@
                         "readOnly": true,
                         "description": "How many items the list holds."
                     },
+                    "is_shared": {
+                        "type": "boolean",
+                        "readOnly": true,
+                        "description": "Whether anyone has a link to this list."
+                    },
                     "created_at": {
                         "type": "string",
                         "format": "date-time",
@@ -1324,6 +2032,7 @@
                     "created_at",
                     "id",
                     "is_default",
+                    "is_shared",
                     "item_count",
                     "name",
                     "position",
@@ -1354,6 +2063,11 @@
                         "readOnly": true,
                         "description": "How many items the list holds."
                     },
+                    "is_shared": {
+                        "type": "boolean",
+                        "readOnly": true,
+                        "description": "Whether anyone has a link to this list."
+                    },
                     "created_at": {
                         "type": "string",
                         "format": "date-time",
@@ -1376,6 +2090,7 @@
                     "created_at",
                     "id",
                     "is_default",
+                    "is_shared",
                     "item_count",
                     "items",
                     "name",

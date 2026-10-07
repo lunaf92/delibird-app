@@ -3,7 +3,14 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 
-import { createList, fetchLists, reorderLists, type Wishlist } from '@/api/client';
+import {
+  createList,
+  fetchLists,
+  fetchSharedWithMe,
+  reorderLists,
+  type ViewerListSummary,
+  type Wishlist,
+} from '@/api/client';
 import { errorMessage } from '@/api/errors';
 import { useApi, useResource } from '@/api/use-api';
 import { useAuth } from '@/auth/context';
@@ -16,6 +23,7 @@ export default function ListsScreen() {
   const { user } = useAuth();
   const api = useApi();
   const { data: lists, setData: setLists, error, reload } = useResource(fetchLists);
+  const { data: sharedWithMe } = useResource(fetchSharedWithMe);
   const [newName, setNewName] = useState('');
   const [creating, setCreating] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -75,6 +83,15 @@ export default function ListsScreen() {
         <ListRow key={list.id} list={list} index={index} count={lists.length} onMove={move} />
       ))}
 
+      {sharedWithMe && sharedWithMe.length > 0 && (
+        <>
+          <Heading>{t('shared.withMe')}</Heading>
+          {sharedWithMe.map((list) => (
+            <SharedListRow key={list.id} list={list} />
+          ))}
+        </>
+      )}
+
       <Heading>{t('lists.new')}</Heading>
       <TextField
         label={t('lists.name')}
@@ -118,6 +135,24 @@ function ListRow({
         </Pressable>
         <MoveButtons name={list.name} index={index} count={count} onMove={onMove} />
       </View>
+    </Card>
+  );
+}
+
+function SharedListRow({ list }: { list: ViewerListSummary }) {
+  const { t } = useTranslation();
+  return (
+    <Card>
+      <Pressable
+        accessibilityRole="link"
+        accessibilityLabel={list.name}
+        style={styles.grow}
+        onPress={() => router.push({ pathname: '/shared-with-me/[id]', params: { id: String(list.id) } })}>
+        <Body>{list.name}</Body>
+        <Body muted>
+          {t('shared.from', { name: list.owner_name })} · {t('lists.itemCount', { count: list.item_count })}
+        </Body>
+      </Pressable>
     </Card>
   );
 }

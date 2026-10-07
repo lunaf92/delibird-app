@@ -21,6 +21,7 @@ export const DEFAULT_LIST = {
   is_default: true,
   position: 0,
   item_count: 0,
+  is_shared: false,
   created_at: '2026-10-01T10:00:00Z',
   updated_at: '2026-10-01T10:00:00Z',
 };
@@ -52,6 +53,7 @@ export function mockApi(handlers: Record<string, Handler>): ApiCall[] {
   const all: Record<string, Handler> = {
     'GET health/': { body: HEALTHY },
     'GET lists/': { body: [DEFAULT_LIST] },
+    'GET shared-with-me/': { body: [] },
     ...handlers,
   };
   globalThis.fetch = jest.fn(async (url: string | URL | Request, init: RequestInit = {}) => {

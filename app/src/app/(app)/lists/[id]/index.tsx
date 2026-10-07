@@ -99,6 +99,14 @@ export default function ListScreen() {
         onPress={() => router.push({ pathname: '/lists/[id]/new', params: { id: String(id) } })}
       />
 
+      <Heading>{t('sharing.title')}</Heading>
+      <Body muted>{list.is_shared ? t('sharing.isShared') : t('sharing.notShared')}</Body>
+      <Button
+        variant="secondary"
+        label={t('sharing.manage')}
+        onPress={() => router.push({ pathname: '/lists/[id]/sharing', params: { id: String(id) } })}
+      />
+
       <Heading>{t('lists.settings')}</Heading>
       {renaming === null ? (
         <Button variant="link" label={t('lists.rename')} onPress={() => setRenaming(list.name)} />

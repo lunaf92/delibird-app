@@ -7,6 +7,7 @@ from wishlists.models import Item, Wishlist
 
 class WishlistSerializer(serializers.ModelSerializer[Wishlist]):
     item_count = serializers.IntegerField(read_only=True, help_text="How many items the list holds.")
+    is_shared = serializers.SerializerMethodField(help_text="Whether anyone has a link to this list.")
 
     class Meta:
         model = Wishlist
@@ -16,10 +17,14 @@ class WishlistSerializer(serializers.ModelSerializer[Wishlist]):
             "is_default",
             "position",
             "item_count",
+            "is_shared",
             "created_at",
             "updated_at",
         )
         read_only_fields = ("id", "is_default", "position", "item_count", "created_at", "updated_at")
+
+    def get_is_shared(self, wishlist: Wishlist) -> bool:
+        return bool(getattr(wishlist, "share_count", 0))
 
 
 class ItemSerializer(serializers.ModelSerializer[Item]):

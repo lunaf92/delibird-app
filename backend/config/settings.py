@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "core",
     "accounts",
     "wishlists",
+    "sharing",
 ]
 
 MIDDLEWARE = [

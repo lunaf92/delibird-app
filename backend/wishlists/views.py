@@ -1,6 +1,6 @@
 from typing import Any, cast
 
-from django.db.models import Count, QuerySet
+from django.db.models import Count, Q, QuerySet
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
 from drf_spectacular.utils import extend_schema
@@ -22,6 +22,7 @@ from wishlists.serializers import (
     WishlistDetailSerializer,
     WishlistSerializer,
 )
+from wishlists.signals import item_edited
 
 
 def owner(request: Request) -> User:
@@ -32,7 +33,11 @@ def own_wishlists(request: Request) -> QuerySet[Wishlist]:
     # Explicit order: the aggregate's GROUP BY would otherwise drop Meta.ordering.
     return (
         Wishlist.objects.filter(owner=owner(request))
-        .annotate(item_count=Count("items"))
+        .annotate(
+            item_count=Count("items", distinct=True),
+            # Depends only on the list's shares, never on reservations.
+            share_count=Count("shares", filter=Q(shares__revoked_at__isnull=True), distinct=True),
+        )
         .order_by("position", "id")
     )
 
@@ -135,6 +140,11 @@ class ItemDetailView(generics.RetrieveUpdateDestroyAPIView[Item]):
         for field, value in data.items():
             setattr(item, field, value)
         item.save()
+        item_edited.send(sender=Item, item=item, deleted=False)
+
+    def perform_destroy(self, instance: Item) -> None:
+        item_edited.send(sender=Item, item=instance, deleted=True)
+        instance.delete()
 
 
 class ItemImageView(APIView):
@@ -161,6 +171,7 @@ class ItemImageView(APIView):
         item.image.save(content.name or "image.jpg", content, save=True)
         if old:
             item.image.storage.delete(old)
+        item_edited.send(sender=Item, item=item, deleted=False)
         return Response(ItemSerializer(item, context={"request": request}).data)
 
     @extend_schema(request=None, responses={200: ItemSerializer})
@@ -168,4 +179,5 @@ class ItemImageView(APIView):
         item = self.item(request, pk)
         if item.image:
             item.image.delete(save=True)
+            item_edited.send(sender=Item, item=item, deleted=False)
         return Response(ItemSerializer(item, context={"request": request}).data)

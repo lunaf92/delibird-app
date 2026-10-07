@@ -54,6 +54,11 @@ Each account starts with a default list. You can add more lists, reorder them, a
 link, notes, a 1–5 star rating, price and currency, and a picture). Uploaded pictures are re-encoded on the server
 (JPEG, at most 1600 px, metadata removed) and kept in `backend/media/` during development.
 
+Share a list from its Sharing screen: each person gets their own link (`APP_URL/shared/…`), which works without
+an account. People who sign in from it add the list to "Shared with me", where they can say which items they'll
+get. The owner never sees what is taken; `backend/sharing/tests/test_leaks.py` checks that for every API route, and
+CI fails if a new route isn't covered.
+
 Magic links open `APP_URL` from `.env` (default `http://localhost:8081`, the web app). For phones on the home Wi-Fi,
 set it to the web app's LAN address, for example `http://192.168.1.50:8081`.
 
