@@ -32,7 +32,8 @@ port in the addresses below, and set `EXPO_PUBLIC_API_URL` in `app/.env` to matc
 
 - API health: http://localhost:8000/api/v1/health/
 - API docs (Swagger): http://localhost:8000/api/v1/docs/
-- Django admin: http://localhost:8000/admin/ (create a user with `docker compose exec api python manage.py createsuperuser`)
+- Django admin: http://localhost:8000/admin/ (create an admin with `docker compose exec api python manage.py createsuperuser`;
+  it asks for an email and a password. Only superusers have a password, for the admin; everyone else signs in with a code)
 - Mailpit (every email the app sends): http://localhost:8025
 
 In a second terminal, start the app:
@@ -44,7 +45,23 @@ npm install
 npm run web                     # opens the web app on http://localhost:8081
 ```
 
-The home screen shows whether the server is healthy and lets you switch between English, Italian and Spanish.
+Sign in with any email address: the app sends a six-digit code and a magic link, which you can read in Mailpit
+at http://localhost:8025. The first sign-in with a new address creates the account (sign-up is open for now, while the
+app only runs on the home network). Settings has your display name, language, signed-in devices, sign out and
+account deletion.
+
+Magic links open `APP_URL` from `.env` (default `http://localhost:8081`, the web app). For phones on the home Wi-Fi,
+set it to the web app's LAN address, for example `http://192.168.1.50:8081`.
+
+### Upgrading a database from the Foundations milestone
+
+The Accounts milestone replaced Django's built-in user model, which Django can't migrate in place. If you ran the
+stack before, recreate the development database once (this deletes its data):
+
+```sh
+docker compose down -v
+docker compose up --build
+```
 
 Check that the Celery worker picks up jobs:
 
@@ -90,6 +107,16 @@ CI runs all of these on every pull request. To run the formatters before each co
 
 ```sh
 pip install pre-commit && pre-commit install
+```
+
+## API types
+
+The app's TypeScript types for the API are generated from the backend's OpenAPI schema. After changing an endpoint
+or serializer, regenerate both and commit them (CI fails if they are out of date):
+
+```sh
+docker compose exec api python manage.py spectacular --format openapi-json --validate --file openapi.json
+cd app && npm run api:types
 ```
 
 ## Translations
