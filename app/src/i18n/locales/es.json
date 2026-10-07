@@ -75,6 +75,7 @@
     "saveName": "Guardar nombre",
     "defaultExplained": "Esta es tu lista predeterminada. Puedes cambiarle el nombre, pero no eliminarla.",
     "delete": "Eliminar lista…",
+    "deleteWarning_zero": "Se eliminará la lista. No se puede deshacer.",
     "deleteWarning_one": "Se eliminará la lista y su {{count}} artículo. No se puede deshacer.",
     "deleteWarning_other": "Se eliminará la lista y sus {{count}} artículos. No se puede deshacer.",
     "deleteConfirm": "Eliminar lista"

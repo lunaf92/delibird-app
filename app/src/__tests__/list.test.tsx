@@ -78,6 +78,15 @@ test('deleting a list needs a confirmation and returns to the lists', async () =
   expect(callsTo(calls, 'DELETE', 'lists/11/')).toHaveLength(1);
 });
 
+test('deleting an empty list has a simpler warning', async () => {
+  mockApi({ 'GET me/': { body: ANN }, 'GET lists/11/': christmasWith([]) });
+  await renderApp('/lists/11');
+
+  await fireEvent.press(await screen.findByRole('button', { name: 'Delete list…' }));
+
+  expect(screen.getByText("This deletes the list. It can't be undone.")).toBeOnTheScreen();
+});
+
 test('the default list cannot be deleted', async () => {
   mockApi({ 'GET me/': { body: ANN }, 'GET lists/10/': { body: { ...DEFAULT_LIST, items: [] } } });
 

@@ -75,6 +75,7 @@
     "saveName": "Salva il nome",
     "defaultExplained": "Questa è la tua lista predefinita. Puoi rinominarla, ma non eliminarla.",
     "delete": "Elimina lista…",
+    "deleteWarning_zero": "La lista verrà eliminata. Non si può annullare.",
     "deleteWarning_one": "La lista verrà eliminata insieme al suo {{count}} elemento. Non si può annullare.",
     "deleteWarning_other": "La lista verrà eliminata insieme ai suoi {{count}} elementi. Non si può annullare.",
     "deleteConfirm": "Elimina lista"

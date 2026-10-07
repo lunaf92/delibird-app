@@ -75,6 +75,7 @@
     "saveName": "Save name",
     "defaultExplained": "This is your default list. You can rename it, but not delete it.",
     "delete": "Delete list…",
+    "deleteWarning_zero": "This deletes the list. It can't be undone.",
     "deleteWarning_one": "This deletes the list and its {{count}} item. It can't be undone.",
     "deleteWarning_other": "This deletes the list and its {{count}} items. It can't be undone.",
     "deleteConfirm": "Delete list"
