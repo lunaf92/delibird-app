@@ -1,0 +1,8 @@
+-r requirements.txt
+pytest~=9.1.1
+pytest-django~=4.14.0
+ruff~=0.16.10
+mypy~=2.4.0
+django-stubs[compatible-mypy]~=6.1.2
+djangorestframework-stubs~=3.18.1
+celery-types~=0.26.0

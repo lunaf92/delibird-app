@@ -1,0 +1,22 @@
+# Install once with: pip install pre-commit && pre-commit install
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.10
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+        files: ^backend/
+      - id: ruff-format
+        files: ^backend/
+  - repo: local
+    hooks:
+      - id: prettier
+        name: prettier (app)
+        entry: bash -c 'cd app && npx prettier --write --ignore-unknown "${@#app/}"' --
+        language: system
+        files: ^app/
+      - id: eslint
+        name: eslint (app)
+        entry: bash -c 'cd app && npx eslint --fix "${@#app/}"' --
+        language: system
+        files: ^app/.*\.(ts|tsx|js)$

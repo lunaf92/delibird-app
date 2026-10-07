@@ -1,0 +1,16 @@
+{
+  "appName": "Delibird",
+  "home": {
+    "title": "Aquí vivirán tus listas de deseos",
+    "server": "Servidor",
+    "checking": "Comprobando el servidor…",
+    "unreachable": "No se puede conectar con el servidor en {{url}}.",
+    "retry": "Reintentar",
+    "language": "Idioma"
+  },
+  "languages": {
+    "en": "English",
+    "it": "Italiano",
+    "es": "Español"
+  }
+}

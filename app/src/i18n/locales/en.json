@@ -1,0 +1,16 @@
+{
+  "appName": "Delibird",
+  "home": {
+    "title": "Your wishlists will live here",
+    "server": "Server",
+    "checking": "Checking the server…",
+    "unreachable": "Can't reach the server at {{url}}.",
+    "retry": "Try again",
+    "language": "Language"
+  },
+  "languages": {
+    "en": "English",
+    "it": "Italiano",
+    "es": "Español"
+  }
+}

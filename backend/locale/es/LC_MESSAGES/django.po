@@ -1,0 +1,29 @@
+# Delibird backend translations.
+msgid ""
+msgstr ""
+"Project-Id-Version: delibird\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: config/settings.py
+msgid "English"
+msgstr "Inglés"
+
+#: config/settings.py
+msgid "Italian"
+msgstr "Italiano"
+
+#: config/settings.py
+msgid "Spanish"
+msgstr "Español"
+
+#: core/views.py
+msgid "The server is running."
+msgstr "El servidor está funcionando."
+
+#: core/views.py
+msgid "The server has a problem."
+msgstr "El servidor tiene un problema."

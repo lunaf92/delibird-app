@@ -1,0 +1,66 @@
+# Local development stack: docker compose up
+# API on http://localhost:8000, Mailpit on http://localhost:8025.
+# The Expo app runs outside Docker: cd app && npx expo start
+
+x-backend: &backend
+  build:
+    context: ./backend
+    args:
+      REQUIREMENTS: requirements-dev.txt
+  env_file: .env
+  volumes:
+    - ./backend:/app
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    <<: *backend
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+
+  worker:
+    <<: *backend
+    environment:
+      SKIP_MIGRATIONS: "1"
+    command: celery -A config worker --loglevel=info
+
+  beat:
+    <<: *backend
+    environment:
+      SKIP_MIGRATIONS: "1"
+    command: celery -A config beat --loglevel=info --schedule /tmp/celerybeat-schedule
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
+
+volumes:
+  pgdata:
