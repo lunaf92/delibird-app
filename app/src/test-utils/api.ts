@@ -1,0 +1,41 @@
+import { API_URL } from '@/api/client';
+
+type Reply = { status?: number; body?: unknown };
+type Handler = Reply | ((body: unknown) => Reply);
+
+export type ApiCall = { method: string; path: string; body: unknown; headers: Record<string, string> };
+
+export const HEALTHY = {
+  status: 'ok',
+  database: true,
+  redis: true,
+  language: 'en',
+  message: 'The server is running.',
+};
+
+export const ANN = { id: 1, email: 'ann@example.com', display_name: 'Ann', language: 'en' as const };
+
+/**
+ * Replaces fetch with a fake API. Handlers are keyed by "METHOD path", for example "POST auth/verify/".
+ * A request without a handler fails like an unreachable server. Returns the list of calls made.
+ */
+export function mockApi(handlers: Record<string, Handler>): ApiCall[] {
+  const calls: ApiCall[] = [];
+  const all: Record<string, Handler> = { 'GET health/': { body: HEALTHY }, ...handlers };
+  globalThis.fetch = jest.fn(async (url: string | URL | Request, init: RequestInit = {}) => {
+    const method = init.method ?? 'GET';
+    const path = String(url).replace(`${API_URL}/api/v1/`, '');
+    const body: unknown = typeof init.body === 'string' ? JSON.parse(init.body) : undefined;
+    calls.push({ method, path, body, headers: (init.headers ?? {}) as Record<string, string> });
+    const handler = all[`${method} ${path}`];
+    if (!handler) throw new TypeError(`Network request failed (no mock for ${method} ${path})`);
+    const reply = typeof handler === 'function' ? handler(body) : handler;
+    const status = reply.status ?? 200;
+    return { ok: status >= 200 && status < 300, status, json: async () => reply.body ?? null } as Response;
+  }) as typeof fetch;
+  return calls;
+}
+
+export function callsTo(calls: ApiCall[], method: string, path: string): ApiCall[] {
+  return calls.filter((call) => call.method === method && call.path === path);
+}

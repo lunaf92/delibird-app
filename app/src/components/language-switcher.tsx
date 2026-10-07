@@ -1,9 +1,15 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { SUPPORTED_LANGUAGES } from '@/i18n';
+import { SUPPORTED_LANGUAGES, type Language } from '@/i18n';
 
-export function LanguageSwitcher() {
+type Props = {
+  /** Called instead of switching the app's language directly, for example to save the choice first. */
+  onChange?: (language: Language) => void;
+  disabled?: boolean;
+};
+
+export function LanguageSwitcher({ onChange, disabled }: Props) {
   const { t, i18n } = useTranslation();
 
   return (
@@ -14,8 +20,9 @@ export function LanguageSwitcher() {
           <Pressable
             key={language}
             accessibilityRole="radio"
-            accessibilityState={{ selected }}
-            onPress={() => i18n.changeLanguage(language)}
+            accessibilityState={{ selected, disabled }}
+            disabled={disabled}
+            onPress={() => (onChange ? onChange(language) : i18n.changeLanguage(language))}
             style={[styles.option, selected && styles.selected]}>
             <Text style={[styles.label, selected && styles.selectedLabel]}>{t(`languages.${language}`)}</Text>
           </Pressable>
@@ -26,7 +33,7 @@ export function LanguageSwitcher() {
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', gap: 8 },
+  row: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
   option: {
     borderWidth: 1,
     borderColor: '#208AEF',

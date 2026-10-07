@@ -1,16 +1,17 @@
-import { useTheme } from 'expo-router';
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { API_URL, fetchHealth, type Health } from '@/api/client';
-import { LanguageSwitcher } from '@/components/language-switcher';
+import { useAuth } from '@/auth/context';
+import { Body, Button, Card, Heading, Message, Screen, Title } from '@/components/ui';
 
 type Result = { key: string; health: Health } | { key: string; failed: true };
 
 export default function HomeScreen() {
   const { t, i18n } = useTranslation();
-  const { colors } = useTheme();
+  const { user } = useAuth();
   const language = i18n.language;
   const [attempt, setAttempt] = useState(0);
   const [result, setResult] = useState<Result | null>(null);
@@ -29,46 +30,39 @@ export default function HomeScreen() {
   }, [language, requestKey]);
 
   const current = result?.key === requestKey ? result : null;
-  const retry = () => setAttempt((n) => n + 1);
+  const name = user?.display_name || user?.email;
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.title, { color: colors.text }]}>{t('home.title')}</Text>
+    <Screen>
+      <Title>{name ? t('home.greeting', { name }) : t('home.greetingNoName')}</Title>
+      <Body>{t('home.title')}</Body>
 
-      <View style={[styles.card, { borderColor: colors.border }]}>
-        <Text style={[styles.cardTitle, { color: colors.text }]}>{t('home.server')}</Text>
+      <Card>
+        <Heading>{t('home.server')}</Heading>
         {current === null && (
           <View style={styles.row}>
             <ActivityIndicator />
-            <Text style={{ color: colors.text }}>{t('home.checking')}</Text>
+            <Body>{t('home.checking')}</Body>
           </View>
         )}
         {current && 'health' in current && (
-          <Text style={{ color: current.health.status === 'ok' ? '#1B873F' : '#C4314B' }}>
+          <Message tone={current.health.status === 'ok' ? 'success' : 'error'}>
             {current.health.message}
-          </Text>
+          </Message>
         )}
         {current && 'failed' in current && (
           <>
-            <Text style={{ color: '#C4314B' }}>{t('home.unreachable', { url: API_URL })}</Text>
-            <Pressable accessibilityRole="button" onPress={retry}>
-              <Text style={styles.link}>{t('home.retry')}</Text>
-            </Pressable>
+            <Message tone="error">{t('home.unreachable', { url: API_URL })}</Message>
+            <Button variant="link" label={t('home.retry')} onPress={() => setAttempt((n) => n + 1)} />
           </>
         )}
-      </View>
+      </Card>
 
-      <Text style={[styles.cardTitle, { color: colors.text }]}>{t('home.language')}</Text>
-      <LanguageSwitcher />
-    </View>
+      <Button variant="secondary" label={t('settings.title')} onPress={() => router.push('/settings')} />
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, gap: 16 },
-  title: { fontSize: 24, fontWeight: '600' },
-  card: { borderWidth: 1, borderRadius: 12, padding: 16, gap: 8 },
-  cardTitle: { fontSize: 15, fontWeight: '600' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  link: { color: '#208AEF', fontWeight: '600' },
 });
