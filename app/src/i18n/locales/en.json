@@ -1,7 +1,6 @@
 {
   "appName": "Delibird",
   "home": {
-    "title": "Your wishlists will live here.",
     "greeting": "Hi, {{name}}",
     "greetingNoName": "Hi!",
     "server": "Server",
@@ -60,5 +59,57 @@
     "en": "English",
     "it": "Italiano",
     "es": "Español"
+  },
+  "lists": {
+    "title": "Your lists",
+    "new": "New list",
+    "name": "List name",
+    "namePlaceholder": "Birthday, Christmas…",
+    "create": "Create list",
+    "itemCount_one": "{{count}} item",
+    "itemCount_other": "{{count}} items",
+    "default": "default list",
+    "empty": "Nothing here yet. Add the first thing you'd like.",
+    "settings": "List settings",
+    "rename": "Rename list",
+    "saveName": "Save name",
+    "defaultExplained": "This is your default list. You can rename it, but not delete it.",
+    "delete": "Delete list…",
+    "deleteWarning_one": "This deletes the list and its {{count}} item. It can't be undone.",
+    "deleteWarning_other": "This deletes the list and its {{count}} items. It can't be undone.",
+    "deleteConfirm": "Delete list"
+  },
+  "items": {
+    "add": "Add an item",
+    "newTitle": "New item",
+    "editTitle": "Edit item",
+    "name": "Name",
+    "url": "Link",
+    "description": "Notes",
+    "descriptionPlaceholder": "Size, colour, where to find it…",
+    "rating": "How much do you want it?",
+    "ratingHelp": "Tap a star; tap it again to clear.",
+    "ratingValue_one": "{{count}} star",
+    "ratingValue_other": "{{count}} stars",
+    "price": "Price",
+    "currency": "Currency",
+    "picture": "Picture",
+    "noPicture": "No picture yet.",
+    "addPicture": "Add a picture",
+    "changePicture": "Change picture",
+    "removePicture": "Remove picture",
+    "list": "List",
+    "save": "Save",
+    "nameRequired": "Give the item a name.",
+    "urlInvalid": "Enter a full link, starting with https://",
+    "priceInvalid": "Enter a price such as 39.90.",
+    "deleteTitle": "Delete item",
+    "delete": "Delete item…",
+    "deleteWarning": "Delete “{{name}}”? It can't be undone.",
+    "deleteConfirm": "Delete item"
+  },
+  "reorder": {
+    "up": "Move {{name}} up",
+    "down": "Move {{name}} down"
   }
 }

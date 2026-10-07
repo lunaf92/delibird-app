@@ -15,17 +15,50 @@ export const HEALTHY = {
 
 export const ANN = { id: 1, email: 'ann@example.com', display_name: 'Ann', language: 'en' as const };
 
+export const DEFAULT_LIST = {
+  id: 10,
+  name: 'My wishlist',
+  is_default: true,
+  position: 0,
+  item_count: 0,
+  created_at: '2026-10-01T10:00:00Z',
+  updated_at: '2026-10-01T10:00:00Z',
+};
+
+export function item(fields: Record<string, unknown> = {}) {
+  return {
+    id: 100,
+    wishlist: 10,
+    name: 'Book',
+    url: '',
+    description: '',
+    rating: null,
+    image: null,
+    price: null,
+    currency: 'EUR',
+    position: 0,
+    created_at: '2026-10-01T10:00:00Z',
+    updated_at: '2026-10-01T10:00:00Z',
+    ...fields,
+  };
+}
+
 /**
  * Replaces fetch with a fake API. Handlers are keyed by "METHOD path", for example "POST auth/verify/".
  * A request without a handler fails like an unreachable server. Returns the list of calls made.
  */
 export function mockApi(handlers: Record<string, Handler>): ApiCall[] {
   const calls: ApiCall[] = [];
-  const all: Record<string, Handler> = { 'GET health/': { body: HEALTHY }, ...handlers };
+  const all: Record<string, Handler> = {
+    'GET health/': { body: HEALTHY },
+    'GET lists/': { body: [DEFAULT_LIST] },
+    ...handlers,
+  };
   globalThis.fetch = jest.fn(async (url: string | URL | Request, init: RequestInit = {}) => {
     const method = init.method ?? 'GET';
     const path = String(url).replace(`${API_URL}/api/v1/`, '');
-    const body: unknown = typeof init.body === 'string' ? JSON.parse(init.body) : undefined;
+    // JSON bodies are decoded; anything else (such as a FormData upload) is passed through as it is.
+    const body: unknown = typeof init.body === 'string' ? JSON.parse(init.body) : init.body;
     calls.push({ method, path, body, headers: (init.headers ?? {}) as Record<string, string> });
     const handler = all[`${method} ${path}`];
     if (!handler) throw new TypeError(`Network request failed (no mock for ${method} ${path})`);

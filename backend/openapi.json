@@ -1002,11 +1002,17 @@
                 },
                 "required": [
                     "created_at",
+                    "currency",
+                    "description",
                     "id",
                     "image",
                     "name",
                     "position",
-                    "updated_at"
+                    "price",
+                    "rating",
+                    "updated_at",
+                    "url",
+                    "wishlist"
                 ]
             },
             "ItemRequest": {

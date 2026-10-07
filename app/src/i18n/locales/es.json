@@ -1,7 +1,6 @@
 {
   "appName": "Delibird",
   "home": {
-    "title": "Aquí vivirán tus listas de deseos.",
     "greeting": "Hola, {{name}}",
     "greetingNoName": "¡Hola!",
     "server": "Servidor",
@@ -60,5 +59,57 @@
     "en": "English",
     "it": "Italiano",
     "es": "Español"
+  },
+  "lists": {
+    "title": "Tus listas",
+    "new": "Nueva lista",
+    "name": "Nombre de la lista",
+    "namePlaceholder": "Cumpleaños, Navidad…",
+    "create": "Crear lista",
+    "itemCount_one": "{{count}} artículo",
+    "itemCount_other": "{{count}} artículos",
+    "default": "lista predeterminada",
+    "empty": "Todavía no hay nada. Añade lo primero que te gustaría.",
+    "settings": "Ajustes de la lista",
+    "rename": "Cambiar nombre",
+    "saveName": "Guardar nombre",
+    "defaultExplained": "Esta es tu lista predeterminada. Puedes cambiarle el nombre, pero no eliminarla.",
+    "delete": "Eliminar lista…",
+    "deleteWarning_one": "Se eliminará la lista y su {{count}} artículo. No se puede deshacer.",
+    "deleteWarning_other": "Se eliminará la lista y sus {{count}} artículos. No se puede deshacer.",
+    "deleteConfirm": "Eliminar lista"
+  },
+  "items": {
+    "add": "Añadir un artículo",
+    "newTitle": "Nuevo artículo",
+    "editTitle": "Editar artículo",
+    "name": "Nombre",
+    "url": "Enlace",
+    "description": "Notas",
+    "descriptionPlaceholder": "Talla, color, dónde encontrarlo…",
+    "rating": "¿Cuánto lo quieres?",
+    "ratingHelp": "Toca una estrella; tócala otra vez para quitarla.",
+    "ratingValue_one": "{{count}} estrella",
+    "ratingValue_other": "{{count}} estrellas",
+    "price": "Precio",
+    "currency": "Moneda",
+    "picture": "Imagen",
+    "noPicture": "Todavía no hay imagen.",
+    "addPicture": "Añadir una imagen",
+    "changePicture": "Cambiar imagen",
+    "removePicture": "Quitar imagen",
+    "list": "Lista",
+    "save": "Guardar",
+    "nameRequired": "Ponle un nombre al artículo.",
+    "urlInvalid": "Escribe un enlace completo, que empiece por https://",
+    "priceInvalid": "Escribe un precio como 39,90.",
+    "deleteTitle": "Eliminar artículo",
+    "delete": "Eliminar artículo…",
+    "deleteWarning": "¿Eliminar «{{name}}»? No se puede deshacer.",
+    "deleteConfirm": "Eliminar artículo"
+  },
+  "reorder": {
+    "up": "Subir {{name}}",
+    "down": "Bajar {{name}}"
   }
 }

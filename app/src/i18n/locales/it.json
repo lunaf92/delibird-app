@@ -1,7 +1,6 @@
 {
   "appName": "Delibird",
   "home": {
-    "title": "Qui vivranno le tue liste dei desideri.",
     "greeting": "Ciao, {{name}}",
     "greetingNoName": "Ciao!",
     "server": "Server",
@@ -60,5 +59,57 @@
     "en": "English",
     "it": "Italiano",
     "es": "Español"
+  },
+  "lists": {
+    "title": "Le tue liste",
+    "new": "Nuova lista",
+    "name": "Nome della lista",
+    "namePlaceholder": "Compleanno, Natale…",
+    "create": "Crea lista",
+    "itemCount_one": "{{count}} elemento",
+    "itemCount_other": "{{count}} elementi",
+    "default": "lista predefinita",
+    "empty": "Ancora niente. Aggiungi la prima cosa che desideri.",
+    "settings": "Impostazioni della lista",
+    "rename": "Rinomina lista",
+    "saveName": "Salva il nome",
+    "defaultExplained": "Questa è la tua lista predefinita. Puoi rinominarla, ma non eliminarla.",
+    "delete": "Elimina lista…",
+    "deleteWarning_one": "La lista verrà eliminata insieme al suo {{count}} elemento. Non si può annullare.",
+    "deleteWarning_other": "La lista verrà eliminata insieme ai suoi {{count}} elementi. Non si può annullare.",
+    "deleteConfirm": "Elimina lista"
+  },
+  "items": {
+    "add": "Aggiungi un elemento",
+    "newTitle": "Nuovo elemento",
+    "editTitle": "Modifica elemento",
+    "name": "Nome",
+    "url": "Link",
+    "description": "Note",
+    "descriptionPlaceholder": "Taglia, colore, dove trovarlo…",
+    "rating": "Quanto lo desideri?",
+    "ratingHelp": "Tocca una stella; toccala di nuovo per toglierla.",
+    "ratingValue_one": "{{count}} stella",
+    "ratingValue_other": "{{count}} stelle",
+    "price": "Prezzo",
+    "currency": "Valuta",
+    "picture": "Immagine",
+    "noPicture": "Ancora nessuna immagine.",
+    "addPicture": "Aggiungi un'immagine",
+    "changePicture": "Cambia immagine",
+    "removePicture": "Rimuovi immagine",
+    "list": "Lista",
+    "save": "Salva",
+    "nameRequired": "Dai un nome all'elemento.",
+    "urlInvalid": "Inserisci un link completo, che inizi con https://",
+    "priceInvalid": "Inserisci un prezzo come 39,90.",
+    "deleteTitle": "Elimina elemento",
+    "delete": "Elimina elemento…",
+    "deleteWarning": "Eliminare “{{name}}”? Non si può annullare.",
+    "deleteConfirm": "Elimina elemento"
+  },
+  "reorder": {
+    "up": "Sposta {{name}} in su",
+    "down": "Sposta {{name}} in giù"
   }
 }
