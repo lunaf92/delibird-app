@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "core",
     "accounts",
+    "wishlists",
 ]
 
 MIDDLEWARE = [

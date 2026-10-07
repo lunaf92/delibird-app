@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: delibird\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-07 20:07+0000\n"
+"POT-Creation-Date: 2026-10-07 21:31+0000\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,15 +26,15 @@ msgstr "Intestazione di autorizzazione non valida."
 msgid "Your session has ended. Sign in again."
 msgstr "La tua sessione è terminata. Accedi di nuovo."
 
-#: accounts/models.py:19 config/settings.py:102
+#: accounts/models.py:19 config/settings.py:103
 msgid "English"
 msgstr "Inglese"
 
-#: accounts/models.py:20 config/settings.py:103
+#: accounts/models.py:20 config/settings.py:104
 msgid "Italian"
 msgstr "Italiano"
 
-#: accounts/models.py:21 config/settings.py:104
+#: accounts/models.py:21 config/settings.py:105
 msgid "Spanish"
 msgstr "Spagnolo"
 
@@ -104,8 +104,12 @@ msgstr "Accedi a Delibird"
 msgid "The code and the link expire in %(minutes)s minute and work only once."
 msgid_plural ""
 "The code and the link expire in %(minutes)s minutes and work only once."
-msgstr[0] "Il codice e il link scadono tra %(minutes)s minuto e funzionano una sola volta."
-msgstr[1] "Il codice e il link scadono tra %(minutes)s minuti e funzionano una sola volta."
+msgstr[0] ""
+"Il codice e il link scadono tra %(minutes)s minuto e funzionano una sola "
+"volta."
+msgstr[1] ""
+"Il codice e il link scadono tra %(minutes)s minuti e funzionano una sola "
+"volta."
 
 #: accounts/templates/accounts/email/sign_in.html:27
 #: accounts/templates/accounts/email/sign_in.txt:15
@@ -119,7 +123,9 @@ msgstr "Troppi tentativi. Aspetta qualche minuto e riprova."
 #: accounts/views.py:83
 #, python-format
 msgid "We've emailed you a sign-in code. It expires in %(minutes)d minutes."
-msgstr "Ti abbiamo inviato via email un codice di accesso. Scade tra %(minutes)d minuti."
+msgstr ""
+"Ti abbiamo inviato via email un codice di accesso. Scade tra %(minutes)d "
+"minuti."
 
 #: accounts/views.py:113
 msgid "That code is wrong or has expired."
@@ -132,3 +138,56 @@ msgstr "Il server è in funzione."
 #: core/views.py:41
 msgid "The server has a problem."
 msgstr "Il server ha un problema."
+
+#: wishlists/migrations/0002_default_wishlists_for_existing_users.py:12
+#: wishlists/signals.py:15
+msgid "My wishlist"
+msgstr "La mia lista dei desideri"
+
+#: wishlists/models.py:14 wishlists/models.py:41
+msgid "name"
+msgstr "nome"
+
+#: wishlists/models.py:42
+msgid "link"
+msgstr "link"
+
+#: wishlists/models.py:43
+msgid "description"
+msgstr "descrizione"
+
+#: wishlists/models.py:45
+msgid "rating"
+msgstr "valutazione"
+
+#: wishlists/models.py:47
+msgid "image"
+msgstr "immagine"
+
+#: wishlists/models.py:49
+msgid "price"
+msgstr "prezzo"
+
+#: wishlists/models.py:52
+msgid "currency"
+msgstr "valuta"
+
+#: wishlists/models.py:55
+msgid "Use a three-letter currency code, such as EUR."
+msgstr "Usa un codice valuta di tre lettere, come EUR."
+
+#: wishlists/views.py:50
+msgid "Send every id exactly once, in the new order."
+msgstr "Invia ogni id una sola volta, nel nuovo ordine."
+
+#: wishlists/views.py:82
+msgid "Your default list can't be deleted."
+msgstr "La tua lista predefinita non si può eliminare."
+
+#: wishlists/views.py:153
+msgid "Choose a picture to upload."
+msgstr "Scegli un'immagine da caricare."
+
+#: wishlists/views.py:158
+msgid "Use a JPEG, PNG, WebP or GIF picture of up to 10 MB."
+msgstr "Usa un'immagine JPEG, PNG, WebP o GIF fino a 10 MB."
