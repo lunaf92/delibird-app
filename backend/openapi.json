@@ -200,6 +200,62 @@
                 }
             }
         },
+        "/api/v1/devices/": {
+            "post": {
+                "operationId": "devices_create",
+                "description": "Registers this phone for push notifications, or stops them.",
+                "tags": [
+                    "devices"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeviceRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeviceRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeviceRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "devices_destroy",
+                "description": "Registers this phone for push notifications, or stops them.",
+                "tags": [
+                    "devices"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
         "/api/v1/health/": {
             "get": {
                 "operationId": "health_retrieve",
@@ -1224,6 +1280,24 @@
                     "detail"
                 ]
             },
+            "DeviceRequest": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200,
+                        "pattern": "^(ExponentPushToken|ExpoPushToken)\\[[^\\]]+\\]$"
+                    },
+                    "platform": {
+                        "$ref": "#/components/schemas/PlatformEnum"
+                    }
+                },
+                "required": [
+                    "platform",
+                    "token"
+                ]
+            },
             "Health": {
                 "type": "object",
                 "properties": {
@@ -1545,6 +1619,14 @@
                         "maxLength": 100
                     }
                 }
+            },
+            "PlatformEnum": {
+                "enum": [
+                    "android",
+                    "ios"
+                ],
+                "type": "string",
+                "description": "* `android` - Android\n* `ios` - Ios"
             },
             "ReorderRequest": {
                 "type": "object",

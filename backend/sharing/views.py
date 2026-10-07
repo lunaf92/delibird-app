@@ -1,6 +1,7 @@
 from typing import Any, cast
 
 from django.conf import settings
+from django.db import transaction
 from django.db.models import Count, Prefetch, QuerySet
 from django.http import Http404
 from django.shortcuts import get_object_or_404
@@ -14,6 +15,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.models import User
+from notifications.tasks import send_share_invitation
 from sharing import services
 from sharing.models import Reservation, Share
 from sharing.serializers import (
@@ -56,7 +58,9 @@ class ShareListView(generics.ListCreateAPIView[Share]):
             new = services.share_list(wishlist, serializer.validated_data["invitee_email"])
         except services.AlreadyShared as error:
             raise ValidationError({"email": [_("This list is already shared with that address.")]}) from error
-        data = {**ShareSerializer(new.share).data, "link": share_link(new.token)}
+        link = share_link(new.token)
+        transaction.on_commit(lambda: send_share_invitation.delay(new.share.pk, link))
+        data = {**ShareSerializer(new.share).data, "link": link}
         return Response(data, status=status.HTTP_201_CREATED)
 
 

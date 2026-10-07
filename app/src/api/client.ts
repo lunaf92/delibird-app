@@ -234,3 +234,16 @@ export function reserveItem(token: string, itemId: number, language: string): Pr
 export function cancelReservation(token: string, itemId: number, language: string): Promise<void> {
   return request(`items/${itemId}/reservation/`, { method: 'DELETE', token, language });
 }
+
+export function registerDevice(
+  token: string,
+  pushToken: string,
+  platform: 'ios' | 'android',
+  language: string,
+): Promise<void> {
+  return request('devices/', { method: 'POST', body: { token: pushToken, platform }, token, language });
+}
+
+export function unregisterDevice(token: string, pushToken: string, language: string): Promise<void> {
+  return request('devices/', { method: 'DELETE', body: { token: pushToken }, token, language });
+}

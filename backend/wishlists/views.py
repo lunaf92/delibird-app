@@ -85,6 +85,8 @@ class WishlistDetailView(generics.RetrieveUpdateDestroyAPIView[Wishlist]):
     def perform_destroy(self, instance: Wishlist) -> None:
         if instance.is_default:
             raise ValidationError({"detail": _("Your default list can't be deleted.")})
+        for item in instance.items.all():
+            item_edited.send(sender=Item, item=item, deleted=True)
         instance.delete()
 
 

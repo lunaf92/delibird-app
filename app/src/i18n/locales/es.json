@@ -153,5 +153,15 @@
     "yours": "Lo regalas tú.",
     "cancel": "Al final no lo regalo",
     "takenBy": "Lo regala {{name}}."
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "email": "Recibes un correo cuando alguien comparte una lista contigo, o cuando cambia algo que vas a regalar.",
+    "turnOn": "Avisar también en este teléfono",
+    "on": "Este teléfono también recibe notificaciones.",
+    "denied": "Las notificaciones de Delibird están desactivadas en los ajustes de este teléfono.",
+    "web": "Las notificaciones en el teléfono están disponibles en la app Delibird.",
+    "simulator": "Las notificaciones en el teléfono necesitan un teléfono de verdad.",
+    "not-configured": "Las notificaciones en el teléfono todavía no están configuradas en esta versión de la app."
   }
 }

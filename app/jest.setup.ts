@@ -12,3 +12,22 @@ jest.mock('expo-secure-store', () => {
     __store: store,
   };
 });
+
+// Push notifications: no native module in tests. Tests set `mockNotifications.*` to steer it.
+jest.mock('expo-notifications', () => {
+  const state = {
+    lastResponse: null as unknown,
+    permission: 'granted',
+    pushToken: 'ExponentPushToken[test-phone]',
+  };
+  return {
+    __state: state,
+    setNotificationHandler: jest.fn(),
+    setNotificationChannelAsync: jest.fn(async () => null),
+    getPermissionsAsync: jest.fn(async () => ({ status: state.permission })),
+    requestPermissionsAsync: jest.fn(async () => ({ status: state.permission })),
+    getExpoPushTokenAsync: jest.fn(async () => ({ data: state.pushToken })),
+    useLastNotificationResponse: () => state.lastResponse,
+    AndroidImportance: { DEFAULT: 3 },
+  };
+});
