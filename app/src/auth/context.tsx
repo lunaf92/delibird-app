@@ -30,11 +30,31 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 const LOADING: AuthState = { status: 'loading', token: null, user: null };
 const SIGNED_OUT: AuthState = { status: 'signedOut', token: null, user: null };
 
-/** A name for this device on the account's sessions list. On the web the server uses the browser's name. */
-function deviceName(): string | undefined {
-  if (Platform.OS === 'web') return undefined;
-  return Device.deviceName ?? Device.modelName ?? Platform.OS;
+/** A name for this device on the account's sessions list, such as "Pixel 9" or "Firefox on Linux". */
+export function deviceName(userAgent = globalThis.navigator?.userAgent ?? ''): string | undefined {
+  if (Platform.OS !== 'web') return Device.deviceName ?? Device.modelName ?? Platform.OS;
+  const browser = BROWSERS.find(([pattern]) => pattern.test(userAgent))?.[1];
+  const system = SYSTEMS.find(([pattern]) => pattern.test(userAgent))?.[1];
+  if (browser && system) return `${browser} on ${system}`;
+  return browser ?? system; // Otherwise the server falls back to the full user agent.
 }
+
+// Order matters: Edge and Opera also say Chrome, and Chrome also says Safari.
+const BROWSERS: [RegExp, string][] = [
+  [/Edg\//, 'Edge'],
+  [/OPR\//, 'Opera'],
+  [/Firefox\//, 'Firefox'],
+  [/Chrome\//, 'Chrome'],
+  [/Safari\//, 'Safari'],
+];
+const SYSTEMS: [RegExp, string][] = [
+  [/Android/, 'Android'],
+  [/iPhone|iPad/, 'iOS'],
+  [/Windows/, 'Windows'],
+  [/Mac OS X/, 'macOS'],
+  [/CrOS/, 'ChromeOS'],
+  [/Linux/, 'Linux'],
+];
 
 export function useAuth(): AuthContextValue {
   const value = use(AuthContext);
