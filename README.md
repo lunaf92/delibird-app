@@ -59,6 +59,21 @@ an account. People who sign in from it add the list to "Shared with me", where t
 get. The owner never sees what is taken; `backend/sharing/tests/test_leaks.py` checks that for every API route, and
 CI fails if a new route isn't covered.
 
+### Notifications
+
+The worker sends emails (seen in Mailpit locally) when a list is shared with someone, and, within a minute, when
+an item someone reserved is edited or deleted. Push notifications to phones go through Expo's push service and
+need, once:
+
+1. An EAS project for the app: `cd app && npx eas-cli@latest init` (adds `extra.eas.projectId` to `app.json`).
+2. For Android, a Firebase project with FCM: add its `google-services.json` to `app/` (and `"googleServicesFile":
+   "./google-services.json"` under `android` in `app.json`), and upload the FCM v1 service account key with
+   `npx eas-cli@latest credentials`.
+3. A new development build. Then Settings → "Also notify this phone".
+
+iPhones need the paid Apple Developer account for push. Set `PUSH_ENABLED=false` in `.env` to stop the server
+from contacting Expo.
+
 Magic links open `APP_URL` from `.env` (default `http://localhost:8081`, the web app). For phones on the home Wi-Fi,
 set it to the web app's LAN address, for example `http://192.168.1.50:8081`.
 
