@@ -1,0 +1,506 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Delibird API",
+        "version": "1.0.0",
+        "description": "API for the Delibird wishlist app."
+    },
+    "paths": {
+        "/api/v1/auth/logout/": {
+            "post": {
+                "operationId": "auth_logout_create",
+                "description": "Ends the session this request was made with.",
+                "tags": [
+                    "auth"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/request-code/": {
+            "post": {
+                "operationId": "auth_request_code_create",
+                "description": "Emails a sign-in code and magic link. Answers the same way whether or not the account exists.",
+                "tags": [
+                    "auth"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RequestCodeRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RequestCodeRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RequestCodeRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "202": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Detail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    },
+                    "429": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Detail"
+                                }
+                            }
+                        },
+                        "description": "Too many requests"
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/sessions/": {
+            "get": {
+                "operationId": "auth_sessions_list",
+                "description": "The devices signed in to this account. `current` marks the one making the request.",
+                "tags": [
+                    "auth"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Session"
+                                    }
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/sessions/{id}/": {
+            "delete": {
+                "operationId": "auth_sessions_destroy",
+                "description": "Signs a device out of this account.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/verify/": {
+            "post": {
+                "operationId": "auth_verify_create",
+                "description": "Exchanges a code (or a magic-link token) for a session token. The first sign-in creates the account.",
+                "tags": [
+                    "auth"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SignedIn"
+                                }
+                            }
+                        },
+                        "description": ""
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Detail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    },
+                    "429": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Detail"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/v1/health/": {
+            "get": {
+                "operationId": "health_retrieve",
+                "description": "Reports whether the API can reach its database and Redis.",
+                "tags": [
+                    "health"
+                ],
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Health"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/v1/me/": {
+            "get": {
+                "operationId": "me_retrieve",
+                "description": "The signed-in account. Deleting it removes the account and everything that belongs to it.",
+                "tags": [
+                    "me"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "me_partial_update",
+                "description": "The signed-in account. Deleting it removes the account and everything that belongs to it.",
+                "tags": [
+                    "me"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedUserRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedUserRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PatchedUserRequest"
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "me_destroy",
+                "description": "The signed-in account. Deleting it removes the account and everything that belongs to it.",
+                "tags": [
+                    "me"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Detail": {
+                "type": "object",
+                "properties": {
+                    "detail": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "detail"
+                ]
+            },
+            "Health": {
+                "type": "object",
+                "properties": {
+                    "status": {
+                        "$ref": "#/components/schemas/StatusEnum"
+                    },
+                    "database": {
+                        "type": "boolean"
+                    },
+                    "redis": {
+                        "type": "boolean"
+                    },
+                    "language": {
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "database",
+                    "language",
+                    "message",
+                    "redis",
+                    "status"
+                ]
+            },
+            "LanguageEnum": {
+                "enum": [
+                    "en",
+                    "it",
+                    "es"
+                ],
+                "type": "string",
+                "description": "* `en` - English\n* `it` - Italian\n* `es` - Spanish"
+            },
+            "PatchedUserRequest": {
+                "type": "object",
+                "properties": {
+                    "display_name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "language": {
+                        "$ref": "#/components/schemas/LanguageEnum"
+                    }
+                }
+            },
+            "RequestCodeRequest": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "minLength": 1
+                    }
+                },
+                "required": [
+                    "email"
+                ]
+            },
+            "Session": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "device_name": {
+                        "type": "string",
+                        "readOnly": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "last_used_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "current": {
+                        "type": "boolean",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "created_at",
+                    "current",
+                    "device_name",
+                    "id",
+                    "last_used_at"
+                ]
+            },
+            "SignedIn": {
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string",
+                        "description": "Send it as `Authorization: Bearer <token>`."
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/User"
+                    }
+                },
+                "required": [
+                    "token",
+                    "user"
+                ]
+            },
+            "StatusEnum": {
+                "enum": [
+                    "ok",
+                    "degraded"
+                ],
+                "type": "string",
+                "description": "* `ok` - ok\n* `degraded` - degraded"
+            },
+            "User": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "readOnly": true
+                    },
+                    "display_name": {
+                        "type": "string",
+                        "maxLength": 100
+                    },
+                    "language": {
+                        "$ref": "#/components/schemas/LanguageEnum"
+                    }
+                },
+                "required": [
+                    "display_name",
+                    "email",
+                    "id",
+                    "language"
+                ]
+            },
+            "VerifyRequest": {
+                "type": "object",
+                "description": "Either the email and the six-digit code, or the token from the magic link.",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "minLength": 1
+                    },
+                    "code": {
+                        "type": "string",
+                        "minLength": 1,
+                        "pattern": "^\\d{6}$"
+                    },
+                    "token": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 200
+                    },
+                    "device_name": {
+                        "type": "string",
+                        "maxLength": 200
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer"
+            }
+        }
+    }
+}

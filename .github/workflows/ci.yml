@@ -42,6 +42,10 @@ jobs:
       - run: ruff format --check .
       - run: mypy .
       - run: python manage.py makemigrations --check --dry-run
+      - name: OpenAPI schema is up to date
+        run: |
+          python manage.py spectacular --format openapi-json --validate --fail-on-warn --file openapi.json
+          git diff --exit-code openapi.json || (echo "::error::Regenerate backend/openapi.json (see README)" && exit 1)
       - run: pytest
 
   app:
@@ -60,5 +64,9 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run format:check
+      - name: API types match the OpenAPI schema
+        run: |
+          npm run api:types
+          git diff --exit-code src/api/schema.d.ts || (echo "::error::Run npm run api:types (see README)" && exit 1)
       - run: npm test -- --ci
       - run: npm run build:web

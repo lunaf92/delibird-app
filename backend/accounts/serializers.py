@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, ClassVar
 
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -30,6 +30,8 @@ class UserSerializer(serializers.ModelSerializer[User]):
         model = User
         fields = ("id", "email", "display_name", "language")
         read_only_fields = ("id", "email")
+        # Required so the schema promises them in responses; PATCH is partial, so updates may still omit them.
+        extra_kwargs: ClassVar = {"display_name": {"required": True}, "language": {"required": True}}
 
 
 class SignedInSerializer(serializers.Serializer[dict[str, Any]]):
@@ -43,6 +45,7 @@ class SessionSerializer(serializers.ModelSerializer[Session]):
     class Meta:
         model = Session
         fields = ("id", "device_name", "created_at", "last_used_at", "current")
+        read_only_fields = fields
 
     def get_current(self, session: Session) -> bool:
         current: Session | None = self.context.get("current_session")
