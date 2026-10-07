@@ -3,10 +3,12 @@ import '@/i18n';
 import { DarkTheme, DefaultTheme, router, SplashScreen, Stack, ThemeProvider } from 'expo-router';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useColorScheme } from 'react-native';
+import { Platform, useColorScheme } from 'react-native';
 
 import { AuthProvider, useAuth } from '@/auth/context';
 import { takeReturnTo } from '@/auth/storage';
+import { notificationPath } from '@/notifications/push';
+import * as Notifications from 'expo-notifications';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -46,14 +48,27 @@ function RootNavigator() {
   if (status === 'loading') return null;
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={signedIn}>
-        <Stack.Screen name="(app)" />
-      </Stack.Protected>
-      <Stack.Protected guard={!signedIn}>
-        <Stack.Screen name="sign-in" />
-      </Stack.Protected>
-      <Stack.Screen name="shared/[token]" options={{ headerShown: true, title: t('appName') }} />
-    </Stack>
+    <>
+      {/* expo-notifications has no web implementation; on the web, notifications come by email. */}
+      {Platform.OS !== 'web' && signedIn && <NotificationTaps />}
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Protected guard={signedIn}>
+          <Stack.Screen name="(app)" />
+        </Stack.Protected>
+        <Stack.Protected guard={!signedIn}>
+          <Stack.Screen name="sign-in" />
+        </Stack.Protected>
+        <Stack.Screen name="shared/[token]" options={{ headerShown: true, title: t('appName') }} />
+      </Stack>
+    </>
   );
+}
+
+/** Tapping a notification opens the list it is about. */
+function NotificationTaps() {
+  const tappedPath = notificationPath(Notifications.useLastNotificationResponse());
+  useEffect(() => {
+    if (tappedPath) router.push(tappedPath as never);
+  }, [tappedPath]);
+  return null;
 }

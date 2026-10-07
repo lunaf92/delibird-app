@@ -153,5 +153,15 @@
     "yours": "You're getting this.",
     "cancel": "I won't get it after all",
     "takenBy": "{{name}} is getting this."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "email": "You get an email when a list is shared with you, or when something you're getting changes.",
+    "turnOn": "Also notify this phone",
+    "on": "This phone gets notifications too.",
+    "denied": "Notifications are turned off for Delibird in this phone's settings.",
+    "web": "Phone notifications are available in the Delibird app.",
+    "simulator": "Phone notifications need a real phone.",
+    "not-configured": "Phone notifications aren't set up in this build of the app yet."
   }
 }

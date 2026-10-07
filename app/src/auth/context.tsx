@@ -5,6 +5,7 @@ import { Platform } from 'react-native';
 
 import { ApiError, fetchMe, logout, verify, type User, type VerifyRequest } from '@/api/client';
 import { isSupportedLanguage } from '@/i18n';
+import { turnOffPush } from '@/notifications/push';
 
 import { loadToken, saveToken } from './storage';
 
@@ -133,7 +134,10 @@ export function AuthProvider({ children }: PropsWithChildren) {
   }, []);
 
   const signOut = useCallback(async () => {
-    if (state.token) await logout(state.token, i18n.language).catch(() => undefined);
+    if (state.token) {
+      await turnOffPush(state.token, i18n.language);
+      await logout(state.token, i18n.language).catch(() => undefined);
+    }
     await forget();
   }, [forget, i18n, state.token]);
 

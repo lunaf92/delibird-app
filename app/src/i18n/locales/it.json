@@ -153,5 +153,15 @@
     "yours": "Lo prendi tu.",
     "cancel": "Alla fine non lo prendo",
     "takenBy": "Lo prende {{name}}."
+  },
+  "notifications": {
+    "title": "Notifiche",
+    "email": "Ricevi un'email quando qualcuno condivide una lista con te, o quando cambia qualcosa che prendi tu.",
+    "turnOn": "Avvisa anche questo telefono",
+    "on": "Anche questo telefono riceve le notifiche.",
+    "denied": "Le notifiche di Delibird sono disattivate nelle impostazioni di questo telefono.",
+    "web": "Le notifiche sul telefono sono disponibili nell'app Delibird.",
+    "simulator": "Le notifiche sul telefono richiedono un telefono vero.",
+    "not-configured": "Le notifiche sul telefono non sono ancora configurate in questa versione dell'app."
   }
 }

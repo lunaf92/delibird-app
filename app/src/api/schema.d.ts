@@ -89,6 +89,24 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/devices/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Registers this phone for push notifications, or stops them. */
+    post: operations['devices_create'];
+    /** @description Registers this phone for push notifications, or stops them. */
+    delete: operations['devices_destroy'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/health/': {
     parameters: {
       query?: never;
@@ -388,6 +406,10 @@ export interface components {
     Detail: {
       detail: string;
     };
+    DeviceRequest: {
+      token: string;
+      platform: components['schemas']['PlatformEnum'];
+    };
     Health: {
       status: components['schemas']['HealthStatusEnum'];
       database: boolean;
@@ -482,6 +504,12 @@ export interface components {
     PatchedWishlistDetailRequest: {
       name?: string;
     };
+    /**
+     * @description * `android` - Android
+     *     * `ios` - Ios
+     * @enum {string}
+     */
+    PlatformEnum: 'android' | 'ios';
     ReorderRequest: {
       /** @description Every id, in the new order. */
       ids: number[];
@@ -764,6 +792,48 @@ export interface operations {
         content: {
           'application/json': components['schemas']['Detail'];
         };
+      };
+    };
+  };
+  devices_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['DeviceRequest'];
+        'application/x-www-form-urlencoded': components['schemas']['DeviceRequest'];
+        'multipart/form-data': components['schemas']['DeviceRequest'];
+      };
+    };
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  devices_destroy: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

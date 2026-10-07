@@ -7,6 +7,7 @@ import { errorMessage, isUnauthorized } from '@/api/errors';
 import { useSignedIn } from '@/auth/context';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { ServerStatus } from '@/components/server-status';
+import { pushAvailability, savedPushToken, turnOnPush } from '@/notifications/push';
 import { Body, Button, Card, Heading, Message, Screen, TextField } from '@/components/ui';
 import type { Language } from '@/i18n';
 
@@ -127,6 +128,8 @@ export default function SettingsScreen() {
       <LanguageSwitcher onChange={changeLanguage} disabled={saving !== null} />
       {profileMessage && <Message tone={profileMessage.tone}>{profileMessage.text}</Message>}
 
+      <PushSettings />
+
       <Heading>{t('settings.sessions')}</Heading>
       <Body muted>{t('settings.sessionsIntro')}</Body>
       <Message tone="error">{sessionsError}</Message>
@@ -191,6 +194,58 @@ export default function SettingsScreen() {
 
       <ServerStatus />
     </Screen>
+  );
+}
+
+/** Push notifications on this phone. Email notifications always arrive. */
+function PushSettings() {
+  const { t, i18n } = useTranslation();
+  const { token } = useSignedIn();
+  const availability = pushAvailability();
+  const [on, setOn] = useState<boolean | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    savedPushToken().then(
+      (saved) => active && setOn(saved !== null),
+      () => active && setOn(false),
+    );
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const turnOn = async () => {
+    setBusy(true);
+    setMessage(null);
+    try {
+      const granted = await turnOnPush(token, i18n.language);
+      setOn(granted);
+      if (!granted) setMessage(t('notifications.denied'));
+    } catch (failure) {
+      setMessage(errorMessage(failure, t));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <>
+      <Heading>{t('notifications.title')}</Heading>
+      <Body muted>{t('notifications.email')}</Body>
+      {availability === 'available' ? (
+        on ? (
+          <Message tone="success">{t('notifications.on')}</Message>
+        ) : (
+          <Button variant="secondary" label={t('notifications.turnOn')} onPress={turnOn} busy={busy} />
+        )
+      ) : (
+        <Body muted>{t(`notifications.${availability}`)}</Body>
+      )}
+      <Message tone="error">{message}</Message>
+    </>
   );
 }
 
