@@ -21,8 +21,18 @@ export default function EditItemScreen() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [pending, setPending] = useState<{ values: ItemValues; image: ImageChange } | null>(null);
+  // On a shared list someone may already have bought this item. The app never knows whether they did, so
+  // it always asks before saving or deleting there.
+  const shared = lists?.find((list) => list.id === item?.wishlist)?.is_shared ?? false;
 
-  const submit = async (values: ItemValues, image: ImageChange) => {
+  const submit = (values: ItemValues, image: ImageChange) => {
+    if (shared) setPending({ values, image });
+    else save(values, image);
+  };
+
+  const save = async (values: ItemValues, image: ImageChange) => {
+    setPending(null);
     setBusy(true);
     setError(null);
     try {
@@ -64,9 +74,20 @@ export default function EditItemScreen() {
         onSubmit={submit}
       />
 
+      {pending && (
+        <Card>
+          <Body>{t('items.sharedWarning')}</Body>
+          <View style={styles.row}>
+            <Button label={t('items.continue')} onPress={() => save(pending.values, pending.image)} />
+            <Button variant="secondary" label={t('settings.cancel')} onPress={() => setPending(null)} />
+          </View>
+        </Card>
+      )}
+
       <Heading>{t('items.deleteTitle')}</Heading>
       {confirmingDelete ? (
         <Card>
+          {shared && <Body>{t('items.sharedWarning')}</Body>}
           <Body>{t('items.deleteWarning', { name: item.name })}</Body>
           <View style={styles.row}>
             <Button variant="danger" label={t('items.deleteConfirm')} onPress={remove} busy={busy} />

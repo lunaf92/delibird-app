@@ -107,10 +107,51 @@
     "deleteTitle": "Eliminar artículo",
     "delete": "Eliminar artículo…",
     "deleteWarning": "¿Eliminar «{{name}}»? No se puede deshacer.",
-    "deleteConfirm": "Eliminar artículo"
+    "deleteConfirm": "Eliminar artículo",
+    "sharedWarning": "Puede que alguien ya lo haya comprado. ¿Continuar?",
+    "continue": "Continuar"
   },
   "reorder": {
     "up": "Subir {{name}}",
     "down": "Bajar {{name}}"
+  },
+  "sharing": {
+    "title": "Compartir",
+    "intro": "Cada persona recibe su propio enlace. Puede ver esta lista y marcar en secreto lo que va a regalar; tú nunca verás qué está cogido.",
+    "add": "Compartir con alguien",
+    "email": "Su correo",
+    "createLink": "Crear su enlace",
+    "linkFor": "Enlace para {{email}}:",
+    "linkOnce": "Envíaselo ahora: por seguridad solo se muestra una vez. Si se pierde, deja de compartir y vuelve a añadir a la persona.",
+    "copy": "Copiar enlace",
+    "copied": "Copiado",
+    "send": "Enviar…",
+    "people": "Personas con enlace",
+    "nobody": "Todavía no se ha compartido con nadie.",
+    "joinedAs": "Abierto por {{name}}",
+    "notJoined": "Todavía no se ha abierto",
+    "stop": "Dejar de compartir…",
+    "stopWarning": "El enlace de {{email}} dejará de funcionar.",
+    "stopConfirm": "Dejar de compartir",
+    "manage": "Compartir esta lista…",
+    "isShared": "Compartida con las personas que tienen un enlace.",
+    "notShared": "Solo tú puedes ver esta lista."
+  },
+  "shared": {
+    "from": "De {{name}}",
+    "signInToReserve": "Entra para ver lo que ya está cogido y marcar lo que vas a regalar. {{owner}} no lo verá.",
+    "signIn": "Entrar",
+    "joinExplained": "Añade esta lista a Compartidas conmigo para marcar lo que vas a regalar.",
+    "join": "Añadir a Compartidas conmigo",
+    "openInSharedWithMe": "Abrir en Compartidas conmigo",
+    "ownerNote": "Esta es tu lista. Así la ven las personas con el enlace; lo que reservan queda oculto para ti.",
+    "empty": "Por ahora esta lista está vacía.",
+    "openLink": "Abrir enlace",
+    "withMe": "Compartidas conmigo",
+    "secret": "{{name}} no puede ver lo que regala cada uno.",
+    "reserve": "Lo regalo yo",
+    "yours": "Lo regalas tú.",
+    "cancel": "Al final no lo regalo",
+    "takenBy": "Lo regala {{name}}."
   }
 }

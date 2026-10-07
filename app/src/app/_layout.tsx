@@ -1,10 +1,12 @@
 import '@/i18n';
 
-import { DarkTheme, DefaultTheme, SplashScreen, Stack, ThemeProvider } from 'expo-router';
+import { DarkTheme, DefaultTheme, router, SplashScreen, Stack, ThemeProvider } from 'expo-router';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useColorScheme } from 'react-native';
 
 import { AuthProvider, useAuth } from '@/auth/context';
+import { takeReturnTo } from '@/auth/storage';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -20,8 +22,10 @@ export default function RootLayout() {
   );
 }
 
-/** Signed-out people only reach the sign-in screens; everything in (app) needs a session. */
+/** Signed-out people only reach the sign-in screens; everything in (app) needs a session. Share links
+ * (/shared/…) open either way. */
 function RootNavigator() {
+  const { t } = useTranslation();
   const { status } = useAuth();
   const signedIn = status === 'signedIn';
 
@@ -29,6 +33,13 @@ function RootNavigator() {
   useEffect(() => {
     if (status !== 'loading') SplashScreen.hide();
   }, [status]);
+
+  // After signing in, go back to where sign-in was asked for, such as a share link.
+  useEffect(() => {
+    if (!signedIn) return;
+    const path = takeReturnTo();
+    if (path?.startsWith('/') && !path.startsWith('//')) router.replace(path as never);
+  }, [signedIn]);
 
   // Mounting the navigator only once the session is known keeps deep links (such as /settings) intact,
   // instead of redirecting them to sign-in while the saved session is still loading.
@@ -42,6 +53,7 @@ function RootNavigator() {
       <Stack.Protected guard={!signedIn}>
         <Stack.Screen name="sign-in" />
       </Stack.Protected>
+      <Stack.Screen name="shared/[token]" options={{ headerShown: true, title: t('appName') }} />
     </Stack>
   );
 }

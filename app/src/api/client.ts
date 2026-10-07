@@ -20,6 +20,14 @@ export type Item = Schemas['Item'];
 export type ItemInput = Schemas['ItemRequest'];
 export type ItemUpdate = Schemas['PatchedItemRequest'];
 
+export type Share = Schemas['Share'];
+export type NewShare = Schemas['NewShare'];
+export type SharedList = Schemas['SharedList'];
+export type SharedItem = Schemas['SharedItem'];
+export type ViewerList = Schemas['ViewerList'];
+export type ViewerListSummary = Schemas['ViewerListSummary'];
+export type ViewerItem = Schemas['ViewerItem'];
+
 /** A picture chosen on the device: a File on the web, a local file URI on phones. */
 export type PickedImage = { uri: string; name: string; type: string; file?: Blob };
 
@@ -175,4 +183,54 @@ export function uploadItemImage(
 
 export function deleteItemImage(token: string, id: number, language: string): Promise<Item> {
   return request(`items/${id}/image/`, { method: 'DELETE', token, language });
+}
+
+export function fetchShares(token: string, listId: number, language: string): Promise<Share[]> {
+  return request(`lists/${listId}/shares/`, { token, language });
+}
+
+export function createShare(
+  token: string,
+  listId: number,
+  email: string,
+  language: string,
+): Promise<NewShare> {
+  return request(`lists/${listId}/shares/`, { method: 'POST', body: { email }, token, language });
+}
+
+export function stopSharing(token: string, shareId: number, language: string): Promise<void> {
+  return request(`shares/${shareId}/`, { method: 'DELETE', token, language });
+}
+
+/** Opens a share link. Works signed out; signed in, the answer says how this person relates to the list. */
+export function fetchSharedList(
+  token: string | null,
+  shareToken: string,
+  language: string,
+): Promise<SharedList> {
+  return request(`shared/${encodeURIComponent(shareToken)}/`, { token, language });
+}
+
+export function joinSharedList(
+  token: string,
+  shareToken: string,
+  language: string,
+): Promise<ViewerListSummary> {
+  return request(`shared/${encodeURIComponent(shareToken)}/join/`, { method: 'POST', token, language });
+}
+
+export function fetchSharedWithMe(token: string, language: string): Promise<ViewerListSummary[]> {
+  return request('shared-with-me/', { token, language });
+}
+
+export function fetchViewerList(token: string, listId: number, language: string): Promise<ViewerList> {
+  return request(`shared-with-me/${listId}/`, { token, language });
+}
+
+export function reserveItem(token: string, itemId: number, language: string): Promise<void> {
+  return request(`items/${itemId}/reservation/`, { method: 'POST', token, language });
+}
+
+export function cancelReservation(token: string, itemId: number, language: string): Promise<void> {
+  return request(`items/${itemId}/reservation/`, { method: 'DELETE', token, language });
 }

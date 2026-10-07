@@ -143,6 +143,30 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/items/{id}/reservation/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * @description Reserve an item on a list shared with you, or cancel your reservation. For anyone who can't
+     *     reserve the item, the owner included, the answer is the same 404 as for an item that doesn't exist.
+     */
+    post: operations['items_reservation_create'];
+    /**
+     * @description Reserve an item on a list shared with you, or cancel your reservation. For anyone who can't
+     *     reserve the item, the owner included, the answer is the same 404 as for an item that doesn't exist.
+     */
+    delete: operations['items_reservation_destroy'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/lists/': {
     parameters: {
       query?: never;
@@ -215,6 +239,24 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/lists/{id}/shares/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The people a list is shared with. Adding someone returns their personal link, once. */
+    get: operations['lists_shares_list'];
+    put?: never;
+    /** @description The people a list is shared with. Adding someone returns their personal link, once. */
+    post: operations['lists_shares_create'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/lists/reorder/': {
     parameters: {
       query?: never;
@@ -251,6 +293,94 @@ export interface paths {
     patch: operations['me_partial_update'];
     trace?: never;
   };
+  '/api/v1/shared-with-me/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Lists other people shared with you, once you accepted their link. */
+    get: operations['shared_with_me_list'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/shared-with-me/{id}/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description One list shared with you, with which items are free, yours, or taken and by whom. */
+    get: operations['shared_with_me_retrieve'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/shared/{token}/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * @description A list opened through someone's link. Needs no account, and never says which items are taken:
+     *     signed-in viewers see that in "Shared with me". The owner gets the same owner-safe view.
+     */
+    get: operations['shared_retrieve'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/shared/{token}/join/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Accepts a link: the list then appears under "Shared with me" and its items can be reserved. */
+    post: operations['shared_join_create'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/shares/{id}/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** @description Stops sharing with one person. Their link stops working. */
+    delete: operations['shares_destroy'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -259,12 +389,18 @@ export interface components {
       detail: string;
     };
     Health: {
-      status: components['schemas']['StatusEnum'];
+      status: components['schemas']['HealthStatusEnum'];
       database: boolean;
       redis: boolean;
       language: string;
       message: string;
     };
+    /**
+     * @description * `ok` - ok
+     *     * `degraded` - degraded
+     * @enum {string}
+     */
+    HealthStatusEnum: 'ok' | 'degraded';
     ImageUploadRequest: {
       /**
        * Format: binary
@@ -309,6 +445,25 @@ export interface components {
      * @enum {string}
      */
     LanguageEnum: 'en' | 'it' | 'es';
+    /** @description A share as its owner sees it. */
+    NewShare: {
+      readonly id: number;
+      /** Format: email */
+      email: string;
+      /** @description Whether someone has accepted the link. */
+      readonly joined: boolean;
+      /** @description The name of whoever accepted the link. */
+      readonly joined_as: string | null;
+      /** Format: date-time */
+      readonly created_at: string;
+      /** @description The person's own link. It is shown only once. */
+      readonly link: string;
+    };
+    /** @description A share as its owner sees it. */
+    NewShareRequest: {
+      /** Format: email */
+      email: string;
+    };
     PatchedItemRequest: {
       wishlist?: number;
       name?: string;
@@ -335,6 +490,20 @@ export interface components {
       /** Format: email */
       email: string;
     };
+    ReservationState: {
+      status: components['schemas']['ReservationStateStatusEnum'];
+      /** @description Who is getting it, when someone else is. */
+      by: string | null;
+    };
+    /**
+     * @description * `free` - free
+     *     * `mine` - mine
+     *     * `taken` - taken
+     * @enum {string}
+     */
+    ReservationStateStatusEnum: 'free' | 'mine' | 'taken';
+    /** @enum {string} */
+    RoleEnum: 'owner' | 'viewer' | 'invited' | 'anonymous';
     Session: {
       readonly id: number;
       readonly device_name: string;
@@ -344,17 +513,45 @@ export interface components {
       readonly last_used_at: string;
       readonly current: boolean;
     };
+    /** @description A share as its owner sees it. */
+    Share: {
+      readonly id: number;
+      /** Format: email */
+      email: string;
+      /** @description Whether someone has accepted the link. */
+      readonly joined: boolean;
+      /** @description The name of whoever accepted the link. */
+      readonly joined_as: string | null;
+      /** Format: date-time */
+      readonly created_at: string;
+    };
+    /** @description An item as people the list is shared with see it, without anything about reservations. */
+    SharedItem: {
+      readonly id: number;
+      name: string;
+      /** Link */
+      url: string;
+      description: string;
+      rating: number | null;
+      readonly image: string | null;
+      /** Format: decimal */
+      price: string | null;
+      currency: string;
+    };
+    /** @description A list opened through a share link. `role` says how the requester relates to it. */
+    SharedList: {
+      readonly id: number;
+      name: string;
+      readonly owner_name: string;
+      /** @description owner: it's your list. viewer: you accepted this link. invited: sign in or accept to reserve. anonymous: not signed in. */
+      readonly role: components['schemas']['RoleEnum'];
+      readonly items: components['schemas']['SharedItem'][];
+    };
     SignedIn: {
       /** @description Send it as `Authorization: Bearer <token>`. */
       token: string;
       user: components['schemas']['User'];
     };
-    /**
-     * @description * `ok` - ok
-     *     * `degraded` - degraded
-     * @enum {string}
-     */
-    StatusEnum: 'ok' | 'degraded';
     User: {
       readonly id: number;
       /** Format: email */
@@ -370,6 +567,33 @@ export interface components {
       token?: string;
       device_name?: string;
     };
+    /** @description An item as a signed-in viewer sees it: with whether it is taken, and by whom. */
+    ViewerItem: {
+      readonly id: number;
+      name: string;
+      /** Link */
+      url: string;
+      description: string;
+      rating: number | null;
+      readonly image: string | null;
+      /** Format: decimal */
+      price: string | null;
+      currency: string;
+      readonly reservation: components['schemas']['ReservationState'];
+    };
+    ViewerList: {
+      readonly id: number;
+      name: string;
+      readonly owner_name: string;
+      readonly item_count: number;
+      readonly items: components['schemas']['ViewerItem'][];
+    };
+    ViewerListSummary: {
+      readonly id: number;
+      name: string;
+      readonly owner_name: string;
+      readonly item_count: number;
+    };
     Wishlist: {
       readonly id: number;
       name: string;
@@ -377,6 +601,8 @@ export interface components {
       readonly position: number;
       /** @description How many items the list holds. */
       readonly item_count: number;
+      /** @description Whether anyone has a link to this list. */
+      readonly is_shared: boolean;
       /** Format: date-time */
       readonly created_at: string;
       /** Format: date-time */
@@ -389,6 +615,8 @@ export interface components {
       readonly position: number;
       /** @description How many items the list holds. */
       readonly item_count: number;
+      /** @description Whether anyone has a link to this list. */
+      readonly is_shared: boolean;
       /** Format: date-time */
       readonly created_at: string;
       /** Format: date-time */
@@ -672,6 +900,67 @@ export interface operations {
       };
     };
   };
+  items_reservation_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No response body */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No response body */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  items_reservation_destroy: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No response body */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   lists_list: {
     parameters: {
       query?: never;
@@ -858,6 +1147,54 @@ export interface operations {
       };
     };
   };
+  lists_shares_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Share'][];
+        };
+      };
+    };
+  };
+  lists_shares_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['NewShareRequest'];
+        'application/x-www-form-urlencoded': components['schemas']['NewShareRequest'];
+        'multipart/form-data': components['schemas']['NewShareRequest'];
+      };
+    };
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['NewShare'];
+        };
+      };
+    };
+  };
   lists_reorder_create: {
     parameters: {
       query?: never;
@@ -941,6 +1278,129 @@ export interface operations {
         content: {
           'application/json': components['schemas']['User'];
         };
+      };
+    };
+  };
+  shared_with_me_list: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ViewerListSummary'][];
+        };
+      };
+    };
+  };
+  shared_with_me_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ViewerList'];
+        };
+      };
+    };
+  };
+  shared_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SharedList'];
+        };
+      };
+      /** @description Unknown link */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  shared_join_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ViewerListSummary'];
+        };
+      };
+      /** @description It's your own list */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Someone else already accepted this link */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  shares_destroy: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

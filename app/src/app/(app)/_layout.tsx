@@ -12,7 +12,9 @@ export default function SignedInLayout() {
       <Stack.Screen name="index" />
       <Stack.Screen name="lists/[id]/index" options={{ title: '' }} />
       <Stack.Screen name="lists/[id]/new" options={{ title: t('items.newTitle') }} />
+      <Stack.Screen name="lists/[id]/sharing" options={{ title: t('sharing.title') }} />
       <Stack.Screen name="items/[id]" options={{ title: t('items.editTitle') }} />
+      <Stack.Screen name="shared-with-me/[id]" options={{ title: '' }} />
       <Stack.Screen name="settings" options={{ title: t('settings.title') }} />
     </Stack>
   );
