@@ -4,6 +4,7 @@ from rest_framework.test import APIClient
 
 from accounts.models import User
 from accounts.tests.helpers import sign_in_as
+from notifications.services import notify_buyers
 from sharing.models import Reservation
 from sharing.services import NewShare, join, share_list
 from wishlists.models import Item, Wishlist
@@ -112,12 +113,16 @@ def test_deleting_the_buyer_account_releases_their_reservations(
     assert viewer_items(carol, scarf.wishlist)["Wool scarf"] == {"status": "free", "by": None}
 
 
-def test_deleting_a_reserved_item_removes_the_reservation(
+def test_a_deleted_items_reservation_goes_once_the_buyer_is_told(
     client: APIClient, scarf: Item, bob_share: NewShare, bob_client: APIClient
 ) -> None:
     bob_client.post(reverse("item-reservation", args=[scarf.pk]))
 
     assert client.delete(reverse("item", args=[scarf.pk])).status_code == 204
+    # Deleting the item leaves the reservation alone, so the owner's request is the same either way.
+    assert Reservation.objects.exists()
+
+    notify_buyers()
     assert not Reservation.objects.exists()
 
 

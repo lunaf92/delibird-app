@@ -1,0 +1,19 @@
+{% load i18n %}{% autoescape off %}{% translate "Hello," %}
+
+{% if kind == "list_shared" %}{% blocktranslate trimmed %}
+{{ owner }} shared their wishlist “{{ list }}” with you on Delibird.
+{% endblocktranslate %}
+
+{% translate "Open it here:" %}
+{{ link }}
+
+{% blocktranslate trimmed %}
+You can look without an account. Sign in to mark what you'll get: {{ owner }} won't see it.
+{% endblocktranslate %}{% elif kind == "item_changed" %}{% blocktranslate trimmed %}
+{{ owner }} changed “{{ item }}” on their list “{{ list }}”, and you said you'd get it. Take a look before you buy it:
+{% endblocktranslate %}
+{{ link }}{% else %}{% blocktranslate trimmed %}
+{{ owner }} removed “{{ item }}” from their list “{{ list }}”. You'd said you'd get it, so it's no longer reserved for you. Have a look at the list for something else:
+{% endblocktranslate %}
+{{ link }}{% endif %}
+{% endautoescape %}

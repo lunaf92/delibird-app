@@ -27,6 +27,9 @@ from rest_framework.test import APIClient
 
 from accounts.models import User
 from accounts.services import open_session
+from notifications import push
+from notifications import services as notifications
+from notifications.models import PushDevice
 from sharing.models import Reservation
 from sharing.services import join, share_list
 from wishlists.models import Item, Wishlist
@@ -86,6 +89,7 @@ def world(tmp_path: Path, settings: Any) -> World:
     join(shares["carol-christmas"].share, carol)
     join(shares["carol-default"].share, carol)
 
+    PushDevice.objects.create(user=ann, token="ExponentPushToken[ann-phone]", platform="android")
     owner_token = open_session(ann, "Laptop")
     open_session(ann, "Phone")
     other = ann.sessions.get(device_name="Phone")
@@ -107,6 +111,23 @@ def reserve_everything(world: World) -> None:
     """Every item on every list gets reserved, some by each viewer, including the never-shared list."""
     for index, item in enumerate(Item.objects.filter(wishlist__owner=world.owner)):
         Reservation.objects.create(item=item, buyer=world.viewers[index % 2])
+
+
+@pytest.fixture(autouse=True)
+def push_outbox(monkeypatch: pytest.MonkeyPatch) -> list[Any]:
+    """Push messages are recorded instead of sent to Expo."""
+    sent: list[Any] = []
+
+    def fake_post(url: str, payload: Any) -> Any:
+        if isinstance(payload, list):
+            sent.extend(payload)
+            return {
+                "data": [{"status": "ok", "id": f"ticket-{len(sent)}-{i}"} for i, _ in enumerate(payload)]
+            }
+        return {"data": {}}
+
+    monkeypatch.setattr(push, "post_json", fake_post)
+    return sent
 
 
 @dataclass
@@ -229,6 +250,21 @@ CALLS: list[Call] = [
     ),
     Call("shared-with-me", "get", lambda w: reverse("shared-with-me")),
     Call("shared-with-me-list", "get", lambda w: reverse("shared-with-me-list", args=[w.christmas.pk])),
+    # Push notifications for the owner's phone.
+    Call(
+        "devices",
+        "post",
+        lambda w: reverse("devices"),
+        lambda w: {"token": "ExponentPushToken[ann-tablet]", "platform": "ios"},
+        changes_data=True,
+    ),
+    Call(
+        "devices",
+        "delete",
+        lambda w: reverse("devices"),
+        lambda w: {"token": "ExponentPushToken[ann-phone]"},
+        changes_data=True,
+    ),
     # Reserving is refused for the owner exactly as for an item that does not exist.
     Call(
         "item-reservation",
@@ -278,13 +314,18 @@ def perform(world: World, call: Call) -> dict[str, Any]:
     return {"status": response.status_code, "headers": headers, "body": content}
 
 
-def run_all(world: World) -> list[dict[str, Any]]:
+def run_all(world: World, push_outbox: list[Any]) -> list[dict[str, Any]]:
     results = []
     for call in CALLS:
         mail.outbox.clear()
+        push_outbox.clear()
         if call.changes_data:
             savepoint = transaction.savepoint_create()
             result = perform(world, call)
+            # Whatever the notifications worker would send after this request is part of what the owner sees.
+            notifications.notify_buyers()
+            notifications.remove_orphaned_reservations()
+            notifications.send_pending()
             transaction.savepoint_rollback(savepoint)
         else:
             result = perform(world, call)
@@ -293,19 +334,20 @@ def run_all(world: World) -> list[dict[str, Any]]:
             for m in mail.outbox
             if "ann@example.com" in m.to
         ]
+        result["pushes"] = [message for message in push_outbox if "ann-" in str(message["to"])]
         results.append({"call": f"{call.method.upper()} {call.route}", **result})
     return results
 
 
-def test_owner_sees_nothing_change_when_everything_is_reserved(world: World) -> None:
+def test_owner_sees_nothing_change_when_everything_is_reserved(world: World, push_outbox: list[Any]) -> None:
     item_rows_before = list(Item.objects.order_by("pk").values())
-    before = run_all(world)
+    before = run_all(world, push_outbox)
 
     reserve_everything(world)
     assert Reservation.objects.count() == 5
 
     assert list(Item.objects.order_by("pk").values()) == item_rows_before
-    after = run_all(world)
+    after = run_all(world, push_outbox)
     for expected, actual in zip(before, after, strict=True):
         assert actual == expected, expected["call"]
 

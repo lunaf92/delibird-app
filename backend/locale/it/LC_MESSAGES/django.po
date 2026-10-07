@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: delibird\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-07 21:56+0000\n"
+"POT-Creation-Date: 2026-10-07 22:19+0000\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,15 +26,15 @@ msgstr "Intestazione di autorizzazione non valida."
 msgid "Your session has ended. Sign in again."
 msgstr "La tua sessione è terminata. Accedi di nuovo."
 
-#: accounts/models.py:19 config/settings.py:104
+#: accounts/models.py:19 config/settings.py:105
 msgid "English"
 msgstr "Inglese"
 
-#: accounts/models.py:20 config/settings.py:105
+#: accounts/models.py:20 config/settings.py:106
 msgid "Italian"
 msgstr "Italiano"
 
-#: accounts/models.py:21 config/settings.py:106
+#: accounts/models.py:21 config/settings.py:107
 msgid "Spanish"
 msgstr "Spagnolo"
 
@@ -81,6 +81,8 @@ msgstr "Il tuo codice di accesso a Delibird: %(code)s"
 
 #: accounts/templates/accounts/email/sign_in.html:9
 #: accounts/templates/accounts/email/sign_in.txt:1
+#: notifications/templates/notifications/email/notification.html:9
+#: notifications/templates/notifications/email/notification.txt:1
 msgid "Hello,"
 msgstr "Ciao,"
 
@@ -139,23 +141,97 @@ msgstr "Il server è in funzione."
 msgid "The server has a problem."
 msgstr "Il server ha un problema."
 
-#: sharing/views.py:58
+#: notifications/messages.py:34
+#, python-format
+msgid "%(owner)s shared a wishlist with you: %(list)s"
+msgstr "%(owner)s ha condiviso con te una lista dei desideri: %(list)s"
+
+#: notifications/messages.py:35
+msgid "A list was shared with you"
+msgstr "Una lista è stata condivisa con te"
+
+#: notifications/messages.py:36
+#, python-format
+msgid "%(owner)s shared “%(list)s” with you."
+msgstr "%(owner)s ha condiviso con te “%(list)s”."
+
+#: notifications/messages.py:40
+#, python-format
+msgid "“%(item)s” changed"
+msgstr "“%(item)s” è cambiato"
+
+#: notifications/messages.py:43
+#, python-format
+msgid ""
+"%(owner)s changed something you're getting. Take a look before you buy it."
+msgstr "%(owner)s ha cambiato qualcosa che prendi tu. Dai un'occhiata prima di comprarlo."
+
+#: notifications/messages.py:48
+#, python-format
+msgid "“%(item)s” was removed"
+msgstr "“%(item)s” è stato rimosso"
+
+#: notifications/messages.py:50
+#, python-format
+msgid "%(owner)s removed something you were getting from “%(list)s”."
+msgstr "%(owner)s ha rimosso da “%(list)s” qualcosa che avresti preso tu."
+
+#: notifications/templates/notifications/email/notification.html:12
+#: notifications/templates/notifications/email/notification.txt:3
+#, python-format
+msgid "%(owner)s shared their wishlist “%(list)s” with you on Delibird."
+msgstr "%(owner)s ha condiviso con te la sua lista dei desideri “%(list)s” su Delibird."
+
+#: notifications/templates/notifications/email/notification.html:14
+#: notifications/templates/notifications/email/notification.txt:12
+#, python-format
+msgid ""
+"%(owner)s changed “%(item)s” on their list “%(list)s”, and you said you'd "
+"get it. Take a look before you buy it:"
+msgstr "%(owner)s ha cambiato “%(item)s” nella sua lista “%(list)s”, e avevi detto che l'avresti preso tu. Dai un'occhiata prima di comprarlo:"
+
+#: notifications/templates/notifications/email/notification.html:16
+#: notifications/templates/notifications/email/notification.txt:15
+#, python-format
+msgid ""
+"%(owner)s removed “%(item)s” from their list “%(list)s”. You'd said you'd "
+"get it, so it's no longer reserved for you. Have a look at the list for "
+"something else:"
+msgstr "%(owner)s ha rimosso “%(item)s” dalla sua lista “%(list)s”. Avevi detto che l'avresti preso tu, quindi non è più prenotato per te. Dai un'occhiata alla lista per qualcos'altro:"
+
+#: notifications/templates/notifications/email/notification.html:23
+msgid "Open the list"
+msgstr "Apri la lista"
+
+#: notifications/templates/notifications/email/notification.html:29
+#: notifications/templates/notifications/email/notification.txt:10
+#, python-format
+msgid ""
+"You can look without an account. Sign in to mark what you'll get: %(owner)s "
+"won't see it."
+msgstr "Puoi guardarla senza un account. Accedi per segnare cosa prenderai: %(owner)s non lo vedrà."
+
+#: notifications/templates/notifications/email/notification.txt:7
+msgid "Open it here:"
+msgstr "Aprila qui:"
+
+#: sharing/views.py:60
 msgid "This list is already shared with that address."
 msgstr "Questa lista è già condivisa con questo indirizzo."
 
-#: sharing/views.py:89 sharing/views.py:122
+#: sharing/views.py:93 sharing/views.py:126
 msgid "This link doesn't work any more. Ask for a new one."
 msgstr "Questo link non funziona più. Chiedine uno nuovo."
 
-#: sharing/views.py:126
+#: sharing/views.py:130
 msgid "This is your own list."
 msgstr "Questa è la tua lista."
 
-#: sharing/views.py:128
+#: sharing/views.py:132
 msgid "Someone else already accepted this link. Ask for your own."
 msgstr "Qualcun altro ha già accettato questo link. Chiedine uno tutto tuo."
 
-#: sharing/views.py:178
+#: sharing/views.py:182
 msgid "Someone else is already getting this."
 msgstr "Qualcun altro lo sta già prendendo."
 
@@ -204,10 +280,10 @@ msgstr "Invia ogni id una sola volta, nel nuovo ordine."
 msgid "Your default list can't be deleted."
 msgstr "La tua lista predefinita non si può eliminare."
 
-#: wishlists/views.py:163
+#: wishlists/views.py:165
 msgid "Choose a picture to upload."
 msgstr "Scegli un'immagine da caricare."
 
-#: wishlists/views.py:168
+#: wishlists/views.py:170
 msgid "Use a JPEG, PNG, WebP or GIF picture of up to 10 MB."
 msgstr "Usa un'immagine JPEG, PNG, WebP o GIF fino a 10 MB."

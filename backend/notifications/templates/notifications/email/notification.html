@@ -1,0 +1,40 @@
+{% load i18n %}{% get_current_language as LANGUAGE_CODE %}<!doctype html>
+<html lang="{{ LANGUAGE_CODE }}">
+  <body style="margin:0;padding:24px;background:#f5f7fa;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1c1f24">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#ffffff;border-radius:12px;padding:32px">
+            <tr><td style="font-size:20px;font-weight:600;padding-bottom:16px">Delibird</td></tr>
+            <tr><td style="font-size:16px;line-height:24px">{% translate "Hello," %}</td></tr>
+            <tr>
+              <td style="font-size:16px;line-height:24px;padding-top:8px">
+                {% if kind == "list_shared" %}{% blocktranslate trimmed %}
+                {{ owner }} shared their wishlist “{{ list }}” with you on Delibird.
+                {% endblocktranslate %}{% elif kind == "item_changed" %}{% blocktranslate trimmed %}
+                {{ owner }} changed “{{ item }}” on their list “{{ list }}”, and you said you'd get it. Take a look before you buy it:
+                {% endblocktranslate %}{% else %}{% blocktranslate trimmed %}
+                {{ owner }} removed “{{ item }}” from their list “{{ list }}”. You'd said you'd get it, so it's no longer reserved for you. Have a look at the list for something else:
+                {% endblocktranslate %}{% endif %}
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 0">
+                <a href="{{ link }}" style="display:inline-block;background:#208aef;color:#ffffff;text-decoration:none;font-weight:600;padding:12px 20px;border-radius:8px">{% translate "Open the list" %}</a>
+              </td>
+            </tr>
+            {% if kind == "list_shared" %}
+            <tr>
+              <td style="font-size:14px;line-height:20px;color:#5c6370">
+                {% blocktranslate trimmed %}
+                You can look without an account. Sign in to mark what you'll get: {{ owner }} won't see it.
+                {% endblocktranslate %}
+              </td>
+            </tr>
+            {% endif %}
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

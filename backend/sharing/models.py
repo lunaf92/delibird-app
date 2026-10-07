@@ -40,7 +40,10 @@ class Reservation(models.Model):
     """Someone is getting this item. Kept apart from Item, and with no reverse accessor on it, so nothing
     the owner sees is built from or changed by a reservation."""
 
-    item = models.OneToOneField(Item, on_delete=models.CASCADE, related_name="+")
+    # No database constraint and nothing done on delete: deleting an item never touches reservations, so
+    # the owner's request is the same with or without one. The notifications worker tells the buyer and
+    # then removes reservations whose item is gone.
+    item = models.OneToOneField(Item, on_delete=models.DO_NOTHING, db_constraint=False, related_name="+")
     buyer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="+")
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -56,7 +59,11 @@ class ItemChange(models.Model):
         CHANGED = "changed"
         DELETED = "deleted"
 
-    wishlist = models.ForeignKey(Wishlist, on_delete=models.CASCADE, related_name="+")
+    # Plain copies, not foreign keys: the record has to outlive the item, its list and even the owner's
+    # account until the worker has told the buyers.
+    wishlist_id = models.PositiveBigIntegerField()
+    wishlist_name = models.CharField(max_length=100)
+    owner_name = models.CharField(max_length=254)
     item_id = models.PositiveBigIntegerField()
     item_name = models.CharField(max_length=200)
     kind = models.CharField(max_length=10, choices=Kind)

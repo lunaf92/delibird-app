@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "accounts",
     "wishlists",
     "sharing",
+    "notifications",
 ]
 
 MIDDLEWARE = [
@@ -125,7 +126,20 @@ CELERY_BEAT_SCHEDULE: dict[str, dict[str, object]] = {
         "task": "accounts.tasks.clear_expired_login_codes",
         "schedule": timedelta(hours=1),
     },
+    "notify-buyers": {
+        "task": "notifications.tasks.notify_buyers",
+        "schedule": timedelta(minutes=1),
+    },
+    "check-push-receipts": {
+        "task": "notifications.tasks.check_push_receipts",
+        "schedule": timedelta(minutes=15),
+    },
 }
+
+# Push notifications go through Expo's push service, which needs no key.
+PUSH_ENABLED = env_bool("PUSH_ENABLED", True)
+EXPO_PUSH_SEND_URL = "https://exp.host/--/api/v2/push/send"
+EXPO_PUSH_RECEIPTS_URL = "https://exp.host/--/api/v2/push/getReceipts"
 
 # Rate limits and other short-lived counters.
 CACHES = {
