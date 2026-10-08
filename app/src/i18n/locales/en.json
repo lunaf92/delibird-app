@@ -78,7 +78,15 @@
     "deleteWarning_zero": "This deletes the list. It can't be undone.",
     "deleteWarning_one": "This deletes the list and its {{count}} item. It can't be undone.",
     "deleteWarning_other": "This deletes the list and its {{count}} items. It can't be undone.",
-    "deleteConfirm": "Delete list"
+    "deleteConfirm": "Delete list",
+    "addExisting": "Add items you already have",
+    "addExistingTitle": "Add to {{name}}",
+    "addExistingIntro": "Everything you've added lives on your default list. Pick what should also be on this one; editing an item later changes it on every list.",
+    "nothingToAdd": "Everything you have is already on this list.",
+    "addThis": "Add {{name}}",
+    "added": "Added",
+    "takeOff": "Take {{name}} off this list",
+    "takeOffConfirm": "Take it off this list"
   },
   "items": {
     "add": "Add an item",
@@ -99,17 +107,18 @@
     "addPicture": "Add a picture",
     "changePicture": "Change picture",
     "removePicture": "Remove picture",
-    "list": "List",
     "save": "Save",
     "nameRequired": "Give the item a name.",
     "urlInvalid": "Enter a full link, starting with https://",
     "priceInvalid": "Enter a price such as 39.90.",
     "deleteTitle": "Delete item",
     "delete": "Delete item…",
-    "deleteWarning": "Delete “{{name}}”? It can't be undone.",
+    "deleteWarning": "Delete “{{name}}” from all your lists? It can't be undone.",
     "deleteConfirm": "Delete item",
     "sharedWarning": "Someone may already have bought this. Continue?",
-    "continue": "Continue"
+    "continue": "Continue",
+    "lists": "Lists",
+    "listsHelp": "Choose every list this item should be on. It always stays on your default list."
   },
   "reorder": {
     "up": "Move {{name}} up",

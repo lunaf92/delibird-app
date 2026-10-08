@@ -58,6 +58,7 @@ class ItemChange(models.Model):
     class Kind(models.TextChoices):
         CHANGED = "changed"
         DELETED = "deleted"
+        REMOVED = "removed"  # Taken off this list; it may still be on others.
 
     # Plain copies, not foreign keys: the record has to outlive the item, its list and even the owner's
     # account until the worker has told the buyers.

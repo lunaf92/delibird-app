@@ -6,9 +6,14 @@ from rest_framework.test import APIClient
 
 from accounts.models import User
 from wishlists.models import Item, Wishlist
-from wishlists.services import add_item, create_wishlist
+from wishlists.services import create_wishlist
+from wishlists.tests.helpers import add_item
 
 pytestmark = pytest.mark.django_db
+
+
+def names_on(client: APIClient, wishlist: Wishlist) -> list[str]:
+    return [item["name"] for item in client.get(reverse("list-items", args=[wishlist.pk])).json()]
 
 
 @pytest.fixture
@@ -21,8 +26,8 @@ def test_add_an_item_with_only_a_name(client: APIClient, christmas: Wishlist) ->
 
     assert response.status_code == 201
     body = response.json()
-    assert {k: body[k] for k in ("wishlist", "name", "url", "description", "rating", "image", "price")} == {
-        "wishlist": christmas.pk,
+    assert {k: body[k] for k in ("lists", "name", "url", "description", "rating", "image", "price")} == {
+        "lists": sorted([christmas.owner.wishlists.get(is_default=True).pk, christmas.pk]),
         "name": "Book",
         "url": "",
         "description": "",
@@ -99,28 +104,15 @@ def test_edit_an_item(client: APIClient, christmas: Wishlist) -> None:
     assert (item.name, item.rating) == ("Hardback book", None)
 
 
-def test_move_an_item_to_the_end_of_another_list(client: APIClient, ann: User, christmas: Wishlist) -> None:
-    default = ann.wishlists.get(is_default=True)
-    add_item(default, name="Already there")
-    item = add_item(christmas, name="Book")
-
-    response = client.patch(reverse("item", args=[item.pk]), {"wishlist": default.pk}, format="json")
-
-    assert response.status_code == 200
-    assert [i.name for i in default.items.all()] == ["Already there", "Book"]
-    assert not christmas.items.exists()
-
-
-def test_cannot_move_an_item_to_someone_elses_list(client: APIClient, christmas: Wishlist, bob: User) -> None:
+def test_cannot_put_an_item_on_someone_elses_list(client: APIClient, christmas: Wishlist, bob: User) -> None:
     item = add_item(christmas, name="Book")
 
     response = client.patch(
-        reverse("item", args=[item.pk]), {"wishlist": bob.wishlists.get().pk}, format="json"
+        reverse("item", args=[item.pk]), {"lists": [bob.wishlists.get().pk]}, format="json"
     )
 
     assert response.status_code == 400
-    item.refresh_from_db()
-    assert item.wishlist_id == christmas.pk
+    assert sorted(item.lists.values_list("name", flat=True)) == ["Christmas", "My wishlist"]
 
 
 def test_delete_an_item(client: APIClient, christmas: Wishlist) -> None:
@@ -140,7 +132,7 @@ def test_reorder_items(client: APIClient, christmas: Wishlist) -> None:
     )
 
     assert response.status_code == 204
-    assert [i.name for i in christmas.items.all()] == ["Bike", "Book", "Scarf"]
+    assert names_on(client, christmas) == ["Bike", "Book", "Scarf"]
 
 
 def test_reorder_items_needs_exactly_the_lists_items(

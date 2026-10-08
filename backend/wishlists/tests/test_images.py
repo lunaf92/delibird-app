@@ -9,7 +9,7 @@ from rest_framework.test import APIClient
 
 from accounts.models import User
 from wishlists.models import Item
-from wishlists.services import add_item
+from wishlists.tests.helpers import add_item
 
 pytestmark = pytest.mark.django_db
 
@@ -83,7 +83,7 @@ def test_deleting_the_item_or_account_removes_the_file(
     client: APIClient, item: Item, media_root: Path
 ) -> None:
     upload(client, item, picture())
-    other = add_item(item.wishlist, name="Second")
+    other = add_item(item.owner.wishlists.get(is_default=True), name="Second")
     upload(client, other, picture())
     assert len(stored_files(media_root)) == 2
 

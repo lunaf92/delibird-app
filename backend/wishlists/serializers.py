@@ -1,5 +1,6 @@
-from typing import Any, cast
+from typing import Any, ClassVar, cast
 
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from wishlists.models import Item, Wishlist
@@ -27,14 +28,29 @@ class WishlistSerializer(serializers.ModelSerializer[Wishlist]):
         return bool(getattr(wishlist, "share_count", 0))
 
 
+def shared_list_ids(owner_id: int) -> set[int]:
+    """The owner's lists anyone has a link to. Depends only on shares, never on reservations."""
+    # shares__isnull=False matters: without it, a list with no shares at all matches "not revoked".
+    shared = Wishlist.objects.filter(owner_id=owner_id, shares__isnull=False, shares__revoked_at__isnull=True)
+    return set(shared.values_list("pk", flat=True))
+
+
 class ItemSerializer(serializers.ModelSerializer[Item]):
     image = serializers.SerializerMethodField(help_text="Absolute URL of the item's picture, if it has one.")
+    lists = serializers.PrimaryKeyRelatedField(
+        many=True,
+        required=False,
+        queryset=Wishlist.objects.none(),
+        help_text="Every list the item is on. It is always on the default list, whether or not that is sent.",
+    )
+    on_shared_list = serializers.SerializerMethodField(
+        help_text="Whether the item is on any list someone has a link to."
+    )
 
     class Meta:
         model = Item
         fields = (
             "id",
-            "wishlist",
             "name",
             "url",
             "description",
@@ -42,18 +58,31 @@ class ItemSerializer(serializers.ModelSerializer[Item]):
             "image",
             "price",
             "currency",
-            "position",
+            "lists",
+            "on_shared_list",
             "created_at",
             "updated_at",
         )
-        read_only_fields = ("id", "image", "position", "created_at", "updated_at")
-        extra_kwargs: dict[str, dict[str, Any]] = {
-            # Set from the URL when adding; on update it moves the item to another of the owner's lists.
-            "wishlist": {"required": False},
+        read_only_fields = ("id", "image", "on_shared_list", "created_at", "updated_at")
+        extra_kwargs: ClassVar = {
             "url": {"required": False},
             "description": {"required": False},
             "currency": {"required": False},
         }
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        # Only the requester's own lists can be chosen; anyone else's look like missing ids.
+        request = self.context.get("request")
+        field = self.fields["lists"]
+        if request is not None and isinstance(field, serializers.ManyRelatedField):
+            # The stubs type `queryset` as a class-level descriptor; on an instance it is a plain attribute.
+            cast(Any, field.child_relation).queryset = Wishlist.objects.filter(owner_id=request.user.pk)
+
+    def to_representation(self, instance: Item) -> dict[str, Any]:
+        data = super().to_representation(instance)
+        data["lists"] = sorted(entry.wishlist_id for entry in instance.entries.all())
+        return data
 
     def get_image(self, item: Item) -> str | None:
         if not item.image:
@@ -61,21 +90,26 @@ class ItemSerializer(serializers.ModelSerializer[Item]):
         request = self.context.get("request")
         return request.build_absolute_uri(item.image.url) if request else item.image.url
 
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super().__init__(*args, **kwargs)
-        # Items can only be moved between the requester's own lists; anyone else's look like missing ids.
-        request = self.context.get("request")
-        field = self.fields["wishlist"]
-        if request is not None and isinstance(field, serializers.PrimaryKeyRelatedField):
-            # The stubs type `queryset` as a class-level descriptor; on an instance it is a plain attribute.
-            cast(Any, field).queryset = Wishlist.objects.filter(owner_id=request.user.pk)
+    def get_on_shared_list(self, item: Item) -> bool:
+        shared: set[int] | None = self.context.get("shared_list_ids")
+        if shared is None:
+            shared = shared_list_ids(item.owner_id)
+        return any(entry.wishlist_id in shared for entry in item.entries.all())
 
 
 class WishlistDetailSerializer(WishlistSerializer):
-    items = ItemSerializer(many=True, read_only=True)
+    items = serializers.SerializerMethodField()
 
     class Meta(WishlistSerializer.Meta):
         fields: tuple[str, ...] = (*WishlistSerializer.Meta.fields, "items")
+
+    @extend_schema_field(ItemSerializer(many=True))
+    def get_items(self, wishlist: Wishlist) -> Any:
+        from wishlists.services import list_items
+
+        items = list_items(wishlist).prefetch_related("entries")
+        context = {**self.context, "shared_list_ids": shared_list_ids(wishlist.owner_id)}
+        return ItemSerializer(items, many=True, context=context).data
 
 
 class ReorderSerializer(serializers.Serializer[None]):

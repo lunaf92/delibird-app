@@ -247,3 +247,13 @@ export function registerDevice(
 export function unregisterDevice(token: string, pushToken: string, language: string): Promise<void> {
   return request('devices/', { method: 'DELETE', body: { token: pushToken }, token, language });
 }
+
+/** Puts one of your existing items on a list too. */
+export function putOnList(token: string, listId: number, itemId: number, language: string): Promise<Item> {
+  return request(`lists/${listId}/items/${itemId}/`, { method: 'PUT', token, language });
+}
+
+/** Takes an item off one list. Taking it off the default list deletes it everywhere. */
+export function takeOffList(token: string, listId: number, itemId: number, language: string): Promise<void> {
+  return request(`lists/${listId}/items/${itemId}/`, { method: 'DELETE', token, language });
+}

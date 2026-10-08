@@ -84,7 +84,7 @@ def viewable_lists(user: User) -> QuerySet[Wishlist]:
 
 
 def viewable_item(user: User, item_id: int) -> Item:
-    item = Item.objects.filter(pk=item_id, wishlist__in=viewable_lists(user)).first()
+    item = Item.objects.filter(pk=item_id, lists__in=viewable_lists(user)).distinct().first()
     if item is None:
         raise NotViewable
     return item

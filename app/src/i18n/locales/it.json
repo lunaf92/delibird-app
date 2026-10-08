@@ -78,7 +78,15 @@
     "deleteWarning_zero": "La lista verrà eliminata. Non si può annullare.",
     "deleteWarning_one": "La lista verrà eliminata insieme al suo {{count}} elemento. Non si può annullare.",
     "deleteWarning_other": "La lista verrà eliminata insieme ai suoi {{count}} elementi. Non si può annullare.",
-    "deleteConfirm": "Elimina lista"
+    "deleteConfirm": "Elimina lista",
+    "addExisting": "Aggiungi cose che hai già",
+    "addExistingTitle": "Aggiungi a {{name}}",
+    "addExistingIntro": "Tutto quello che aggiungi sta nella tua lista predefinita. Scegli cosa deve stare anche in questa; se modifichi un elemento, cambia in tutte le liste.",
+    "nothingToAdd": "Tutto quello che hai è già in questa lista.",
+    "addThis": "Aggiungi {{name}}",
+    "added": "Aggiunto",
+    "takeOff": "Togli {{name}} da questa lista",
+    "takeOffConfirm": "Toglilo da questa lista"
   },
   "items": {
     "add": "Aggiungi un elemento",
@@ -99,17 +107,18 @@
     "addPicture": "Aggiungi un'immagine",
     "changePicture": "Cambia immagine",
     "removePicture": "Rimuovi immagine",
-    "list": "Lista",
     "save": "Salva",
     "nameRequired": "Dai un nome all'elemento.",
     "urlInvalid": "Inserisci un link completo, che inizi con https://",
     "priceInvalid": "Inserisci un prezzo come 39,90.",
     "deleteTitle": "Elimina elemento",
     "delete": "Elimina elemento…",
-    "deleteWarning": "Eliminare “{{name}}”? Non si può annullare.",
+    "deleteWarning": "Eliminare “{{name}}” da tutte le tue liste? Non si può annullare.",
     "deleteConfirm": "Elimina elemento",
     "sharedWarning": "Qualcuno potrebbe averlo già comprato. Continuare?",
-    "continue": "Continua"
+    "continue": "Continua",
+    "lists": "Liste",
+    "listsHelp": "Scegli tutte le liste in cui deve stare. Resta sempre nella tua lista predefinita."
   },
   "reorder": {
     "up": "Sposta {{name}} in su",

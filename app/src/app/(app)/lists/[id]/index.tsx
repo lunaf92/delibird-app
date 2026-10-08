@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 
-import { deleteList, fetchList, renameList, reorderItems, type Item } from '@/api/client';
+import { deleteList, fetchList, renameList, reorderItems, takeOffList, type Item } from '@/api/client';
 import { errorMessage } from '@/api/errors';
 import { useApi, useResource } from '@/api/use-api';
 import { MoveButtons, moved } from '@/components/move-buttons';
@@ -62,6 +62,16 @@ export default function ListScreen() {
     }
   };
 
+  const takeOff = async (item: Item) => {
+    setActionError(null);
+    try {
+      await api((token, language) => takeOffList(token, id, item.id, language));
+      reload();
+    } catch (failure) {
+      setActionError(errorMessage(failure, t));
+    }
+  };
+
   const remove = async () => {
     setSaving(true);
     try {
@@ -92,12 +102,20 @@ export default function ListScreen() {
           index={index}
           count={list.items.length}
           onMove={move}
+          onTakeOff={list.is_default ? undefined : () => takeOff(item)}
         />
       ))}
       <Button
         label={t('items.add')}
         onPress={() => router.push({ pathname: '/lists/[id]/new', params: { id: String(id) } })}
       />
+      {!list.is_default && (
+        <Button
+          variant="secondary"
+          label={t('lists.addExisting')}
+          onPress={() => router.push({ pathname: '/lists/[id]/add', params: { id: String(id) } })}
+        />
+      )}
 
       <Heading>{t('sharing.title')}</Heading>
       <Body muted>{list.is_shared ? t('sharing.isShared') : t('sharing.notShared')}</Body>
@@ -153,13 +171,18 @@ function ItemRow({
   index,
   count,
   onMove,
+  onTakeOff,
 }: {
   item: Item;
   language: string;
   index: number;
   count: number;
   onMove: (from: number, to: number) => void;
+  /** Takes the item off this list (it stays on the others). Not offered on the default list. */
+  onTakeOff?: () => void;
 }) {
+  const { t } = useTranslation();
+  const [confirming, setConfirming] = useState(false);
   const price = formatPrice(item.price, item.currency, language);
   return (
     <Card>
@@ -182,6 +205,23 @@ function ItemRow({
         </Pressable>
         <MoveButtons name={item.name} index={index} count={count} onMove={onMove} />
       </View>
+      {onTakeOff &&
+        (confirming ? (
+          <>
+            {/* Someone may have bought it through this list; the app can't know, so it always asks. */}
+            {item.on_shared_list && <Body>{t('items.sharedWarning')}</Body>}
+            <View style={styles.row}>
+              <Button variant="danger" label={t('lists.takeOffConfirm')} onPress={onTakeOff} />
+              <Button variant="secondary" label={t('settings.cancel')} onPress={() => setConfirming(false)} />
+            </View>
+          </>
+        ) : (
+          <Button
+            variant="link"
+            label={t('lists.takeOff', { name: item.name })}
+            onPress={() => (item.on_shared_list ? setConfirming(true) : onTakeOff())}
+          />
+        ))}
     </Card>
   );
 }

@@ -8,7 +8,7 @@ from notifications.services import notify_buyers
 from sharing.models import Reservation
 from sharing.services import NewShare, join, share_list
 from wishlists.models import Item, Wishlist
-from wishlists.services import add_item
+from wishlists.tests.helpers import add_item
 
 pytestmark = pytest.mark.django_db
 
@@ -97,7 +97,9 @@ def test_revoked_viewers_lose_access_but_their_reservation_stays(
 
     client.delete(reverse("share", args=[bob_share.share.pk]))
 
-    assert bob_client.get(reverse("shared-with-me-list", args=[scarf.wishlist_id])).status_code == 404
+    assert (
+        bob_client.get(reverse("shared-with-me-list", args=[bob_share.share.wishlist_id])).status_code == 404
+    )
     assert bob_client.delete(reverse("item-reservation", args=[scarf.pk])).status_code == 404
     assert Reservation.objects.count() == 1
 
@@ -110,7 +112,7 @@ def test_deleting_the_buyer_account_releases_their_reservations(
     bob_client.delete(reverse("me"))
 
     assert not Reservation.objects.exists()
-    assert viewer_items(carol, scarf.wishlist)["Wool scarf"] == {"status": "free", "by": None}
+    assert viewer_items(carol, bob_share.share.wishlist)["Wool scarf"] == {"status": "free", "by": None}
 
 
 def test_a_deleted_items_reservation_goes_once_the_buyer_is_told(

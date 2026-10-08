@@ -23,8 +23,8 @@ export default function EditItemScreen() {
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [pending, setPending] = useState<{ values: ItemValues; image: ImageChange } | null>(null);
   // On a shared list someone may already have bought this item. The app never knows whether they did, so
-  // it always asks before saving or deleting there.
-  const shared = lists?.find((list) => list.id === item?.wishlist)?.is_shared ?? false;
+  // it always asks before saving or deleting an item that is on any shared list.
+  const shared = item?.on_shared_list ?? false;
 
   const submit = (values: ItemValues, image: ImageChange) => {
     if (shared) setPending({ values, image });

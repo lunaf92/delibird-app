@@ -33,7 +33,8 @@ from notifications.models import PushDevice
 from sharing.models import Reservation
 from sharing.services import join, share_list
 from wishlists.models import Item, Wishlist
-from wishlists.services import add_item, create_wishlist
+from wishlists.services import create_wishlist, put_on_list
+from wishlists.tests.helpers import add_item
 
 pytestmark = pytest.mark.django_db
 
@@ -78,6 +79,8 @@ def world(tmp_path: Path, settings: Any) -> World:
         add_item(birthday, name="Cake"),
     ]
     items[2].image.save("x.jpg", picture(), save=True)
+    # The bike is on two shared lists, so a reservation made through one shows on the other.
+    put_on_list(items[3], birthday)
 
     shares = {
         "bob-christmas": share_list(christmas, "bob@example.com"),
@@ -109,7 +112,7 @@ def world(tmp_path: Path, settings: Any) -> World:
 
 def reserve_everything(world: World) -> None:
     """Every item on every list gets reserved, some by each viewer, including the never-shared list."""
-    for index, item in enumerate(Item.objects.filter(wishlist__owner=world.owner)):
+    for index, item in enumerate(Item.objects.filter(owner=world.owner)):
         Reservation.objects.create(item=item, buyer=world.viewers[index % 2])
 
 
@@ -183,9 +186,12 @@ CALLS: list[Call] = [
         changes_data=True,
     ),
     Call("list", "delete", lambda w: reverse("list", args=[w.christmas.pk]), changes_data=True),
+    Call("list", "delete", lambda w: reverse("list", args=[w.birthday.pk]), changes_data=True),
     Call("list", "delete", lambda w: reverse("list", args=[w.default.pk]), changes_data=True),
     # Items
     Call("list-items", "get", lambda w: reverse("list-items", args=[w.christmas.pk])),
+    Call("list-items", "get", lambda w: reverse("list-items", args=[w.birthday.pk])),
+    Call("list-items", "get", lambda w: reverse("list-items", args=[w.default.pk])),
     Call(
         "list-items",
         "post",
@@ -202,6 +208,7 @@ CALLS: list[Call] = [
     ),
     Call("item", "get", lambda w: reverse("item", args=[w.items[2].pk])),
     Call("item", "get", lambda w: reverse("item", args=[w.items[0].pk])),
+    Call("item", "get", lambda w: reverse("item", args=[w.items[3].pk])),
     Call(
         "item",
         "patch",
@@ -216,7 +223,40 @@ CALLS: list[Call] = [
         lambda w: {"wishlist": w.default.pk},
         changes_data=True,
     ),
+    Call(
+        "item",
+        "patch",
+        lambda w: reverse("item", args=[w.items[3].pk]),
+        lambda w: {"lists": [w.christmas.pk]},
+        changes_data=True,
+    ),
     Call("item", "delete", lambda w: reverse("item", args=[w.items[2].pk]), changes_data=True),
+    Call("item", "delete", lambda w: reverse("item", args=[w.items[3].pk]), changes_data=True),
+    # Putting items on lists and taking them off.
+    Call(
+        "list-item",
+        "put",
+        lambda w: reverse("list-item", args=[w.christmas.pk, w.items[1].pk]),
+        changes_data=True,
+    ),
+    Call(
+        "list-item",
+        "delete",
+        lambda w: reverse("list-item", args=[w.christmas.pk, w.items[3].pk]),
+        changes_data=True,
+    ),
+    Call(
+        "list-item",
+        "delete",
+        lambda w: reverse("list-item", args=[w.birthday.pk, w.items[3].pk]),
+        changes_data=True,
+    ),
+    Call(
+        "list-item",
+        "delete",
+        lambda w: reverse("list-item", args=[w.default.pk, w.items[2].pk]),
+        changes_data=True,
+    ),
     Call("item", "delete", lambda w: reverse("item", args=[w.items[4].pk]), changes_data=True),
     Call(
         "item-image",
@@ -242,6 +282,7 @@ CALLS: list[Call] = [
     ),
     Call("shared", "get", lambda w: reverse("shared", args=[w.share_tokens["bob-christmas"]])),
     Call("shared", "get", lambda w: reverse("shared", args=[w.share_tokens["dave-birthday"]])),
+    Call("shared", "get", lambda w: reverse("shared", args=[w.share_tokens["carol-default"]])),
     Call(
         "shared-join",
         "post",

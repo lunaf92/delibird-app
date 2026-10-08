@@ -50,8 +50,11 @@ at http://localhost:8025. The first sign-in with a new address creates the accou
 app only runs on the home network). Settings has your display name, language, signed-in devices, sign out and
 account deletion.
 
-Each account starts with a default list. You can add more lists, reorder them, and fill them with items (name,
-link, notes, a 1–5 star rating, price and currency, and a picture). Uploaded pictures are re-encoded on the server
+Each account starts with a default list, which holds every item. You can add more lists (Birthday, Christmas…),
+reorder them, and fill them with items (name, link, notes, a 1–5 star rating, price and currency, and a picture).
+An item can be on any number of lists: add it from a list, or pick "Add items you already have". Editing an item
+changes it everywhere; taking it off a list keeps it on the others, and deleting it removes it from all of them.
+A reservation belongs to the item, so a gift reserved through one shared list shows as taken on the others. Uploaded pictures are re-encoded on the server
 (JPEG, at most 1600 px, metadata removed) and kept in `backend/media/` during development.
 
 Share a list from its Sharing screen: each person gets their own link (`APP_URL/shared/…`), which works without
