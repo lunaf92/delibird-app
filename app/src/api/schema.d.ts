@@ -131,15 +131,24 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** @description One item. Sending another of your lists as `wishlist` moves the item to the end of that list. */
+    /**
+     * @description One item, on every list it is on. Sending `lists` sets exactly which lists it is on (it always stays
+     *     on the default list). Deleting it removes it from every list.
+     */
     get: operations['items_retrieve'];
     put?: never;
     post?: never;
-    /** @description One item. Sending another of your lists as `wishlist` moves the item to the end of that list. */
+    /**
+     * @description One item, on every list it is on. Sending `lists` sets exactly which lists it is on (it always stays
+     *     on the default list). Deleting it removes it from every list.
+     */
     delete: operations['items_destroy'];
     options?: never;
     head?: never;
-    /** @description One item. Sending another of your lists as `wishlist` moves the item to the end of that list. */
+    /**
+     * @description One item, on every list it is on. Sending `lists` sets exactly which lists it is on (it always stays
+     *     on the default list). Deleting it removes it from every list.
+     */
     patch: operations['items_partial_update'];
     trace?: never;
   };
@@ -210,15 +219,24 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** @description One list with its items. The default list can be renamed but not deleted. */
+    /**
+     * @description One list with its items. The default list holds every item; it can be renamed but not deleted.
+     *     Deleting another list takes its items off it, but keeps them on the default list.
+     */
     get: operations['lists_retrieve'];
     put?: never;
     post?: never;
-    /** @description One list with its items. The default list can be renamed but not deleted. */
+    /**
+     * @description One list with its items. The default list holds every item; it can be renamed but not deleted.
+     *     Deleting another list takes its items off it, but keeps them on the default list.
+     */
     delete: operations['lists_destroy'];
     options?: never;
     head?: never;
-    /** @description One list with its items. The default list can be renamed but not deleted. */
+    /**
+     * @description One list with its items. The default list holds every item; it can be renamed but not deleted.
+     *     Deleting another list takes its items off it, but keeps them on the default list.
+     */
     patch: operations['lists_partial_update'];
     trace?: never;
   };
@@ -229,12 +247,42 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** @description The items on one list, in order. New items go to the end. */
+    /**
+     * @description The items on one list, in that list's order. A new item goes at the end of this list and of the
+     *     default list, and of any other lists named in `lists`.
+     */
     get: operations['lists_items_list'];
     put?: never;
-    /** @description The items on one list, in order. New items go to the end. */
+    /**
+     * @description The items on one list, in that list's order. A new item goes at the end of this list and of the
+     *     default list, and of any other lists named in `lists`.
+     */
     post: operations['lists_items_create'];
     delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/lists/{id}/items/{item_id}/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * @description Puts one of your existing items on this list (PUT), or takes it off (DELETE). Taking an item off
+     *     the default list deletes it everywhere.
+     */
+    put: operations['lists_items_update'];
+    post?: never;
+    /**
+     * @description Puts one of your existing items on this list (PUT), or takes it off (DELETE). Taking an item off
+     *     the default list deletes it everywhere.
+     */
+    delete: operations['lists_items_destroy'];
     options?: never;
     head?: never;
     patch?: never;
@@ -432,7 +480,6 @@ export interface components {
     };
     Item: {
       readonly id: number;
-      wishlist: number;
       name: string;
       /** Link */
       url: string;
@@ -443,14 +490,16 @@ export interface components {
       /** Format: decimal */
       price: string | null;
       currency: string;
-      readonly position: number;
+      /** @description Every list the item is on. It is always on the default list, whether or not that is sent. */
+      lists: number[];
+      /** @description Whether the item is on any list someone has a link to. */
+      readonly on_shared_list: boolean;
       /** Format: date-time */
       readonly created_at: string;
       /** Format: date-time */
       readonly updated_at: string;
     };
     ItemRequest: {
-      wishlist?: number;
       name: string;
       /** Link */
       url?: string;
@@ -459,6 +508,8 @@ export interface components {
       /** Format: decimal */
       price?: string | null;
       currency?: string;
+      /** @description Every list the item is on. It is always on the default list, whether or not that is sent. */
+      lists?: number[];
     };
     /**
      * @description * `en` - English
@@ -487,7 +538,6 @@ export interface components {
       email: string;
     };
     PatchedItemRequest: {
-      wishlist?: number;
       name?: string;
       /** Link */
       url?: string;
@@ -496,6 +546,8 @@ export interface components {
       /** Format: decimal */
       price?: string | null;
       currency?: string;
+      /** @description Every list the item is on. It is always on the default list, whether or not that is sent. */
+      lists?: number[];
     };
     PatchedUserRequest: {
       display_name?: string;
@@ -1188,6 +1240,49 @@ export interface operations {
         content: {
           'application/json': components['schemas']['Item'];
         };
+      };
+    };
+  };
+  lists_items_update: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+        item_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Item'];
+        };
+      };
+    };
+  };
+  lists_items_destroy: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+        item_id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No response body */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

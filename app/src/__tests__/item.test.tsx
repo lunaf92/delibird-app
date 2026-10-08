@@ -9,10 +9,10 @@ import { storeToken } from '@/test-utils/storage';
 jest.mock('expo-image-picker', () => ({ launchImageLibraryAsync: jest.fn() }));
 const pickImage = ImagePicker.launchImageLibraryAsync as jest.Mock;
 
-const CHRISTMAS = { ...DEFAULT_LIST, id: 11, name: 'Christmas', is_default: false, position: 1 };
+const CHRISTMAS = { ...DEFAULT_LIST, id: 11, name: 'Christmas', is_default: false };
 const SCARF = item({
   id: 101,
-  wishlist: 11,
+  lists: [10, 11],
   name: 'Wool scarf',
   url: 'https://shop.example.com/scarf',
   price: '39.90',
@@ -32,7 +32,7 @@ async function openNewItemForm(handlers: Parameters<typeof mockApi>[0] = {}) {
     'GET lists/11/': { body: { ...CHRISTMAS, items: [] } },
     'POST lists/11/items/': (body) => ({
       status: 201,
-      body: item({ id: 105, wishlist: 11, ...(body as object) }),
+      body: item({ id: 105, lists: [10, 11], ...(body as object) }),
     }),
     ...handlers,
   });
@@ -115,7 +115,7 @@ test('a picture is uploaded after the item is saved', async () => {
   expect(upload.headers['Content-Type']).toBeUndefined();
 });
 
-test('editing an item, moving it and removing its picture', async () => {
+test('editing an item, choosing its lists and removing its picture', async () => {
   const calls = mockApi({
     'GET me/': { body: ANN },
     'GET lists/': { body: [DEFAULT_LIST, CHRISTMAS] },
@@ -129,7 +129,9 @@ test('editing an item, moving it and removing its picture', async () => {
   expect(screen.getByDisplayValue('39.90')).toBeOnTheScreen();
   await fireEvent.changeText(screen.getByLabelText('Name'), 'Green wool scarf');
   await fireEvent.press(screen.getByRole('radio', { name: '4 stars' })); // Tapping the same star clears it.
-  await fireEvent.press(screen.getByRole('radio', { name: 'My wishlist' }));
+  // The default list can't be unticked; Christmas can.
+  expect(screen.getByRole('checkbox', { name: 'My wishlist' })).toBeDisabled();
+  await fireEvent.press(screen.getByRole('checkbox', { name: 'Christmas' }));
   await fireEvent.press(screen.getByRole('button', { name: 'Remove picture' }));
   await fireEvent.press(screen.getByRole('button', { name: 'Save' }));
 
@@ -137,7 +139,7 @@ test('editing an item, moving it and removing its picture', async () => {
   expect(callsTo(calls, 'PATCH', 'items/101/')[0].body).toMatchObject({
     name: 'Green wool scarf',
     rating: null,
-    wishlist: 10,
+    lists: [10],
   });
 });
 
@@ -151,7 +153,7 @@ test('deleting an item needs a confirmation', async () => {
   await renderApp('/items/101');
 
   await fireEvent.press(await screen.findByRole('button', { name: 'Delete item…' }));
-  expect(screen.getByText("Delete “Wool scarf”? It can't be undone.")).toBeOnTheScreen();
+  expect(screen.getByText("Delete “Wool scarf” from all your lists? It can't be undone.")).toBeOnTheScreen();
   await fireEvent.press(screen.getByRole('button', { name: 'Delete item' }));
 
   await waitFor(() => expect(callsTo(calls, 'DELETE', 'items/101/')).toHaveLength(1));

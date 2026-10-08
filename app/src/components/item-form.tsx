@@ -19,12 +19,13 @@ export type ItemValues = {
   rating: number | null;
   price: string | null;
   currency: string;
-  wishlist?: number;
+  /** Every list the item should be on. Only sent when editing; the default list is always included. */
+  lists?: number[];
 };
 
 type Props = {
   item?: Item;
-  /** The owner's lists, to move the item to another one. Left out when adding. */
+  /** The owner's lists, to choose which ones the item is on. Left out when adding. */
   lists?: Wishlist[];
   submitLabel: string;
   busy: boolean;
@@ -41,7 +42,7 @@ export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit }: Pr
   const [rating, setRating] = useState<number | null>(item?.rating ?? null);
   const [priceText, setPriceText] = useState(item?.price ?? '');
   const [currency, setCurrency] = useState(item?.currency ?? 'EUR');
-  const [wishlist, setWishlist] = useState(item?.wishlist);
+  const [onLists, setOnLists] = useState<number[]>(item?.lists ?? []);
   const [image, setImage] = useState<ImageChange>({ kind: 'keep' });
   const [problem, setProblem] = useState<string | null>(null);
 
@@ -81,7 +82,7 @@ export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit }: Pr
         rating,
         price,
         currency,
-        ...(wishlist !== undefined && lists ? { wishlist } : {}),
+        ...(item && lists ? { lists: onLists } : {}),
       },
       image,
     );
@@ -163,14 +164,24 @@ export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit }: Pr
 
       {lists && lists.length > 1 && (
         <>
-          <Heading>{t('items.list')}</Heading>
-          <View style={styles.chips} accessibilityRole="radiogroup" accessibilityLabel={t('items.list')}>
+          <Heading>{t('items.lists')}</Heading>
+          <Body muted>{t('items.listsHelp')}</Body>
+          <View style={styles.chips}>
             {lists.map((list) => (
               <Chip
                 key={list.id}
+                role="checkbox"
                 label={list.name}
-                selected={list.id === wishlist}
-                onPress={() => setWishlist(list.id)}
+                selected={list.is_default || onLists.includes(list.id)}
+                // Every item stays on the default list; delete the item to remove it from there.
+                disabled={list.is_default}
+                onPress={() =>
+                  setOnLists((current) =>
+                    current.includes(list.id)
+                      ? current.filter((id) => id !== list.id)
+                      : [...current, list.id],
+                  )
+                }
               />
             ))}
           </View>
@@ -183,14 +194,23 @@ export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit }: Pr
   );
 }
 
-function Chip({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
+type ChipProps = {
+  label: string;
+  selected: boolean;
+  onPress: () => void;
+  role?: 'radio' | 'checkbox';
+  disabled?: boolean;
+};
+
+function Chip({ label, selected, onPress, role = 'radio', disabled }: ChipProps) {
   return (
     <Pressable
-      accessibilityRole="radio"
+      accessibilityRole={role}
       accessibilityLabel={label}
-      accessibilityState={{ selected }}
+      accessibilityState={role === 'checkbox' ? { checked: selected, disabled } : { selected, disabled }}
+      disabled={disabled}
       onPress={onPress}
-      style={[styles.chip, selected && styles.chipSelected]}>
+      style={[styles.chip, selected && styles.chipSelected, disabled && styles.chipDisabled]}>
       <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>{label}</Text>
     </Pressable>
   );
@@ -202,6 +222,7 @@ const styles = StyleSheet.create({
   chips: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
   chip: { borderWidth: 1, borderColor: BLUE, borderRadius: 16, paddingHorizontal: 14, paddingVertical: 6 },
   chipSelected: { backgroundColor: BLUE },
+  chipDisabled: { opacity: 0.6 },
   chipLabel: { color: BLUE, fontSize: 15 },
   chipLabelSelected: { color: '#FFFFFF', fontWeight: '600' },
   preview: { width: '100%', height: 220, borderRadius: 12, backgroundColor: '#F2F4F7' },

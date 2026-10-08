@@ -78,7 +78,15 @@
     "deleteWarning_zero": "Se eliminará la lista. No se puede deshacer.",
     "deleteWarning_one": "Se eliminará la lista y su {{count}} artículo. No se puede deshacer.",
     "deleteWarning_other": "Se eliminará la lista y sus {{count}} artículos. No se puede deshacer.",
-    "deleteConfirm": "Eliminar lista"
+    "deleteConfirm": "Eliminar lista",
+    "addExisting": "Añadir cosas que ya tienes",
+    "addExistingTitle": "Añadir a {{name}}",
+    "addExistingIntro": "Todo lo que añades está en tu lista predeterminada. Elige qué debe estar también en esta; si editas un artículo, cambia en todas las listas.",
+    "nothingToAdd": "Todo lo que tienes ya está en esta lista.",
+    "addThis": "Añadir {{name}}",
+    "added": "Añadido",
+    "takeOff": "Quitar {{name}} de esta lista",
+    "takeOffConfirm": "Quitarlo de esta lista"
   },
   "items": {
     "add": "Añadir un artículo",
@@ -99,17 +107,18 @@
     "addPicture": "Añadir una imagen",
     "changePicture": "Cambiar imagen",
     "removePicture": "Quitar imagen",
-    "list": "Lista",
     "save": "Guardar",
     "nameRequired": "Ponle un nombre al artículo.",
     "urlInvalid": "Escribe un enlace completo, que empiece por https://",
     "priceInvalid": "Escribe un precio como 39,90.",
     "deleteTitle": "Eliminar artículo",
     "delete": "Eliminar artículo…",
-    "deleteWarning": "¿Eliminar «{{name}}»? No se puede deshacer.",
+    "deleteWarning": "¿Eliminar «{{name}}» de todas tus listas? No se puede deshacer.",
     "deleteConfirm": "Eliminar artículo",
     "sharedWarning": "Puede que alguien ya lo haya comprado. ¿Continuar?",
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "lists": "Listas",
+    "listsHelp": "Elige todas las listas en las que debe estar. Siempre se queda en tu lista predeterminada."
   },
   "reorder": {
     "up": "Subir {{name}}",

@@ -8,7 +8,7 @@ import { storeToken } from '@/test-utils/storage';
 
 jest.mock('expo-clipboard', () => ({ setStringAsync: jest.fn(async () => true) }));
 
-const CHRISTMAS = { ...DEFAULT_LIST, id: 11, name: 'Christmas', is_default: false, position: 1 };
+const CHRISTMAS = { ...DEFAULT_LIST, id: 11, name: 'Christmas', is_default: false };
 const BOB = {
   id: 1,
   email: 'bob@example.com',
@@ -112,13 +112,13 @@ test('stopping a share needs a confirmation', async () => {
 });
 
 describe('editing items on a shared list', () => {
-  const SCARF = item({ id: 101, wishlist: 11, name: 'Wool scarf' });
+  const SCARF = item({ id: 101, lists: [10, 11], name: 'Wool scarf' });
 
   function openItem(isShared: boolean) {
     const calls = mockApi({
       'GET me/': { body: ANN },
       'GET lists/': { body: [DEFAULT_LIST, { ...CHRISTMAS, is_shared: isShared }] },
-      'GET items/101/': { body: SCARF },
+      'GET items/101/': { body: { ...SCARF, on_shared_list: isShared } },
       'PATCH items/101/': (body) => ({ body: { ...SCARF, ...(body as object) } }),
       'DELETE items/101/': { status: 204 },
     });

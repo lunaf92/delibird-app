@@ -5,9 +5,16 @@ import { ANN, callsTo, DEFAULT_LIST, item, mockApi } from '@/test-utils/api';
 import { renderApp } from '@/test-utils/render';
 import { storeToken } from '@/test-utils/storage';
 
-const CHRISTMAS = { ...DEFAULT_LIST, id: 11, name: 'Christmas', is_default: false, position: 1 };
-const SCARF = item({ id: 101, wishlist: 11, name: 'Wool scarf', price: '39.90', currency: 'EUR', rating: 4 });
-const BOOK = item({ id: 102, wishlist: 11, name: 'Book', position: 1 });
+const CHRISTMAS = { ...DEFAULT_LIST, id: 11, name: 'Christmas', is_default: false };
+const SCARF = item({
+  id: 101,
+  lists: [10, 11],
+  name: 'Wool scarf',
+  price: '39.90',
+  currency: 'EUR',
+  rating: 4,
+});
+const BOOK = item({ id: 102, lists: [10, 11], name: 'Book' });
 
 function christmasWith(items: unknown[]) {
   return { body: { ...CHRISTMAS, item_count: items.length, items } };
