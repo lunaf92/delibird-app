@@ -159,6 +159,8 @@
     "ownerNote": "This is your list. This is what people with the link see; what they reserve stays hidden from you.",
     "empty": "This list is empty for now.",
     "openLink": "Open link",
+    "affiliateLink": "Delibird may earn a small commission if you buy through this link.",
+    "affiliateAbout": "About shop links: some links to shops such as Amazon carry Delibird's affiliate code. If you buy through one, the shop pays Delibird a small commission; the price you pay is the same. The person who made the list always sees their own link, and nobody, not even Delibird, records who opened which link.",
     "withMe": "Shared with me",
     "secret": "{{name}} can't see what anyone is getting.",
     "reserve": "I'll get this",

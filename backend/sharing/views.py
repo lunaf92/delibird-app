@@ -97,7 +97,8 @@ class SharedListView(APIView):
             role = "viewer"
         else:
             role = "invited"
-        context = {"request": request, "role": role}
+        # The owner's own links are never routed through affiliate links.
+        context = {"request": request, "role": role, "share_id": None if role == "owner" else share.pk}
         return Response(SharedListSerializer(wishlist, context=context).data)
 
 
@@ -157,7 +158,10 @@ class SharedWithMeDetailView(APIView):
             r.item_id: r
             for r in Reservation.objects.filter(item__entries__wishlist=wishlist).select_related("buyer")
         }
-        context = {"request": request, "reservations": reservations}
+        share_id = (
+            services.active_shares().filter(wishlist=wishlist, user=user).values_list("pk", flat=True).first()
+        )
+        context = {"request": request, "reservations": reservations, "share_id": share_id}
         return Response(ViewerListSerializer(wishlist, context=context).data)
 
 

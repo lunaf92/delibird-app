@@ -29,6 +29,17 @@ def env_list(name: str, default: str = "") -> list[str]:
     return [item.strip() for item in env(name, default).split(",") if item.strip()]
 
 
+def env_pairs(name: str) -> dict[str, str]:
+    """Reads `key=value,key=value` from the environment."""
+    pairs = {}
+    for entry in env_list(name):
+        key, separator, value = entry.partition("=")
+        if not separator:
+            raise ImproperlyConfigured(f"{name} entries look like key=value, not {entry!r}.")
+        pairs[key.strip().lower()] = value.strip()
+    return pairs
+
+
 DEBUG = env_bool("DJANGO_DEBUG")
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")
@@ -51,6 +62,7 @@ INSTALLED_APPS = [
     "sharing",
     "notifications",
     "autofill",
+    "affiliate",
 ]
 
 MIDDLEWARE = [
@@ -150,6 +162,12 @@ CACHES = {
         "KEY_PREFIX": "delibird",
     }
 }
+
+
+# Affiliate links for people a list is shared with (see affiliate/links.py). Off until there's a programme.
+AFFILIATE_ENABLED = env_bool("AFFILIATE_ENABLED")
+# Amazon Associates tracking ids per Amazon site, e.g. amazon.it=yourname-21,amazon.es=yourname-21
+AFFILIATE_AMAZON_TAGS = env_pairs("AFFILIATE_AMAZON_TAGS")
 
 # Sign-in. Links in sign-in emails open the app at APP_URL.
 APP_URL = env("APP_URL", "http://localhost:8081")

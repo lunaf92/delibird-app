@@ -28,12 +28,20 @@ export function SharedItemCard({ item, children }: PropsWithChildren<{ item: Sha
         </View>
       </View>
       {item.description ? <Body muted>{item.description}</Body> : null}
-      {item.url ? (
-        <Button variant="link" label={t('shared.openLink')} onPress={() => Linking.openURL(item.url)} />
+      {item.shop_url ? (
+        <Button variant="link" label={t('shared.openLink')} onPress={() => Linking.openURL(item.shop_url)} />
       ) : null}
+      {item.affiliate ? <Body muted>{t('shared.affiliateLink')}</Body> : null}
       {children}
     </Card>
   );
+}
+
+/** Says how affiliate links work, under a shared list that has any. */
+export function AffiliateNote({ items }: { items: SharedItem[] }) {
+  const { t } = useTranslation();
+  if (!items.some((item) => item.affiliate)) return null;
+  return <Body muted>{t('shared.affiliateAbout')}</Body>;
 }
 
 const styles = StyleSheet.create({

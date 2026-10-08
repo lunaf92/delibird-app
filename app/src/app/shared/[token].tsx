@@ -7,7 +7,7 @@ import { fetchSharedList, joinSharedList, type SharedList } from '@/api/client';
 import { errorMessage, isUnauthorized } from '@/api/errors';
 import { useAuth } from '@/auth/context';
 import { rememberReturnTo } from '@/auth/storage';
-import { SharedItemCard } from '@/components/shared-item';
+import { AffiliateNote, SharedItemCard } from '@/components/shared-item';
 import { Body, Button, Card, Message, Screen, Title } from '@/components/ui';
 
 /** Where share links land. Anyone can read the list; nothing here says what is already taken. */
@@ -89,6 +89,7 @@ export default function SharedLinkScreen() {
       {list.items.map((item) => (
         <SharedItemCard key={item.id} item={item} />
       ))}
+      <AffiliateNote items={list.items} />
     </Screen>
   );
 }

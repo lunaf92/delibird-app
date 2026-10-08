@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: delibird\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-08 08:23+0000\n"
+"POT-Creation-Date: 2026-10-08 13:05+0000\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,15 +26,15 @@ msgstr "Intestazione di autorizzazione non valida."
 msgid "Your session has ended. Sign in again."
 msgstr "La tua sessione è terminata. Accedi di nuovo."
 
-#: accounts/models.py:19 config/settings.py:106
+#: accounts/models.py:19 config/settings.py:118
 msgid "English"
 msgstr "Inglese"
 
-#: accounts/models.py:20 config/settings.py:107
+#: accounts/models.py:20 config/settings.py:119
 msgid "Italian"
 msgstr "Italiano"
 
-#: accounts/models.py:21 config/settings.py:108
+#: accounts/models.py:21 config/settings.py:120
 msgid "Spanish"
 msgstr "Spagnolo"
 
@@ -133,6 +133,10 @@ msgstr ""
 msgid "That code is wrong or has expired."
 msgstr "Il codice è sbagliato o è scaduto."
 
+#: affiliate/views.py:32 affiliate/views.py:43
+msgid "This link doesn't work any more."
+msgstr "Questo link non funziona più."
+
 #: autofill/views.py:54
 msgid "Too many links at once. Wait a few minutes."
 msgstr "Troppi link tutti insieme. Aspetta qualche minuto."
@@ -143,7 +147,9 @@ msgstr "Questo link non si può leggere: non è un indirizzo web pubblico."
 
 #: autofill/views.py:111
 msgid "That picture couldn't be downloaded. Add one from your device."
-msgstr "Non è stato possibile scaricare l'immagine. Aggiungine una dal tuo dispositivo."
+msgstr ""
+"Non è stato possibile scaricare l'immagine. Aggiungine una dal tuo "
+"dispositivo."
 
 #: core/views.py:41
 msgid "The server is running."
@@ -242,19 +248,19 @@ msgstr "Aprila qui:"
 msgid "This list is already shared with that address."
 msgstr "Questa lista è già condivisa con questo indirizzo."
 
-#: sharing/views.py:89 sharing/views.py:118
+#: sharing/views.py:89 sharing/views.py:119
 msgid "This link doesn't work any more. Ask for a new one."
 msgstr "Questo link non funziona più. Chiedine uno nuovo."
 
-#: sharing/views.py:122
+#: sharing/views.py:123
 msgid "This is your own list."
 msgstr "Questa è la tua lista."
 
-#: sharing/views.py:124
+#: sharing/views.py:125
 msgid "Someone else already accepted this link. Ask for your own."
 msgstr "Qualcun altro ha già accettato questo link. Chiedine uno tutto tuo."
 
-#: sharing/views.py:176
+#: sharing/views.py:180
 msgid "Someone else is already getting this."
 msgstr "Qualcun altro lo sta già prendendo."
 

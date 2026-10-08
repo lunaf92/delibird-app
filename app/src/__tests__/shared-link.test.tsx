@@ -1,4 +1,5 @@
 import { fireEvent, screen } from 'expo-router/testing-library';
+import { Linking } from 'react-native';
 
 import i18n from '@/i18n';
 import { ANN, callsTo, item, mockApi } from '@/test-utils/api';
@@ -9,7 +10,16 @@ const SHARED = {
   id: 11,
   name: 'Christmas',
   owner_name: 'Ann',
-  items: [item({ id: 101, name: 'Wool scarf', price: '39.90', url: 'https://shop.example.com/scarf' })],
+  items: [
+    item({
+      id: 101,
+      name: 'Wool scarf',
+      price: '39.90',
+      url: 'https://shop.example.com/scarf',
+      shop_url: 'https://shop.example.com/scarf',
+      affiliate: false,
+    }),
+  ],
 };
 const BOB = { id: 2, email: 'bob@example.com', display_name: 'Bob', language: 'en' as const };
 const VIEWER_LIST = {
@@ -36,6 +46,40 @@ test('a signed-out visitor sees the list but nothing about reservations', async 
   expect(screen.queryByText(/is getting this/)).not.toBeOnTheScreen();
   expect(screen.queryByRole('button', { name: "I'll get this" })).not.toBeOnTheScreen();
   expect(callsTo(calls, 'GET', 'shared/abc/')[0].headers.Authorization).toBeUndefined();
+});
+
+test('shop links say nothing about commissions unless they carry one', async () => {
+  mockApi({ 'GET shared/abc/': { body: { ...SHARED, role: 'anonymous' } } });
+  const openURL = jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
+
+  await renderApp('/shared/abc');
+  await fireEvent.press(await screen.findByRole('button', { name: 'Open link' }));
+
+  expect(openURL).toHaveBeenCalledWith('https://shop.example.com/scarf');
+  expect(screen.queryByText(/commission/)).not.toBeOnTheScreen();
+});
+
+test('affiliate links open through Delibird and are disclosed', async () => {
+  const go = 'http://localhost:8000/api/v1/go/abc123/';
+  const bike = item({
+    id: 102,
+    name: 'Bike',
+    url: 'https://www.amazon.it/dp/B0BIKE',
+    shop_url: go,
+    affiliate: true,
+  });
+  mockApi({
+    'GET shared/abc/': { body: { ...SHARED, items: [...SHARED.items, bike], role: 'anonymous' } },
+  });
+  const openURL = jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
+
+  await renderApp('/shared/abc');
+  const links = await screen.findAllByRole('button', { name: 'Open link' });
+  await fireEvent.press(links[1]);
+
+  expect(openURL).toHaveBeenCalledWith(go);
+  expect(screen.getAllByText(/may earn a small commission if you buy through this link/)).toHaveLength(1);
+  expect(screen.getByText(/About shop links/)).toBeOnTheScreen();
 });
 
 test('signing in from a share link comes back to it, then joining opens the list', async () => {

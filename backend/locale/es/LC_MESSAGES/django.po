@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: delibird\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-08 08:23+0000\n"
+"POT-Creation-Date: 2026-10-08 13:05+0000\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,15 +26,15 @@ msgstr "Cabecera de autorización no válida."
 msgid "Your session has ended. Sign in again."
 msgstr "Tu sesión ha terminado. Vuelve a entrar."
 
-#: accounts/models.py:19 config/settings.py:106
+#: accounts/models.py:19 config/settings.py:118
 msgid "English"
 msgstr "Inglés"
 
-#: accounts/models.py:20 config/settings.py:107
+#: accounts/models.py:20 config/settings.py:119
 msgid "Italian"
 msgstr "Italiano"
 
-#: accounts/models.py:21 config/settings.py:108
+#: accounts/models.py:21 config/settings.py:120
 msgid "Spanish"
 msgstr "Español"
 
@@ -131,6 +131,10 @@ msgstr ""
 #: accounts/views.py:113
 msgid "That code is wrong or has expired."
 msgstr "El código es incorrecto o ha caducado."
+
+#: affiliate/views.py:32 affiliate/views.py:43
+msgid "This link doesn't work any more."
+msgstr "Este enlace ya no funciona."
 
 #: autofill/views.py:54
 msgid "Too many links at once. Wait a few minutes."
@@ -240,19 +244,19 @@ msgstr "Ábrela aquí:"
 msgid "This list is already shared with that address."
 msgstr "Esta lista ya está compartida con esa dirección."
 
-#: sharing/views.py:89 sharing/views.py:118
+#: sharing/views.py:89 sharing/views.py:119
 msgid "This link doesn't work any more. Ask for a new one."
 msgstr "Este enlace ya no funciona. Pide uno nuevo."
 
-#: sharing/views.py:122
+#: sharing/views.py:123
 msgid "This is your own list."
 msgstr "Esta es tu propia lista."
 
-#: sharing/views.py:124
+#: sharing/views.py:125
 msgid "Someone else already accepted this link. Ask for your own."
 msgstr "Otra persona ya aceptó este enlace. Pide uno para ti."
 
-#: sharing/views.py:176
+#: sharing/views.py:180
 msgid "Someone else is already getting this."
 msgstr "Otra persona ya lo va a regalar."
 
