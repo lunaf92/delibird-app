@@ -208,6 +208,8 @@ function Chip({ label, selected, onPress, role = 'radio', disabled }: ChipProps)
       accessibilityRole={role}
       accessibilityLabel={label}
       accessibilityState={role === 'checkbox' ? { checked: selected, disabled } : { selected, disabled }}
+      // react-native-web doesn't turn accessibilityState.checked into aria-checked, so set it directly.
+      aria-checked={role === 'checkbox' ? selected : undefined}
       disabled={disabled}
       onPress={onPress}
       style={[styles.chip, selected && styles.chipSelected, disabled && styles.chipDisabled]}>
