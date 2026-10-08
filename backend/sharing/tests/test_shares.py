@@ -106,6 +106,8 @@ def test_signed_out_link_shows_the_list_without_reservations(
             "id": scarf.pk,
             "name": "Wool scarf",
             "url": "",
+            "shop_url": "",
+            "affiliate": False,
             "description": "",
             "rating": None,
             "image": None,

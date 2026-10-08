@@ -159,6 +159,8 @@
     "ownerNote": "Questa è la tua lista. Così la vedono le persone con il link; quello che prenotano resta nascosto a te.",
     "empty": "Per ora questa lista è vuota.",
     "openLink": "Apri il link",
+    "affiliateLink": "Delibird potrebbe ricevere una piccola commissione se acquisti tramite questo link.",
+    "affiliateAbout": "Sui link ai negozi: alcuni link a negozi come Amazon contengono il codice di affiliazione di Delibird. Se acquisti tramite uno di questi, il negozio paga a Delibird una piccola commissione; il prezzo che paghi non cambia. Chi ha creato la lista vede sempre il proprio link, e nessuno, nemmeno Delibird, registra chi ha aperto quale link.",
     "withMe": "Condivise con me",
     "secret": "{{name}} non può vedere cosa prende ciascuno.",
     "reserve": "Lo prendo io",

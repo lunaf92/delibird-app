@@ -70,6 +70,29 @@ Shops that block it still keep the link. `APP_URL/add?url=<link>` starts a new i
 phone share sheet will land once it's added. The server only fetches public internet addresses (never the home
 network), over http or https, with a short timeout and size limits.
 
+### Affiliate links (off until switched on)
+
+Delibird can earn a small commission when someone buys a gift through a shop link. It's off by default and
+changes nothing until it's switched on in `.env`:
+
+```
+AFFILIATE_ENABLED=true
+# Amazon Associates tracking ids, one per Amazon site you've signed up for
+AFFILIATE_AMAZON_TAGS=amazon.it=yourname-21,amazon.es=yourname-21
+```
+
+Then `docker compose up -d` to restart. Stored links never change, and the owner always sees and opens their own
+link. People a list is shared with get a Delibird link (`/api/v1/go/…`) instead, which adds the tag when it's
+opened, so tags can change, or the feature can be switched off, without touching any item. That link only works
+while the list is still shared with them and the item is still on it, and nothing records who opened it.
+
+Only full Amazon links for the sites listed get a tag; links that already carry someone's affiliate or referral
+code, short links such as `amzn.eu/d/…`, and other shops are left as they are. Rules for more shops go in
+`backend/affiliate/links.py`. When a shared list has an affiliate link, the app says so under that link, with a
+short paragraph about it at the bottom of the list (in English, Italian and Spanish). Before switching it on,
+Amazon Associates (and most programmes) expect the app to be on a public website with a privacy policy that
+mentions affiliate links.
+
 ### Notifications
 
 The worker sends emails (seen in Mailpit locally) when a list is shared with someone, and, within a minute, when

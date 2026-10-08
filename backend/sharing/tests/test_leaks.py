@@ -27,6 +27,7 @@ from rest_framework.test import APIClient
 
 from accounts.models import User
 from accounts.services import open_session
+from affiliate.links import go_token
 from autofill.fetch import Fetched
 from notifications import push
 from notifications import services as notifications
@@ -66,6 +67,9 @@ def picture() -> SimpleUploadedFile:
 @pytest.fixture
 def world(tmp_path: Path, settings: Any) -> World:
     settings.MEDIA_ROOT = tmp_path
+    # Affiliate links on, so the links friends get are part of what's compared.
+    settings.AFFILIATE_ENABLED = True
+    settings.AFFILIATE_AMAZON_TAGS = {"amazon.it": "delibird-21"}
     ann = User.objects.create_user("ann@example.com", display_name="Ann")
     bob = User.objects.create_user("bob@example.com", display_name="Bob")
     carol = User.objects.create_user("carol@example.com", display_name="")
@@ -76,7 +80,14 @@ def world(tmp_path: Path, settings: Any) -> World:
         add_item(default, name="Book", price="12.50", currency="EUR", rating=3),
         add_item(default, name="Socks"),
         add_item(christmas, name="Wool scarf", url="https://shop.example.com/scarf", description="Green"),
-        add_item(christmas, name="Bike", price="499.00", currency="GBP", rating=5),
+        add_item(
+            christmas,
+            name="Bike",
+            url="https://www.amazon.it/dp/B0BIKE",
+            price="499.00",
+            currency="GBP",
+            rating=5,
+        ),
         add_item(birthday, name="Cake"),
     ]
     items[2].image.save("x.jpg", picture(), save=True)
@@ -335,6 +346,23 @@ CALLS: list[Call] = [
         lambda w: reverse("devices"),
         lambda w: {"token": "ExponentPushToken[ann-phone]"},
         changes_data=True,
+    ),
+    # Shop links handed to friends, opened by the owner: they go to the shop and record nothing.
+    Call(
+        "affiliate-go",
+        "get",
+        lambda w: reverse("affiliate-go", args=[go_token(w.share_ids["bob-christmas"], w.items[3].pk)]),
+    ),
+    Call(
+        "affiliate-go",
+        "get",
+        lambda w: reverse("affiliate-go", args=[go_token(w.share_ids["carol-christmas"], w.items[2].pk)]),
+    ),
+    Call(
+        "affiliate-go",
+        "get",
+        lambda w: reverse("affiliate-go", args=[go_token(w.share_ids["dave-birthday"], w.items[3].pk)]),
+        signed_in=False,
     ),
     # Reserving is refused for the owner exactly as for an item that does not exist.
     Call(

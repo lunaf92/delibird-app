@@ -256,6 +256,36 @@
                 }
             }
         },
+        "/api/v1/go/{token}/": {
+            "get": {
+                "operationId": "go_retrieve",
+                "description": "Opens an item's shop link for someone a list is shared with, adding Delibird's affiliate code when the\nshop has one. It works only through a link Delibird handed out, while the list is still shared with them\nand the item is still on it, so it can't send people anywhere else or reveal other items. It records\nnothing, so the owner can never learn who clicked.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "token",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "go"
+                ],
+                "security": [
+                    {}
+                ],
+                "responses": {
+                    "302": {
+                        "description": "To the shop"
+                    },
+                    "404": {
+                        "description": "Unknown link, or no longer shared"
+                    }
+                }
+            }
+        },
         "/api/v1/health/": {
             "get": {
                 "operationId": "health_retrieve",
@@ -2039,6 +2069,16 @@
                             }
                         ]
                     },
+                    "shop_url": {
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "The link to open for this item: the shop link itself, or a Delibird link that adds an affiliate code on the way. Empty when the item has no link."
+                    },
+                    "affiliate": {
+                        "type": "boolean",
+                        "readOnly": true,
+                        "description": "Whether opening shop_url may earn a commission."
+                    },
                     "description": {
                         "type": "string",
                         "maxLength": 2000
@@ -2067,6 +2107,7 @@
                     }
                 },
                 "required": [
+                    "affiliate",
                     "currency",
                     "description",
                     "id",
@@ -2074,6 +2115,7 @@
                     "name",
                     "price",
                     "rating",
+                    "shop_url",
                     "url"
                 ]
             },
@@ -2212,6 +2254,16 @@
                             }
                         ]
                     },
+                    "shop_url": {
+                        "type": "string",
+                        "readOnly": true,
+                        "description": "The link to open for this item: the shop link itself, or a Delibird link that adds an affiliate code on the way. Empty when the item has no link."
+                    },
+                    "affiliate": {
+                        "type": "boolean",
+                        "readOnly": true,
+                        "description": "Whether opening shop_url may earn a commission."
+                    },
                     "description": {
                         "type": "string",
                         "maxLength": 2000
@@ -2248,6 +2300,7 @@
                     }
                 },
                 "required": [
+                    "affiliate",
                     "currency",
                     "description",
                     "id",
@@ -2256,6 +2309,7 @@
                     "price",
                     "rating",
                     "reservation",
+                    "shop_url",
                     "url"
                 ]
             },

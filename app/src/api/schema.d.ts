@@ -107,6 +107,28 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/go/{token}/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * @description Opens an item's shop link for someone a list is shared with, adding Delibird's affiliate code when the
+     *     shop has one. It works only through a link Delibird handed out, while the list is still shared with them
+     *     and the item is still on it, so it can't send people anywhere else or reveal other items. It records
+     *     nothing, so the owner can never learn who clicked.
+     */
+    get: operations['go_retrieve'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/health/': {
     parameters: {
       query?: never;
@@ -665,6 +687,10 @@ export interface components {
       name: string;
       /** Link */
       url: string;
+      /** @description The link to open for this item: the shop link itself, or a Delibird link that adds an affiliate code on the way. Empty when the item has no link. */
+      readonly shop_url: string;
+      /** @description Whether opening shop_url may earn a commission. */
+      readonly affiliate: boolean;
       description: string;
       rating: number | null;
       readonly image: string | null;
@@ -707,6 +733,10 @@ export interface components {
       name: string;
       /** Link */
       url: string;
+      /** @description The link to open for this item: the shop link itself, or a Delibird link that adds an affiliate code on the way. Empty when the item has no link. */
+      readonly shop_url: string;
+      /** @description Whether opening shop_url may earn a commission. */
+      readonly affiliate: boolean;
       description: string;
       rating: number | null;
       readonly image: string | null;
@@ -936,6 +966,33 @@ export interface operations {
     responses: {
       /** @description No response body */
       204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  go_retrieve: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        token: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description To the shop */
+      302: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unknown link, or no longer shared */
+      404: {
         headers: {
           [name: string]: unknown;
         };

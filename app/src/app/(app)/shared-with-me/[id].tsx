@@ -6,7 +6,7 @@ import { ActivityIndicator } from 'react-native';
 import { ApiError, cancelReservation, fetchViewerList, reserveItem, type ViewerItem } from '@/api/client';
 import { errorMessage } from '@/api/errors';
 import { useApi, useResource } from '@/api/use-api';
-import { SharedItemCard } from '@/components/shared-item';
+import { AffiliateNote, SharedItemCard } from '@/components/shared-item';
 import { Body, Button, Message, Screen, Title } from '@/components/ui';
 
 /** A list someone shared with you: reserve what you'll get, and see what others are getting. */
@@ -78,6 +78,7 @@ export default function ViewerListScreen() {
           )}
         </SharedItemCard>
       ))}
+      <AffiliateNote items={list.items} />
     </Screen>
   );
 }

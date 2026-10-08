@@ -4,6 +4,7 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
 from accounts.models import User
+from affiliate.links import shop_link
 from sharing.models import Reservation, Share
 from wishlists.models import Item, Wishlist
 from wishlists.services import list_items
@@ -44,16 +45,38 @@ class SharedItemSerializer(serializers.ModelSerializer[Item]):
     """An item as people the list is shared with see it, without anything about reservations."""
 
     image = serializers.SerializerMethodField()
+    shop_url = serializers.SerializerMethodField(
+        help_text="The link to open for this item: the shop link itself, or a Delibird link that adds an "
+        "affiliate code on the way. Empty when the item has no link."
+    )
+    affiliate = serializers.SerializerMethodField(help_text="Whether opening shop_url may earn a commission.")
 
     class Meta:
         model = Item
-        fields: tuple[str, ...] = ("id", "name", "url", "description", "rating", "image", "price", "currency")
+        fields: tuple[str, ...] = (
+            "id",
+            "name",
+            "url",
+            "shop_url",
+            "affiliate",
+            "description",
+            "rating",
+            "image",
+            "price",
+            "currency",
+        )
 
     def get_image(self, item: Item) -> str | None:
         if not item.image:
             return None
         request = self.context.get("request")
         return request.build_absolute_uri(item.image.url) if request else item.image.url
+
+    def get_shop_url(self, item: Item) -> str:
+        return shop_link(self.context.get("request"), item.url, item.pk, self.context.get("share_id"))[0]
+
+    def get_affiliate(self, item: Item) -> bool:
+        return shop_link(self.context.get("request"), item.url, item.pk, self.context.get("share_id"))[1]
 
 
 class ReservationStateSerializer(serializers.Serializer[Any]):
