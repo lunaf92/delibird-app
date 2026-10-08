@@ -66,7 +66,7 @@ CI fails if a new route isn't covered.
 
 Paste a shop link in a new item and press "Fill in from link": the server reads the page (schema.org Product
 data, Open Graph and product tags, or the page title) and fills in the name, price, currency, notes and picture.
-Shops that block it (an error status, or a robot-check or captcha page such as Amazon's) still keep the link, and the app says why nothing was filled in: blocked by the shop, too slow, unreachable, unreadable, or not a public address. `APP_URL/add?url=<link>` starts a new item from a link, and is where the
+Shops that block it (an error status, or a robot-check or captcha page such as Amazon's) still keep the link, and the app says why nothing was filled in: blocked by the shop, too slow, unreachable, unreadable, or not a public address. When nothing can be read, the app guesses the name from the link itself where it reads like one (IKEA's `/p/kallax-shelving-unit-white-stained-oak-effect-00324518/` becomes "Kallax shelving unit white stained oak effect"), only into an empty name, and says it's a guess. `APP_URL/add?url=<link>` starts a new item from a link, and is where the
 phone share sheet will land once it's added. The server only fetches public internet addresses (never the home
 network), over http or https, with a short timeout and size limits.
 

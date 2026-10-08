@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { ApiError, type Autofill, type Item, type PickedImage, type Wishlist } from '@/api/client';
+import { nameFromLink } from '@/api/links';
 
 import { CURRENCIES, parsePrice } from './price';
 import { RatingPicker } from './rating';
@@ -44,7 +45,6 @@ type Props = {
 
 const LINK = /^https?:\/\/\S+\.\S+/i;
 
-/** The item form: only the name is required. */
 /** What to say when nothing could be read from a link, by the server's reason. */
 const PROBLEM_TEXT = {
   none: 'items.autofillNothing',
@@ -54,6 +54,7 @@ const PROBLEM_TEXT = {
   unreadable: 'items.autofillUnreadable',
 } as const;
 
+/** The item form: only the name is required. */
 export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit, autofill, initialUrl }: Props) {
   const { t } = useTranslation();
   const [name, setName] = useState(item?.name ?? '');
@@ -67,6 +68,13 @@ export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit, auto
   const [problem, setProblem] = useState<string | null>(null);
   const [filling, setFilling] = useState(Boolean(initialUrl));
   const [fillNote, setFillNote] = useState<{ tone: 'success' | 'error'; text: string } | null>(null);
+  /** The name was guessed from the link because the page couldn't be read. */
+  const [nameGuessed, setNameGuessed] = useState(false);
+  // The name as last typed, for answers that arrive after the person has started typing.
+  const typedName = useRef(name);
+  useEffect(() => {
+    typedName.current = name;
+  }, [name]);
   const started = useRef(false);
 
   /** Fills only the fields that are still empty, so nothing the person typed is overwritten. */
@@ -75,6 +83,11 @@ export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit, auto
     setUrl(found.url);
     if (!found.found) {
       setFillNote({ tone: 'error', text: t(PROBLEM_TEXT[found.problem ?? 'none']) });
+      const guess = nameFromLink(found.url);
+      if (guess && !typedName.current.trim()) {
+        setName(guess);
+        setNameGuessed(true);
+      }
       return;
     }
     setName((current) => current.trim() || found.name);
@@ -197,7 +210,16 @@ export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit, auto
     <>
       {/* For a new item the shop link usually comes first: it fills in the rest. */}
       {!item && linkField}
-      <TextField label={t('items.name')} value={name} onChangeText={setName} maxLength={200} />
+      <TextField
+        label={t('items.name')}
+        value={name}
+        onChangeText={(text) => {
+          setName(text);
+          setNameGuessed(false);
+        }}
+        maxLength={200}
+      />
+      {nameGuessed && <Body muted>{t('items.nameGuessed')}</Body>}
       {item && linkField}
       <TextField
         label={t('items.description')}

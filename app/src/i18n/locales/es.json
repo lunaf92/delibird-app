@@ -126,7 +126,8 @@
     "autofillTimeout": "La tienda ha tardado demasiado en responder. El enlace se guarda; escribe el resto o inténtalo más tarde.",
     "autofillUnreachable": "Delibird no ha podido llegar a esta tienda. Revisa el enlace; se guarda, así que puedes escribir el resto.",
     "autofillUnreadable": "Delibird no ha podido leer esta página. El enlace se guarda; escribe el resto.",
-    "autofillNotPublic": "Delibird no abre este enlace: apunta a una dirección que no está en internet. El enlace se guarda; escribe el resto."
+    "autofillNotPublic": "Delibird no abre este enlace: apunta a una dirección que no está en internet. El enlace se guarda; escribe el resto.",
+    "nameGuessed": "Sacado del enlace, porque no se ha podido leer la página de la tienda. Revísalo antes de guardar."
   },
   "reorder": {
     "up": "Subir {{name}}",
