@@ -8,6 +8,7 @@ from accounts.tests.helpers import sign_in_as
 from sharing.models import ItemChange, Share
 from sharing.services import NewShare, share_list
 from wishlists.models import Item, Wishlist
+from wishlists.tests.helpers import add_item
 
 pytestmark = pytest.mark.django_db
 
@@ -185,7 +186,7 @@ def test_owners_shared_lists_page_shows_who_joined(
 def test_edits_and_deletions_on_shared_lists_are_recorded(
     client: APIClient, christmas: Wishlist, scarf: Item, bob_share: NewShare, ann: User
 ) -> None:
-    unshared_item = ann.wishlists.get(is_default=True).items.create(name="Socks")
+    unshared_item = add_item(ann.wishlists.get(is_default=True), name="Socks")
 
     client.patch(reverse("item", args=[scarf.pk]), {"name": "Red scarf"}, format="json")
     client.delete(reverse("item", args=[scarf.pk]))
@@ -201,3 +202,12 @@ def test_deleting_the_owner_account_removes_shares(client: APIClient, bob_share:
     client.delete(reverse("me"))
 
     assert not Share.objects.exists()
+
+
+def test_items_say_whether_they_are_on_a_shared_list(
+    client: APIClient, ann: User, christmas: Wishlist, scarf: Item, bob_share: NewShare
+) -> None:
+    only_on_default = add_item(ann.wishlists.get(is_default=True), name="Socks")
+
+    assert client.get(reverse("item", args=[scarf.pk])).json()["on_shared_list"] is True
+    assert client.get(reverse("item", args=[only_on_default.pk])).json()["on_shared_list"] is False

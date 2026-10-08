@@ -4,7 +4,8 @@ from rest_framework.test import APIClient
 
 from accounts.models import User
 from wishlists.models import Item, Wishlist
-from wishlists.services import add_item, create_wishlist
+from wishlists.services import create_wishlist
+from wishlists.tests.helpers import add_item
 
 pytestmark = pytest.mark.django_db
 
@@ -30,7 +31,7 @@ def test_lists_are_the_owners_own_in_order(client: APIClient, ann: User, bob: Us
 
     assert response.status_code == 200
     assert [(w["name"], w["is_default"], w["item_count"]) for w in response.json()] == [
-        ("My wishlist", True, 0),
+        ("My wishlist", True, 2),  # Every item is on the default list.
         ("Birthday", False, 2),
     ]
 
@@ -82,7 +83,7 @@ def test_is_default_cannot_be_changed(client: APIClient, ann: User) -> None:
     assert not other.is_default
 
 
-def test_delete_a_list_and_its_items(client: APIClient, ann: User) -> None:
+def test_deleting_a_list_keeps_its_items_on_the_default_list(client: APIClient, ann: User) -> None:
     wishlist = create_wishlist(ann, "Christmas")
     add_item(wishlist, name="Book")
 
@@ -90,7 +91,9 @@ def test_delete_a_list_and_its_items(client: APIClient, ann: User) -> None:
 
     assert response.status_code == 204
     assert not Wishlist.objects.filter(pk=wishlist.pk).exists()
-    assert not Item.objects.exists()
+    default = ann.wishlists.get(is_default=True)
+    assert [i["name"] for i in client.get(reverse("list", args=[default.pk])).json()["items"]] == ["Book"]
+    assert Item.objects.count() == 1
 
 
 def test_default_list_cannot_be_deleted(client: APIClient, ann: User) -> None:

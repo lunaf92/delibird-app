@@ -14,7 +14,7 @@ from notifications.tasks import notify_buyers
 from sharing.models import Reservation
 from sharing.services import NewShare
 from wishlists.models import Item, Wishlist
-from wishlists.services import add_item
+from wishlists.tests.helpers import add_item
 
 pytestmark = pytest.mark.django_db
 
@@ -103,9 +103,9 @@ def test_the_buyer_hears_when_their_item_changes(
     [message] = mail.outbox
     assert message.to == ["bob@example.com"]
     assert message.subject == "“Green wool scarf” changed"
-    assert f"/shared-with-me/{scarf.wishlist_id}" in message.body
+    assert f"/shared-with-me/{bob_share.share.wishlist_id}" in message.body
     [notification] = pushes
-    assert notification["data"] == {"path": f"/shared-with-me/{scarf.wishlist_id}"}
+    assert notification["data"] == {"path": f"/shared-with-me/{bob_share.share.wishlist_id}"}
     # Nothing is sent twice.
     notify_buyers.apply()
     assert len(mail.outbox) == 1

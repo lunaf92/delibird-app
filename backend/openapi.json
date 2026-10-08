@@ -283,7 +283,7 @@
         "/api/v1/items/{id}/": {
             "get": {
                 "operationId": "items_retrieve",
-                "description": "One item. Sending another of your lists as `wishlist` moves the item to the end of that list.",
+                "description": "One item, on every list it is on. Sending `lists` sets exactly which lists it is on (it always stays\non the default list). Deleting it removes it from every list.",
                 "parameters": [
                     {
                         "in": "path",
@@ -317,7 +317,7 @@
             },
             "patch": {
                 "operationId": "items_partial_update",
-                "description": "One item. Sending another of your lists as `wishlist` moves the item to the end of that list.",
+                "description": "One item, on every list it is on. Sending `lists` sets exactly which lists it is on (it always stays\non the default list). Deleting it removes it from every list.",
                 "parameters": [
                     {
                         "in": "path",
@@ -370,7 +370,7 @@
             },
             "delete": {
                 "operationId": "items_destroy",
-                "description": "One item. Sending another of your lists as `wishlist` moves the item to the end of that list.",
+                "description": "One item, on every list it is on. Sending `lists` sets exactly which lists it is on (it always stays\non the default list). Deleting it removes it from every list.",
                 "parameters": [
                     {
                         "in": "path",
@@ -617,7 +617,7 @@
         "/api/v1/lists/{id}/": {
             "get": {
                 "operationId": "lists_retrieve",
-                "description": "One list with its items. The default list can be renamed but not deleted.",
+                "description": "One list with its items. The default list holds every item; it can be renamed but not deleted.\nDeleting another list takes its items off it, but keeps them on the default list.",
                 "parameters": [
                     {
                         "in": "path",
@@ -651,7 +651,7 @@
             },
             "patch": {
                 "operationId": "lists_partial_update",
-                "description": "One list with its items. The default list can be renamed but not deleted.",
+                "description": "One list with its items. The default list holds every item; it can be renamed but not deleted.\nDeleting another list takes its items off it, but keeps them on the default list.",
                 "parameters": [
                     {
                         "in": "path",
@@ -704,7 +704,7 @@
             },
             "delete": {
                 "operationId": "lists_destroy",
-                "description": "One list with its items. The default list can be renamed but not deleted.",
+                "description": "One list with its items. The default list holds every item; it can be renamed but not deleted.\nDeleting another list takes its items off it, but keeps them on the default list.",
                 "parameters": [
                     {
                         "in": "path",
@@ -733,7 +733,7 @@
         "/api/v1/lists/{id}/items/": {
             "get": {
                 "operationId": "lists_items_list",
-                "description": "The items on one list, in order. New items go to the end.",
+                "description": "The items on one list, in that list's order. A new item goes at the end of this list and of the\ndefault list, and of any other lists named in `lists`.",
                 "parameters": [
                     {
                         "in": "path",
@@ -770,7 +770,7 @@
             },
             "post": {
                 "operationId": "lists_items_create",
-                "description": "The items on one list, in order. New items go to the end.",
+                "description": "The items on one list, in that list's order. A new item goes at the end of this list and of the\ndefault list, and of any other lists named in `lists`.",
                 "parameters": [
                     {
                         "in": "path",
@@ -819,6 +819,85 @@
                             }
                         },
                         "description": ""
+                    }
+                }
+            }
+        },
+        "/api/v1/lists/{id}/items/{item_id}/": {
+            "put": {
+                "operationId": "lists_items_update",
+                "description": "Puts one of your existing items on this list (PUT), or takes it off (DELETE). Taking an item off\nthe default list deletes it everywhere.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "item_id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "lists"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Item"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "lists_items_destroy",
+                "description": "Puts one of your existing items on this list (PUT), or takes it off (DELETE). Taking an item off\nthe default list deletes it everywhere.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    },
+                    {
+                        "in": "path",
+                        "name": "item_id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "lists"
+                ],
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No response body"
                     }
                 }
             }
@@ -1353,9 +1432,6 @@
                         "type": "integer",
                         "readOnly": true
                     },
-                    "wishlist": {
-                        "type": "integer"
-                    },
                     "name": {
                         "type": "string",
                         "maxLength": 200
@@ -1401,9 +1477,17 @@
                         "pattern": "^[A-Z]{3}$",
                         "maxLength": 3
                     },
-                    "position": {
-                        "type": "integer",
-                        "readOnly": true
+                    "lists": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "description": "Every list the item is on. It is always on the default list, whether or not that is sent."
+                    },
+                    "on_shared_list": {
+                        "type": "boolean",
+                        "readOnly": true,
+                        "description": "Whether the item is on any list someone has a link to."
                     },
                     "created_at": {
                         "type": "string",
@@ -1422,21 +1506,18 @@
                     "description",
                     "id",
                     "image",
+                    "lists",
                     "name",
-                    "position",
+                    "on_shared_list",
                     "price",
                     "rating",
                     "updated_at",
-                    "url",
-                    "wishlist"
+                    "url"
                 ]
             },
             "ItemRequest": {
                 "type": "object",
                 "properties": {
-                    "wishlist": {
-                        "type": "integer"
-                    },
                     "name": {
                         "type": "string",
                         "minLength": 1,
@@ -1477,6 +1558,13 @@
                         "minLength": 1,
                         "pattern": "^[A-Z]{3}$",
                         "maxLength": 3
+                    },
+                    "lists": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "description": "Every list the item is on. It is always on the default list, whether or not that is sent."
                     }
                 },
                 "required": [
@@ -1552,9 +1640,6 @@
             "PatchedItemRequest": {
                 "type": "object",
                 "properties": {
-                    "wishlist": {
-                        "type": "integer"
-                    },
                     "name": {
                         "type": "string",
                         "minLength": 1,
@@ -1595,6 +1680,13 @@
                         "minLength": 1,
                         "pattern": "^[A-Z]{3}$",
                         "maxLength": 3
+                    },
+                    "lists": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "description": "Every list the item is on. It is always on the default list, whether or not that is sent."
                     }
                 }
             },

@@ -7,6 +7,7 @@ from notifications import push
 from notifications.messages import Message, compose
 from notifications.models import Notification, PushDevice
 from sharing.models import ItemChange, Reservation, Share
+from sharing.services import viewable_lists
 from wishlists.models import Item
 
 
@@ -40,41 +41,50 @@ def invite(share: Share, link: str) -> None:
 
 
 def notify_buyers() -> int:
-    """Turns recorded edits and deletions into notifications for whoever reserved those items.
+    """Turns recorded edits, deletions and removals into notifications for whoever reserved those items.
 
-    Several changes to one item since the last run become one notification, and a deletion wins over
-    changes. Reservations of deleted items are removed once their buyer has been told.
+    Several changes to one item since the last run become one message per buyer. A buyer whose item was
+    deleted, or who can no longer see it on any list shared with them, is told it was removed and the
+    reservation is released; otherwise a buyer is told it changed. The link points at a list the buyer can
+    still open.
     """
     created = 0
     with transaction.atomic():
         changes = list(
             ItemChange.objects.select_for_update(skip_locked=True).filter(notified_at__isnull=True)
         )
-        latest: dict[int, ItemChange] = {}
+        by_item: dict[int, list[ItemChange]] = {}
         for change in changes:
-            current = latest.get(change.item_id)
-            if (
-                current is None
-                or change.kind == ItemChange.Kind.DELETED
-                or current.kind != ItemChange.Kind.DELETED
-            ):
-                latest[change.item_id] = change
-        for item_id, change in latest.items():
-            deleted = change.kind == ItemChange.Kind.DELETED or not Item.objects.filter(pk=item_id).exists()
+            by_item.setdefault(change.item_id, []).append(change)
+        for item_id, item_changes in by_item.items():
+            kinds = {c.kind for c in item_changes}
+            deleted = ItemChange.Kind.DELETED in kinds or not Item.objects.filter(pk=item_id).exists()
+            latest = item_changes[-1]
             for reservation in Reservation.objects.filter(item_id=item_id).select_related("buyer"):
+                buyer = reservation.buyer
+                visible = [] if deleted else list(viewable_lists(buyer).filter(entries__item_id=item_id))
+                if deleted or not visible:
+                    kind = Notification.Kind.ITEM_DELETED
+                    list_id, list_name = latest.wishlist_id, latest.wishlist_name
+                    reservation.delete()
+                elif ItemChange.Kind.CHANGED in kinds:
+                    kind = Notification.Kind.ITEM_CHANGED
+                    shown = next((c for c in item_changes if c.wishlist_id in {w.pk for w in visible}), None)
+                    list_id = visible[0].pk
+                    list_name = shown.wishlist_name if shown else visible[0].name
+                else:
+                    continue  # Taken off one list, but still on another this buyer can see.
                 Notification.objects.create(
-                    recipient=reservation.buyer,
-                    kind=Notification.Kind.ITEM_DELETED if deleted else Notification.Kind.ITEM_CHANGED,
+                    recipient=buyer,
+                    kind=kind,
                     payload={
-                        "owner_name": change.owner_name,
-                        "list_name": change.wishlist_name,
-                        "list_id": change.wishlist_id,
-                        "item_name": change.item_name,
+                        "owner_name": latest.owner_name,
+                        "list_name": list_name,
+                        "list_id": list_id,
+                        "item_name": latest.item_name,
                     },
                 )
                 created += 1
-            if deleted:
-                Reservation.objects.filter(item_id=item_id).delete()
         ItemChange.objects.filter(pk__in=[c.pk for c in changes]).update(notified_at=timezone.now())
     return created
 

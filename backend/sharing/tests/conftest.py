@@ -5,7 +5,8 @@ from accounts.models import User
 from accounts.tests.helpers import sign_in_as
 from sharing.services import NewShare, join, share_list
 from wishlists.models import Item, Wishlist
-from wishlists.services import add_item, create_wishlist
+from wishlists.services import create_wishlist
+from wishlists.tests.helpers import add_item
 
 
 @pytest.fixture

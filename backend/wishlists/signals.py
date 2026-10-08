@@ -9,9 +9,10 @@ from django.utils.translation import gettext as _
 from accounts.models import User
 from wishlists.models import Item, Wishlist
 
-# Sent when the owner edits (deleted=False) or is about to delete (deleted=True) an item. Other apps listen,
-# for example to tell people who shared the list.
+# Sent when the owner edits (deleted=False) or is about to delete (deleted=True) an item, and when they
+# take an item off one list (item_removed, before it goes). Other apps listen, to tell people who can see it.
 item_edited = Signal()
+item_removed = Signal()
 
 
 def default_list_name(language: str) -> str:

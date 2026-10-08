@@ -2,7 +2,7 @@ from typing import Any, cast
 
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Count, Prefetch, QuerySet
+from django.db.models import Count, QuerySet
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext as _
@@ -25,15 +25,11 @@ from sharing.serializers import (
     ViewerListSerializer,
     ViewerListSummarySerializer,
 )
-from wishlists.models import Item, Wishlist
+from wishlists.models import Wishlist
 
 
 def current_user(request: Request) -> User:
     return cast(User, request.user)
-
-
-def ordered_items() -> Prefetch[Any]:
-    return Prefetch("items", queryset=Item.objects.order_by("position", "id"))
 
 
 class ShareListView(generics.ListCreateAPIView[Share]):
@@ -91,11 +87,7 @@ class SharedListView(APIView):
         share = services.share_for_token(token)
         if share is None:
             raise NotFound(_("This link doesn't work any more. Ask for a new one."))
-        wishlist = (
-            Wishlist.objects.select_related("owner")
-            .prefetch_related(ordered_items())
-            .get(pk=share.wishlist_id)
-        )
+        wishlist = Wishlist.objects.select_related("owner").get(pk=share.wishlist_id)
         user = request.user if request.user.is_authenticated else None
         if user is None:
             role = "anonymous"
@@ -138,7 +130,7 @@ def viewer_lists(user: User) -> QuerySet[Wishlist]:
     return (
         services.viewable_lists(user)
         .select_related("owner")
-        .annotate(item_count=Count("items", distinct=True))
+        .annotate(item_count=Count("entries", distinct=True))
         .order_by("owner__display_name", "name", "id")
     )
 
@@ -159,9 +151,11 @@ class SharedWithMeDetailView(APIView):
     @extend_schema(responses={200: ViewerListSerializer})
     def get(self, request: Request, pk: int) -> Response:
         user = current_user(request)
-        wishlist = get_object_or_404(viewer_lists(user).prefetch_related(ordered_items()), pk=pk)
+        wishlist = get_object_or_404(viewer_lists(user), pk=pk)
+        # Reservations are per item, so one made through another list shows here too.
         reservations = {
-            r.item_id: r for r in Reservation.objects.filter(item__wishlist=wishlist).select_related("buyer")
+            r.item_id: r
+            for r in Reservation.objects.filter(item__entries__wishlist=wishlist).select_related("buyer")
         }
         context = {"request": request, "reservations": reservations}
         return Response(ViewerListSerializer(wishlist, context=context).data)

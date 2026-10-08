@@ -6,6 +6,7 @@ from rest_framework import serializers
 from accounts.models import User
 from sharing.models import Reservation, Share
 from wishlists.models import Item, Wishlist
+from wishlists.services import list_items
 
 
 def public_name(user: User) -> str:
@@ -83,7 +84,7 @@ class SharedListSerializer(serializers.ModelSerializer[Wishlist]):
     """A list opened through a share link. `role` says how the requester relates to it."""
 
     owner_name = serializers.SerializerMethodField()
-    items = SharedItemSerializer(many=True, read_only=True)
+    items = serializers.SerializerMethodField()
     role = serializers.SerializerMethodField(
         help_text="owner: it's your list. viewer: you accepted this link. invited: sign in or accept to "
         "reserve. anonymous: not signed in."
@@ -95,6 +96,10 @@ class SharedListSerializer(serializers.ModelSerializer[Wishlist]):
 
     def get_owner_name(self, wishlist: Wishlist) -> str:
         return public_name(wishlist.owner)
+
+    @extend_schema_field(SharedItemSerializer(many=True))
+    def get_items(self, wishlist: Wishlist) -> Any:
+        return SharedItemSerializer(list_items(wishlist), many=True, context=self.context).data
 
     @extend_schema_field(serializers.ChoiceField(choices=["owner", "viewer", "invited", "anonymous"]))
     def get_role(self, wishlist: Wishlist) -> str:
@@ -114,7 +119,11 @@ class ViewerListSummarySerializer(serializers.ModelSerializer[Wishlist]):
 
 
 class ViewerListSerializer(ViewerListSummarySerializer):
-    items = ViewerItemSerializer(many=True, read_only=True)
+    items = serializers.SerializerMethodField()
 
     class Meta(ViewerListSummarySerializer.Meta):
         fields = (*ViewerListSummarySerializer.Meta.fields, "items")
+
+    @extend_schema_field(ViewerItemSerializer(many=True))
+    def get_items(self, wishlist: Wishlist) -> Any:
+        return ViewerItemSerializer(list_items(wishlist), many=True, context=self.context).data
