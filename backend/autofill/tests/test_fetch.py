@@ -1,5 +1,7 @@
+import gzip
 import socket
 import threading
+import zlib
 from collections.abc import Iterator
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
@@ -25,6 +27,19 @@ class Shop(BaseHTTPRequestHandler):
             "/big": (200, {"Content-Type": "text/html"}, b"x" * 5000),
             "/pdf": (200, {"Content-Type": "application/pdf"}, b"%PDF"),
             "/gone": (404, {"Content-Type": "text/html"}, b"no"),
+            "/gzip": (200, {"Content-Type": "text/html", "Content-Encoding": "gzip"}, gzip.compress(HTML)),
+            "/deflate": (
+                200,
+                {"Content-Type": "text/html", "Content-Encoding": "deflate"},
+                zlib.compress(HTML),
+            ),
+            # Tiny on the wire, huge once unpacked.
+            "/bomb": (
+                200,
+                {"Content-Type": "text/html", "Content-Encoding": "gzip"},
+                gzip.compress(b"x" * 5_000_000),
+            ),
+            "/brotli": (200, {"Content-Type": "text/html", "Content-Encoding": "br"}, b"\x00"),
         }
         status, headers, body = routes.get(self.path, (404, {}, b""))
         self.send_response(status)
@@ -142,3 +157,14 @@ def test_unknown_hosts_fail_quietly(monkeypatch: pytest.MonkeyPatch) -> None:
 
     with pytest.raises(FetchFailed):
         page("https://no-such-shop.example/")
+
+
+@pytest.mark.parametrize("path", ["/gzip", "/deflate"])
+def test_compressed_pages_are_unpacked(shop: str, path: str) -> None:
+    assert page(shop + path).body == HTML
+
+
+@pytest.mark.parametrize("path", ["/bomb", "/brotli"])
+def test_compressed_pages_that_unpack_too_big_or_oddly_are_refused(shop: str, path: str) -> None:
+    with pytest.raises(FetchFailed):
+        page(shop + path, max_bytes=1000)

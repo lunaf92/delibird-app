@@ -10,6 +10,7 @@ import http.client
 import ipaddress
 import socket
 import ssl
+import zlib
 from dataclasses import dataclass
 from urllib.parse import urljoin, urlsplit
 
@@ -89,6 +90,24 @@ def open_connection(scheme: str, host: str, port: int) -> http.client.HTTPConnec
     return connection
 
 
+def decompress(body: bytes, encoding: str | None, max_bytes: int) -> bytes:
+    """Unpacks gzip or deflate bodies, refusing anything that unpacks to more than `max_bytes`."""
+    encoding = (encoding or "").strip().lower()
+    if encoding in ("", "identity"):
+        return body
+    if encoding not in ("gzip", "x-gzip", "deflate"):
+        raise FetchFailed("unsupported encoding")
+    wbits = 16 + zlib.MAX_WBITS if "gzip" in encoding else zlib.MAX_WBITS
+    try:
+        unpacker = zlib.decompressobj(wbits)
+        data = unpacker.decompress(body, max_bytes + 1)
+    except zlib.error as error:
+        raise FetchFailed("broken compression") from error
+    if len(data) > max_bytes or unpacker.unconsumed_tail:
+        raise FetchFailed("too big")
+    return data
+
+
 def fetch(url: str, *, accept: tuple[str, ...], max_bytes: int) -> Fetched:
     """GETs `url`, following up to five redirects, and returns the body if its type starts with `accept`."""
     for _ in range(MAX_REDIRECTS + 1):
@@ -103,6 +122,8 @@ def fetch(url: str, *, accept: tuple[str, ...], max_bytes: int) -> Fetched:
                     "Accept": ", ".join(f"{a}*" if a.endswith("/") else a for a in accept)
                     + ";q=0.9, */*;q=0.1",
                     "Accept-Language": "en,it;q=0.8,es;q=0.7",
+                    # Many shops compress whether asked or not, so ask for gzip and unpack it below.
+                    "Accept-Encoding": "gzip, deflate",
                 },
             )
             response = connection.getresponse()
@@ -120,6 +141,7 @@ def fetch(url: str, *, accept: tuple[str, ...], max_bytes: int) -> Fetched:
             body = response.read(max_bytes + 1)
             if len(body) > max_bytes:
                 raise FetchFailed("too big")
+            body = decompress(body, response.getheader("Content-Encoding"), max_bytes)
             return Fetched(url=url, content_type=content_type, body=body)
         except (OSError, http.client.HTTPException) as error:
             raise FetchFailed("connection failed") from error
