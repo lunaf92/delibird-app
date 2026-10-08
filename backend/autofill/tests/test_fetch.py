@@ -27,6 +27,8 @@ class Shop(BaseHTTPRequestHandler):
             "/big": (200, {"Content-Type": "text/html"}, b"x" * 5000),
             "/pdf": (200, {"Content-Type": "application/pdf"}, b"%PDF"),
             "/gone": (404, {"Content-Type": "text/html"}, b"no"),
+            "/forbidden": (403, {"Content-Type": "text/html"}, b"Access Denied"),
+            "/busy": (503, {"Content-Type": "text/html"}, b"Try again"),
             "/gzip": (200, {"Content-Type": "text/html", "Content-Encoding": "gzip"}, gzip.compress(HTML)),
             "/deflate": (
                 200,
@@ -106,8 +108,29 @@ def test_only_the_expected_kind_of_file(shop: str) -> None:
 
 
 def test_error_pages_are_failures(shop: str) -> None:
-    with pytest.raises(FetchFailed):
+    with pytest.raises(FetchFailed) as failure:
         page(shop + "/gone")
+    assert failure.value.reason == "unreadable"
+
+
+@pytest.mark.parametrize("path", ["/forbidden", "/busy"])
+def test_shops_turning_us_away_count_as_blocked(shop: str, path: str) -> None:
+    with pytest.raises(FetchFailed) as failure:
+        page(shop + path)
+    assert failure.value.reason == "blocked"
+
+
+def test_shops_that_never_answer_time_out(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("autofill.fetch.public_addresses", lambda host, port: ["203.0.113.5"])
+
+    def connect(*args: Any, **kwargs: Any) -> Any:
+        raise TimeoutError("timed out")
+
+    monkeypatch.setattr("autofill.fetch.socket.create_connection", connect)
+
+    with pytest.raises(FetchFailed) as failure:
+        page("https://slow-shop.example/")
+    assert failure.value.reason == "timeout"
 
 
 @pytest.mark.parametrize(
@@ -155,8 +178,9 @@ def test_unknown_hosts_fail_quietly(monkeypatch: pytest.MonkeyPatch) -> None:
 
     monkeypatch.setattr("autofill.fetch.socket.getaddrinfo", resolve)
 
-    with pytest.raises(FetchFailed):
+    with pytest.raises(FetchFailed) as failure:
         page("https://no-such-shop.example/")
+    assert failure.value.reason == "unreachable"
 
 
 @pytest.mark.parametrize("path", ["/gzip", "/deflate"])

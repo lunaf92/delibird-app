@@ -42,6 +42,13 @@ class AutofillSerializer(serializers.Serializer[None]):
     price = serializers.DecimalField(max_digits=10, decimal_places=2, allow_null=True)
     currency = serializers.CharField(allow_null=True)
     image_url = serializers.CharField(allow_null=True, help_text="A picture to fetch with image/from-url/.")
+    problem = serializers.ChoiceField(
+        choices=["blocked", "timeout", "unreachable", "unreadable"],
+        allow_null=True,
+        help_text="Why nothing was read: the shop turned us away (blocked), took too long (timeout), "
+        "couldn't be reached (unreachable), or sent something that isn't a readable page (unreadable). Null "
+        "when the page was read, even if it had no details.",
+    )
 
 
 def owner(request: Request) -> User:
@@ -72,14 +79,24 @@ class AutofillView(APIView):
     def post(self, request: Request) -> Response:
         url = link_from(request)
         check_rate(request)
-        empty = {"found": False, "url": url, "name": "", "description": "", "price": None, "currency": None}
+        empty = {
+            "found": False,
+            "url": url,
+            "name": "",
+            "description": "",
+            "price": None,
+            "currency": None,
+            "image_url": None,
+        }
         try:
             page = fetch(url, accept=("text/html", "application/xhtml"), max_bytes=MAX_PAGE_BYTES)
         except FetchRefused as error:
             raise refused(error) from error
-        except FetchFailed:
-            return Response({**empty, "image_url": None})
+        except FetchFailed as error:
+            return Response({**empty, "problem": error.reason})
         product = read_product(page.body.decode("utf-8", errors="replace"), page.url)
+        if product.blocked:
+            return Response({**empty, "problem": "blocked"})
         return Response(
             {
                 "found": product.found_anything,
@@ -89,6 +106,7 @@ class AutofillView(APIView):
                 "price": product.price,
                 "currency": product.currency,
                 "image_url": product.image_url,
+                "problem": None,
             }
         )
 

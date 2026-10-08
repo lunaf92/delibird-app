@@ -24,7 +24,18 @@ class FetchRefused(Exception):
 
 
 class FetchFailed(Exception):
-    """The shop didn't answer usefully: unreachable, an error status, too big, or the wrong kind of file."""
+    """The shop didn't answer usefully: unreachable, an error status, too big, or the wrong kind of file.
+
+    `reason` says which, in the words the app shows: "unreachable", "timeout", "blocked" (the shop refused
+    us) or "unreadable" (anything else)."""
+
+    def __init__(self, message: str, reason: str = "unreadable") -> None:
+        super().__init__(message)
+        self.reason = reason
+
+
+# Statuses shops answer with when they turn away automated visitors.
+BLOCKED_STATUSES = {401, 403, 429, 503}
 
 
 @dataclass
@@ -39,7 +50,7 @@ def public_addresses(host: str, port: int) -> list[str]:
     try:
         infos = socket.getaddrinfo(host, port, type=socket.SOCK_STREAM)
     except (socket.gaierror, UnicodeError) as error:
-        raise FetchFailed("unknown host") from error
+        raise FetchFailed("unknown host", "unreachable") from error
     addresses = sorted({str(info[4][0]) for info in infos})
     for address in addresses:
         ip = ipaddress.ip_address(address.split("%")[0])
@@ -48,7 +59,7 @@ def public_addresses(host: str, port: int) -> list[str]:
         if not ip.is_global or ip.is_multicast:
             raise FetchRefused("not a public address")
     if not addresses:
-        raise FetchFailed("unknown host")
+        raise FetchFailed("unknown host", "unreachable")
     return addresses
 
 
@@ -73,8 +84,10 @@ def open_connection(scheme: str, host: str, port: int) -> http.client.HTTPConnec
     address = public_addresses(host, port)[0]
     try:
         sock = socket.create_connection((address, port), timeout=TIMEOUT_SECONDS)
+    except TimeoutError as error:
+        raise FetchFailed("timed out", "timeout") from error
     except OSError as error:
-        raise FetchFailed("unreachable") from error
+        raise FetchFailed("unreachable", "unreachable") from error
     if scheme == "https":
         try:
             sock = ssl.create_default_context().wrap_socket(sock, server_hostname=host)
@@ -134,7 +147,8 @@ def fetch(url: str, *, accept: tuple[str, ...], max_bytes: int) -> Fetched:
                 url = urljoin(url, location)
                 continue
             if response.status != 200:
-                raise FetchFailed(f"HTTP {response.status}")
+                reason = "blocked" if response.status in BLOCKED_STATUSES else "unreadable"
+                raise FetchFailed(f"HTTP {response.status}", reason)
             content_type = (response.getheader("Content-Type") or "").split(";")[0].strip().lower()
             if not content_type.startswith(accept):
                 raise FetchFailed("wrong kind of file")
@@ -143,6 +157,8 @@ def fetch(url: str, *, accept: tuple[str, ...], max_bytes: int) -> Fetched:
                 raise FetchFailed("too big")
             body = decompress(body, response.getheader("Content-Encoding"), max_bytes)
             return Fetched(url=url, content_type=content_type, body=body)
+        except TimeoutError as error:
+            raise FetchFailed("timed out", "timeout") from error
         except (OSError, http.client.HTTPException) as error:
             raise FetchFailed("connection failed") from error
         finally:

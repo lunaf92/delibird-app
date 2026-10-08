@@ -45,6 +45,15 @@ type Props = {
 const LINK = /^https?:\/\/\S+\.\S+/i;
 
 /** The item form: only the name is required. */
+/** What to say when nothing could be read from a link, by the server's reason. */
+const PROBLEM_TEXT = {
+  none: 'items.autofillNothing',
+  blocked: 'items.autofillBlocked',
+  timeout: 'items.autofillTimeout',
+  unreachable: 'items.autofillUnreachable',
+  unreadable: 'items.autofillUnreadable',
+} as const;
+
 export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit, autofill, initialUrl }: Props) {
   const { t } = useTranslation();
   const [name, setName] = useState(item?.name ?? '');
@@ -65,7 +74,7 @@ export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit, auto
     setFilling(false);
     setUrl(found.url);
     if (!found.found) {
-      setFillNote({ tone: 'error', text: t('items.autofillNothing') });
+      setFillNote({ tone: 'error', text: t(PROBLEM_TEXT[found.problem ?? 'none']) });
       return;
     }
     setName((current) => current.trim() || found.name);
@@ -83,10 +92,11 @@ export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit, auto
 
   const failed = (error: unknown) => {
     setFilling(false);
-    setFillNote({
-      tone: 'error',
-      text: error instanceof ApiError && error.detail ? error.detail : t('items.autofillNothing'),
-    });
+    let text = t('items.autofillNothing');
+    // The only link the server refuses outright is one that isn't on the public internet.
+    if (error instanceof ApiError && error.status === 400) text = t('items.autofillNotPublic');
+    else if (error instanceof ApiError && error.detail) text = error.detail;
+    setFillNote({ tone: 'error', text });
   };
 
   const fillFromLink = () => {

@@ -1481,6 +1481,18 @@
                         "type": "string",
                         "nullable": true,
                         "description": "A picture to fetch with image/from-url/."
+                    },
+                    "problem": {
+                        "nullable": true,
+                        "description": "Why nothing was read: the shop turned us away (blocked), took too long (timeout), couldn't be reached (unreachable), or sent something that isn't a readable page (unreadable). Null when the page was read, even if it had no details.\n\n* `blocked` - blocked\n* `timeout` - timeout\n* `unreachable` - unreachable\n* `unreadable` - unreadable",
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/ProblemEnum"
+                            },
+                            {
+                                "$ref": "#/components/schemas/NullEnum"
+                            }
+                        ]
                     }
                 },
                 "required": [
@@ -1490,6 +1502,7 @@
                     "image_url",
                     "name",
                     "price",
+                    "problem",
                     "url"
                 ]
             },
@@ -1796,6 +1809,11 @@
                     "email"
                 ]
             },
+            "NullEnum": {
+                "enum": [
+                    null
+                ]
+            },
             "PatchedItemRequest": {
                 "type": "object",
                 "properties": {
@@ -1878,6 +1896,16 @@
                 ],
                 "type": "string",
                 "description": "* `android` - Android\n* `ios` - Ios"
+            },
+            "ProblemEnum": {
+                "enum": [
+                    "blocked",
+                    "timeout",
+                    "unreachable",
+                    "unreadable"
+                ],
+                "type": "string",
+                "description": "* `blocked` - blocked\n* `timeout` - timeout\n* `unreachable` - unreachable\n* `unreadable` - unreadable"
             },
             "ReorderRequest": {
                 "type": "object",

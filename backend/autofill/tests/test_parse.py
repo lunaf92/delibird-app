@@ -90,3 +90,39 @@ def test_currency_without_price_is_dropped() -> None:
     product = read_product(html, "https://shop.example.com/x")
 
     assert (product.price, product.currency) == (None, None)
+
+
+def test_amazons_robot_check_is_nothing_found() -> None:
+    """A saved copy of the page Amazon sent instead of a product (amzn.eu/d/0386v2Tm, October 2026)."""
+    product = read_product(page("amazon_robot_check.html"), "https://www.amazon.co.uk/dp/B00A2HD40E")
+
+    assert product.blocked
+    assert not product.found_anything
+    assert product.name == ""
+
+
+@pytest.mark.parametrize(
+    "html",
+    [
+        "<title>Just a moment...</title><script src='/cdn-cgi/challenge-platform/h/b/orchestrate'></script>",
+        "<title>Attention Required! | Cloudflare</title>",
+        "<title>Access Denied</title><p>Reference errors.edgesuite.net/18.1</p>",
+        "<title>Pardon Our Interruption</title>",
+        "<title>Shop</title><script src='https://ct.captcha-delivery.com/c.js'></script>",
+        "<title>Shop</title><div id='px-captcha'></div>",
+    ],
+)
+def test_other_robot_checks_are_nothing_found(html: str) -> None:
+    assert read_product(html, "https://shop.example.com/x").blocked
+
+
+def test_a_product_page_with_a_captcha_on_its_review_form_is_still_read() -> None:
+    html = (
+        '<title>Captcha the board game</title><meta property="og:title" content="Captcha the board game">'
+        "<form class='review'><div class='g-recaptcha'></div></form>"
+    )
+
+    product = read_product(html, "https://games.example.com/captcha")
+
+    assert not product.blocked
+    assert product.name == "Captcha the board game"
