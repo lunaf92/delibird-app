@@ -100,7 +100,7 @@ export function Button({ label, onPress, variant = 'primary', busy, disabled }: 
   );
 }
 
-export function TextField({ label, ...props }: TextInputProps & { label: string }) {
+export function TextField({ label, style, ...props }: TextInputProps & { label: string }) {
   const { colors } = useTheme();
   return (
     <View style={styles.field}>
@@ -108,8 +108,9 @@ export function TextField({ label, ...props }: TextInputProps & { label: string 
       <TextInput
         accessibilityLabel={label}
         placeholderTextColor="#8A8F98"
-        style={[styles.input, { color: colors.text, borderColor: colors.border }]}
         {...props}
+        // Extra styles (such as a taller multi-line box) add to the field's look rather than replace it.
+        style={[styles.input, { color: colors.text, borderColor: colors.border }, style]}
       />
     </View>
   );
