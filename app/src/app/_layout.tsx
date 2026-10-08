@@ -59,6 +59,7 @@ function RootNavigator() {
           <Stack.Screen name="sign-in" />
         </Stack.Protected>
         <Stack.Screen name="shared/[token]" options={{ headerShown: true, title: t('appName') }} />
+        <Stack.Screen name="add" options={{ headerShown: true, title: t('add.title') }} />
       </Stack>
     </>
   );

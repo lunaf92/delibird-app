@@ -27,6 +27,7 @@ from rest_framework.test import APIClient
 
 from accounts.models import User
 from accounts.services import open_session
+from autofill.fetch import Fetched
 from notifications import push
 from notifications import services as notifications
 from notifications.models import PushDevice
@@ -131,6 +132,21 @@ def push_outbox(monkeypatch: pytest.MonkeyPatch) -> list[Any]:
 
     monkeypatch.setattr(push, "post_json", fake_post)
     return sent
+
+
+@pytest.fixture(autouse=True)
+def fake_shop(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Autofill and picture links read from a pretend shop instead of the internet."""
+    page = b'<title>Scarf</title><meta property="product:price:amount" content="39.90">'
+
+    def fetch(url: str, *, accept: tuple[str, ...], max_bytes: int) -> Fetched:
+        if accept == ("image/",):
+            buffer = BytesIO()
+            Image.new("RGB", (40, 30), (200, 20, 20)).save(buffer, format="PNG")
+            return Fetched(url=url, content_type="image/png", body=buffer.getvalue())
+        return Fetched(url=url, content_type="text/html", body=page)
+
+    monkeypatch.setattr("autofill.views.fetch", fetch)
 
 
 @dataclass
@@ -291,6 +307,20 @@ CALLS: list[Call] = [
     ),
     Call("shared-with-me", "get", lambda w: reverse("shared-with-me")),
     Call("shared-with-me-list", "get", lambda w: reverse("shared-with-me-list", args=[w.christmas.pk])),
+    # Adding from shops.
+    Call(
+        "item-autofill",
+        "post",
+        lambda w: reverse("item-autofill"),
+        lambda w: {"url": "https://shop.example.com/scarf"},
+    ),
+    Call(
+        "item-image-from-url",
+        "post",
+        lambda w: reverse("item-image-from-url", args=[w.items[3].pk]),
+        lambda w: {"url": "https://shop.example.com/scarf.png"},
+        changes_data=True,
+    ),
     # Push notifications for the owner's phone.
     Call(
         "devices",

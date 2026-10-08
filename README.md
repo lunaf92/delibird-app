@@ -62,6 +62,14 @@ an account. People who sign in from it add the list to "Shared with me", where t
 get. The owner never sees what is taken; `backend/sharing/tests/test_leaks.py` checks that for every API route, and
 CI fails if a new route isn't covered.
 
+### Adding from shops
+
+Paste a shop link in a new item and press "Fill in from link": the server reads the page (schema.org Product
+data, Open Graph and product tags, or the page title) and fills in the name, price, currency, notes and picture.
+Shops that block it still keep the link. `APP_URL/add?url=<link>` starts a new item from a link, and is where the
+phone share sheet will land once it's added. The server only fetches public internet addresses (never the home
+network), over http or https, with a short timeout and size limits.
+
 ### Notifications
 
 The worker sends emails (seen in Mailpit locally) when a list is shared with someone, and, within a minute, when

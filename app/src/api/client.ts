@@ -20,6 +20,7 @@ export type Item = Schemas['Item'];
 export type ItemInput = Schemas['ItemRequest'];
 export type ItemUpdate = Schemas['PatchedItemRequest'];
 
+export type Autofill = Schemas['Autofill'];
 export type Share = Schemas['Share'];
 export type NewShare = Schemas['NewShare'];
 export type SharedList = Schemas['SharedList'];
@@ -256,4 +257,14 @@ export function putOnList(token: string, listId: number, itemId: number, languag
 /** Takes an item off one list. Taking it off the default list deletes it everywhere. */
 export function takeOffList(token: string, listId: number, itemId: number, language: string): Promise<void> {
   return request(`lists/${listId}/items/${itemId}/`, { method: 'DELETE', token, language });
+}
+
+/** Reads a shop page and suggests the item's details. `found` is false when the shop can't be read. */
+export function autofillLink(token: string, url: string, language: string): Promise<Autofill> {
+  return request('items/autofill/', { method: 'POST', body: { url }, token, language });
+}
+
+/** Downloads a picture from a link (such as the one autofill found) and stores it on the item. */
+export function imageFromUrl(token: string, itemId: number, url: string, language: string): Promise<Item> {
+  return request(`items/${itemId}/image/from-url/`, { method: 'POST', body: { url }, token, language });
 }

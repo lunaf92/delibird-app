@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
-import { deleteItem, fetchItem, fetchLists, updateItem } from '@/api/client';
+import { autofillLink, deleteItem, fetchItem, fetchLists, updateItem } from '@/api/client';
 import { errorMessage } from '@/api/errors';
 import { saveImage } from '@/api/items';
 import { useApi, useResource } from '@/api/use-api';
@@ -72,6 +72,7 @@ export default function EditItemScreen() {
         busy={busy}
         error={error}
         onSubmit={submit}
+        autofill={(link) => api((token, language) => autofillLink(token, link, language))}
       />
 
       {pending && (

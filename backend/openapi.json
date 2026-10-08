@@ -476,6 +476,62 @@
                 }
             }
         },
+        "/api/v1/items/{id}/image/from-url/": {
+            "post": {
+                "operationId": "items_image_from_url_create",
+                "description": "Downloads a picture (for example the one autofill found) and stores it as the item's picture.",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "id",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true
+                    }
+                ],
+                "tags": [
+                    "items"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LinkRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LinkRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LinkRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Item"
+                                }
+                            }
+                        },
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/v1/items/{id}/reservation/": {
             "post": {
                 "operationId": "items_reservation_create",
@@ -537,6 +593,52 @@
                     },
                     "404": {
                         "description": "No response body"
+                    }
+                }
+            }
+        },
+        "/api/v1/items/autofill/": {
+            "post": {
+                "operationId": "items_autofill_create",
+                "description": "Reads a shop page and suggests the item's name, price, currency, description and picture. When the\nshop can't be read, `found` is false and the link is still returned, so it can be saved as it is.",
+                "tags": [
+                    "items"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LinkRequest"
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LinkRequest"
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LinkRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Autofill"
+                                }
+                            }
+                        },
+                        "description": ""
                     }
                 }
             }
@@ -1348,6 +1450,49 @@
     },
     "components": {
         "schemas": {
+            "Autofill": {
+                "type": "object",
+                "properties": {
+                    "found": {
+                        "type": "boolean",
+                        "description": "Whether anything was read. If not, keep the link and type the rest."
+                    },
+                    "url": {
+                        "type": "string",
+                        "description": "The link to save: the one sent, or where it led."
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "price": {
+                        "type": "string",
+                        "format": "decimal",
+                        "pattern": "^-?\\d{0,8}(?:\\.\\d{0,2})?$",
+                        "nullable": true
+                    },
+                    "currency": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "image_url": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "A picture to fetch with image/from-url/."
+                    }
+                },
+                "required": [
+                    "currency",
+                    "description",
+                    "found",
+                    "image_url",
+                    "name",
+                    "price",
+                    "url"
+                ]
+            },
             "Detail": {
                 "type": "object",
                 "properties": {
@@ -1579,6 +1724,20 @@
                 ],
                 "type": "string",
                 "description": "* `en` - English\n* `it` - Italian\n* `es` - Spanish"
+            },
+            "LinkRequest": {
+                "type": "object",
+                "properties": {
+                    "url": {
+                        "type": "string",
+                        "minLength": 1,
+                        "format": "uri",
+                        "maxLength": 2000
+                    }
+                },
+                "required": [
+                    "url"
+                ]
             },
             "NewShare": {
                 "type": "object",

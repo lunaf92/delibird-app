@@ -118,7 +118,10 @@
     "sharedWarning": "Puede que alguien ya lo haya comprado. ¿Continuar?",
     "continue": "Continuar",
     "lists": "Listas",
-    "listsHelp": "Elige todas las listas en las que debe estar. Siempre se queda en tu lista predeterminada."
+    "listsHelp": "Elige todas las listas en las que debe estar. Siempre se queda en tu lista predeterminada.",
+    "autofill": "Rellenar desde el enlace",
+    "autofillDone": "Rellenado desde la tienda. Revisa los datos antes de guardar.",
+    "autofillNothing": "Esta tienda no ha compartido sus datos. El enlace se guarda; escribe tú el resto."
   },
   "reorder": {
     "up": "Subir {{name}}",
@@ -172,5 +175,9 @@
     "web": "Las notificaciones en el teléfono están disponibles en la app Delibird.",
     "simulator": "Las notificaciones en el teléfono necesitan un teléfono de verdad.",
     "not-configured": "Las notificaciones en el teléfono todavía no están configuradas en esta versión de la app."
+  },
+  "add": {
+    "title": "Añadir desde un enlace",
+    "noLink": "Aquí no hay ningún enlace web que añadir."
   }
 }
