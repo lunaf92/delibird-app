@@ -199,3 +199,83 @@ test('finding the link in shared text', () => {
   expect(firstLink('no link here')).toBeNull();
   expect(firstLink(undefined)).toBeNull();
 });
+
+test('when a shop blocks us, the name is guessed from the link and marked as a guess', async () => {
+  const link = 'https://www.ikea.com/gb/en/p/kallax-shelving-unit-white-stained-oak-effect-00324518/';
+  const { calls, ready } = openNewItem({
+    'POST items/autofill/': { body: { ...NOTHING, url: link, problem: 'blocked' } },
+  });
+  await ready;
+
+  await fireEvent.changeText(screen.getByLabelText('Link'), link);
+  await fireEvent.press(screen.getByRole('button', { name: 'Fill in from link' }));
+
+  expect(
+    await screen.findByText(
+      'The shop blocked Delibird from reading this page. The link is kept; type the rest.',
+    ),
+  ).toBeOnTheScreen();
+  expect(screen.getByLabelText('Name').props.value).toBe('Kallax shelving unit white stained oak effect');
+  expect(screen.getByText(/Guessed from the link/)).toBeOnTheScreen();
+  expect(screen.getByLabelText('Price').props.value).toBe('');
+  await fireEvent.press(screen.getByRole('button', { name: 'Save' }));
+  await waitFor(() => expect(callsTo(calls, 'POST', 'lists/10/items/')).toHaveLength(1));
+  expect(callsTo(calls, 'POST', 'lists/10/items/')[0].body).toMatchObject({
+    name: 'Kallax shelving unit white stained oak effect',
+    url: link,
+  });
+});
+
+test('a guessed name never replaces one already typed, and the note goes once it is edited', async () => {
+  const link = 'https://www.lecreuset.co.uk/en_GB/p/cast-iron-pumpkin-casserole/CI1238.html';
+  const { ready } = openNewItem({
+    'POST items/autofill/': { body: { ...NOTHING, url: link, problem: 'blocked' } },
+  });
+  await ready;
+
+  await fireEvent.changeText(screen.getByLabelText('Name'), 'Pumpkin pot');
+  await fireEvent.changeText(screen.getByLabelText('Link'), link);
+  await fireEvent.press(screen.getByRole('button', { name: 'Fill in from link' }));
+  await screen.findByText(/The shop blocked Delibird/);
+  expect(screen.getByLabelText('Name').props.value).toBe('Pumpkin pot');
+  expect(screen.queryByText(/Guessed from the link/)).not.toBeOnTheScreen();
+
+  await fireEvent.changeText(screen.getByLabelText('Name'), '');
+  await fireEvent.press(screen.getByRole('button', { name: 'Fill in from link' }));
+  await waitFor(() => expect(screen.getByLabelText('Name').props.value).toBe('Cast iron pumpkin casserole'));
+  expect(screen.getByText(/Guessed from the link/)).toBeOnTheScreen();
+  await fireEvent.changeText(screen.getByLabelText('Name'), 'Cast iron pumpkin casserole, 24 cm');
+  expect(screen.queryByText(/Guessed from the link/)).not.toBeOnTheScreen();
+});
+
+test('short links with nothing to go on leave the name empty', async () => {
+  const { ready } = openNewItem({
+    'POST items/autofill/': { body: { ...NOTHING, url: 'https://ebay.io/m/wYOGiR', problem: 'blocked' } },
+  });
+  await ready;
+
+  await fireEvent.changeText(screen.getByLabelText('Link'), 'https://ebay.io/m/wYOGiR');
+  await fireEvent.press(screen.getByRole('button', { name: 'Fill in from link' }));
+
+  await screen.findByText(/The shop blocked Delibird/);
+  expect(screen.getByLabelText('Name').props.value).toBe('');
+  expect(screen.queryByText(/Guessed from the link/)).not.toBeOnTheScreen();
+});
+
+test('a link refused for not being a public address still gets a guessed name', async () => {
+  const link = 'https://www.amazon.co.uk/Le-Creuset-Signature-Round-Casserole/dp/B00A2HD40E';
+  const { ready } = openNewItem({
+    'POST items/autofill/': {
+      status: 400,
+      body: { url: ["This link can't be read: it isn't a public web address."] },
+    },
+  });
+  await ready;
+
+  await fireEvent.changeText(screen.getByLabelText('Link'), link);
+  await fireEvent.press(screen.getByRole('button', { name: 'Fill in from link' }));
+
+  await screen.findByText(/Delibird won't open this link/);
+  expect(screen.getByLabelText('Name').props.value).toBe('Le Creuset Signature Round Casserole');
+  expect(screen.getByText(/Guessed from the link/)).toBeOnTheScreen();
+});

@@ -126,7 +126,8 @@
     "autofillTimeout": "The shop took too long to answer. The link is kept; type the rest or try again later.",
     "autofillUnreachable": "Delibird couldn't reach this shop. Check the link; it's kept, so you can type the rest.",
     "autofillUnreadable": "Delibird couldn't read this page. The link is kept; type the rest.",
-    "autofillNotPublic": "Delibird won't open this link: it points to an address that isn't on the public internet. The link is kept; type the rest."
+    "autofillNotPublic": "Delibird won't open this link: it points to an address that isn't on the public internet. The link is kept; type the rest.",
+    "nameGuessed": "Guessed from the link, since the shop's page couldn't be read. Check it before saving."
   },
   "reorder": {
     "up": "Move {{name}} up",
