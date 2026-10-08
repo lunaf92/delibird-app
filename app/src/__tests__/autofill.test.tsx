@@ -14,6 +14,7 @@ const FOUND = {
   price: '39.90',
   currency: 'GBP',
   image_url: 'https://shop.example.com/files/scarf.jpg',
+  problem: null,
 };
 const NOTHING = {
   ...FOUND,
@@ -113,11 +114,11 @@ test('a shop that can not be read leaves the form as it was, with the link', asy
   expect(callsTo(calls, 'POST', 'items/105/image/from-url/')).toHaveLength(0);
 });
 
-test('links the server refuses are explained', async () => {
+test('links the server refuses are explained in plain words', async () => {
   const { ready } = openNewItem({
     'POST items/autofill/': {
       status: 400,
-      body: { detail: "This link can't be read: it isn't a public web address." },
+      body: { url: ["This link can't be read: it isn't a public web address."] },
     },
   });
   await ready;
@@ -126,8 +127,33 @@ test('links the server refuses are explained', async () => {
   await fireEvent.press(screen.getByRole('button', { name: 'Fill in from link' }));
 
   expect(
-    await screen.findByText("This link can't be read: it isn't a public web address."),
+    await screen.findByText(
+      "Delibird won't open this link: it points to an address that isn't on the public internet. The link is kept; type the rest.",
+    ),
   ).toBeOnTheScreen();
+  expect(screen.getByLabelText('Link').props.value).toBe('http://192.168.1.1/');
+});
+
+test.each([
+  ['blocked', 'The shop blocked Delibird from reading this page. The link is kept; type the rest.'],
+  ['timeout', 'The shop took too long to answer. The link is kept; type the rest or try again later.'],
+  ['unreachable', "Delibird couldn't reach this shop. Check the link; it's kept, so you can type the rest."],
+  ['unreadable', "Delibird couldn't read this page. The link is kept; type the rest."],
+])('when nothing could be read (%s), the app says why and fills nothing', async (problem, text) => {
+  const { ready } = openNewItem({
+    'POST items/autofill/': {
+      body: { ...NOTHING, url: 'https://amzn.eu/d/0386v2Tm', problem },
+    },
+  });
+  await ready;
+
+  await fireEvent.changeText(screen.getByLabelText('Link'), 'https://amzn.eu/d/0386v2Tm');
+  await fireEvent.press(screen.getByRole('button', { name: 'Fill in from link' }));
+
+  expect(await screen.findByText(text)).toBeOnTheScreen();
+  expect(screen.queryByText(/Filled in from the shop/)).not.toBeOnTheScreen();
+  expect(screen.getByLabelText('Name').props.value).toBe('');
+  expect(screen.getByLabelText('Link').props.value).toBe('https://amzn.eu/d/0386v2Tm');
 });
 
 test('opening /add with a shared link starts a new item from it', async () => {

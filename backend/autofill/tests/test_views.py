@@ -72,13 +72,14 @@ def test_autofill_reads_the_shop_page(client: APIClient, ann: User, monkeypatch:
         "price": "39.90",
         "currency": "EUR",
         "image_url": "https://shop.example.com/files/scarf-1.jpg",
+        "problem": None,
     }
 
 
 def test_a_shop_that_blocks_us_still_keeps_the_link(
     client: APIClient, ann: User, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    serve(monkeypatch, FetchFailed("HTTP 503"))
+    serve(monkeypatch, FetchFailed("HTTP 503", "blocked"))
 
     response = autofill(client, "https://www.amazon.example/dp/B000")
 
@@ -91,6 +92,50 @@ def test_a_shop_that_blocks_us_still_keeps_the_link(
         "price": None,
         "currency": None,
         "image_url": None,
+        "problem": "blocked",
+    }
+
+
+def test_a_robot_check_page_is_reported_as_blocked(
+    client: APIClient, ann: User, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    body = (PAGES / "amazon_robot_check.html").read_bytes()
+    serve(
+        monkeypatch,
+        Fetched(url="https://www.amazon.co.uk/dp/B00A2HD40E", content_type="text/html", body=body),
+    )
+
+    response = autofill(client, "https://amzn.eu/d/0386v2Tm")
+
+    assert response.status_code == 200
+    body_json = response.json()
+    assert (body_json["found"], body_json["name"], body_json["problem"]) == (False, "", "blocked")
+    assert body_json["url"] == "https://amzn.eu/d/0386v2Tm"
+
+
+@pytest.mark.parametrize("reason", ["timeout", "unreachable", "unreadable"])
+def test_the_reason_nothing_was_read_is_passed_on(
+    client: APIClient, ann: User, monkeypatch: pytest.MonkeyPatch, reason: str
+) -> None:
+    serve(monkeypatch, FetchFailed("x", reason))
+
+    assert autofill(client, "https://shop.example.com/").json()["problem"] == reason
+
+
+def test_a_readable_page_without_details_has_no_problem(
+    client: APIClient, ann: User, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    serve(monkeypatch, Fetched(url="https://shop.example.com/", content_type="text/html", body=b"<p>Hi</p>"))
+
+    assert autofill(client, "https://shop.example.com/").json() | {"url": ""} == {
+        "found": False,
+        "url": "",
+        "name": "",
+        "description": "",
+        "price": None,
+        "currency": None,
+        "image_url": None,
+        "problem": None,
     }
 
 

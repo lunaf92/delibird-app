@@ -500,6 +500,15 @@ export interface components {
       currency: string | null;
       /** @description A picture to fetch with image/from-url/. */
       image_url: string | null;
+      /**
+       * @description Why nothing was read: the shop turned us away (blocked), took too long (timeout), couldn't be reached (unreachable), or sent something that isn't a readable page (unreadable). Null when the page was read, even if it had no details.
+       *
+       *     * `blocked` - blocked
+       *     * `timeout` - timeout
+       *     * `unreachable` - unreachable
+       *     * `unreadable` - unreadable
+       */
+      problem: (components['schemas']['ProblemEnum'] | components['schemas']['NullEnum']) | null;
     };
     Detail: {
       detail: string;
@@ -591,6 +600,8 @@ export interface components {
       /** Format: email */
       email: string;
     };
+    /** @enum {unknown} */
+    NullEnum: null;
     PatchedItemRequest: {
       name?: string;
       /** Link */
@@ -616,6 +627,14 @@ export interface components {
      * @enum {string}
      */
     PlatformEnum: 'android' | 'ios';
+    /**
+     * @description * `blocked` - blocked
+     *     * `timeout` - timeout
+     *     * `unreachable` - unreachable
+     *     * `unreadable` - unreadable
+     * @enum {string}
+     */
+    ProblemEnum: 'blocked' | 'timeout' | 'unreachable' | 'unreadable';
     ReorderRequest: {
       /** @description Every id, in the new order. */
       ids: number[];

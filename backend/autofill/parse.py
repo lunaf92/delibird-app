@@ -1,7 +1,9 @@
 """Reading a product's name, price, currency, description and picture from a shop page.
 
 Sources, best first: schema.org Product data (JSON-LD), then Open Graph and product meta tags, then the
-page title. Anything not found is left empty for the person to type.
+page title. Anything not found is left empty for the person to type. Robot checks, captchas and "access
+denied" pages that shops show automated visitors are recognised and read as nothing found, so the shop's own
+name doesn't end up as the item's name.
 """
 
 import html
@@ -15,6 +17,23 @@ from urllib.parse import urljoin
 
 CURRENCY_SYMBOLS = {"€": "EUR", "£": "GBP", "$": "USD", "CHF": "CHF"}
 
+# Things only found on pages that turn automated visitors away.
+BLOCK_MARKERS = re.compile(
+    r"validateCaptcha"  # Amazon
+    r"|api-services-support@amazon\.com"
+    r"|/cdn-cgi/challenge-platform|cf-browser-verification|cf_chl_opt"  # Cloudflare
+    r"|captcha-delivery\.com"  # DataDome
+    r"|px-captcha|_pxCaptcha"  # PerimeterX / HUMAN
+    r"|_Incapsula_Resource|Incapsula incident"  # Imperva
+    r"|errors\.edgesuite\.net",  # Akamai's "Access Denied"
+    re.IGNORECASE,
+)
+BLOCK_TITLES = re.compile(
+    r"^(access denied|attention required!?( \| cloudflare)?|just a moment\.*|robot check|are you a robot\??"
+    r"|security check|pardon our interruption|captcha|verify you are human|one more step|403 forbidden)$",
+    re.IGNORECASE,
+)
+
 
 @dataclass
 class Product:
@@ -23,10 +42,11 @@ class Product:
     price: str | None = None
     currency: str | None = None
     image_url: str | None = None
+    blocked: bool = False  # The shop showed a robot check instead of the page.
 
     @property
     def found_anything(self) -> bool:
-        return bool(self.name or self.price or self.image_url)
+        return not self.blocked and bool(self.name or self.price or self.image_url)
 
 
 class PageReader(HTMLParser):
@@ -143,6 +163,9 @@ def read_product(page: str, base_url: str) -> Product:
         reader.close()
     except Exception:  # noqa: S110 - a broken page just yields whatever was read so far.
         pass
+
+    if BLOCK_MARKERS.search(page) or BLOCK_TITLES.match(reader.title):
+        return Product(blocked=True)
 
     product = Product()
     for block in reader.json_ld:
