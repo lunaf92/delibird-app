@@ -58,7 +58,14 @@
           "microphonePermission": false
         }
       ],
-      "expo-notifications"
+      "expo-notifications",
+      [
+        "expo-share-intent",
+        {
+          "androidIntentFilters": ["text/*"],
+          "disableIOS": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
