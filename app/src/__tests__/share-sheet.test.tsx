@@ -51,3 +51,32 @@ test('a link shared from a shop app starts a new item from it', async () => {
   // Handled, so it isn't picked up again.
   expect(shareState.shareIntent).toBeNull();
 });
+
+test('a share arriving while the app shows something else still opens a new item', async () => {
+  shareState.shareIntent = {
+    text: 'https://shop.example.com/scarf',
+    webUrl: 'https://shop.example.com/scarf',
+  };
+  mockApi({
+    'GET me/': { body: ANN },
+    'GET lists/10/': { body: { ...DEFAULT_LIST, items: [] } },
+    'POST items/autofill/': {
+      body: {
+        found: true,
+        url: 'https://shop.example.com/scarf',
+        name: 'Wool scarf',
+        description: '',
+        price: null,
+        currency: null,
+        image_url: null,
+      },
+    },
+  });
+
+  const app = await renderApp('/');
+
+  expect(
+    await screen.findByText('Filled in from the shop. Check the details before saving.'),
+  ).toBeOnTheScreen();
+  expect(app.pathname()).toBe('/lists/10/new');
+});

@@ -23,9 +23,13 @@ export default function NewItemScreen() {
     try {
       const item = await api((token, language) => createItem(token, listId, values, language));
       await saveImage(api, item, image);
-      // Opened from a shared link (/add), there is no screen to go back to: show the list instead.
-      if (router.canGoBack()) router.back();
-      else router.replace({ pathname: '/lists/[id]', params: { id: String(listId) } });
+      // Started from a shared link (/add or the share sheet), "back" may be another app or an older form:
+      // show the list the item went on instead.
+      if (params.url || !router.canGoBack()) {
+        router.replace({ pathname: '/lists/[id]', params: { id: String(listId) } });
+      } else {
+        router.back();
+      }
     } catch (failure) {
       setError(errorMessage(failure, t));
       setBusy(false);

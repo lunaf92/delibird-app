@@ -1,6 +1,14 @@
 import '@/i18n';
 
-import { DarkTheme, DefaultTheme, router, SplashScreen, Stack, ThemeProvider } from 'expo-router';
+import {
+  DarkTheme,
+  DefaultTheme,
+  router,
+  SplashScreen,
+  Stack,
+  ThemeProvider,
+  usePathname,
+} from 'expo-router';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform, useColorScheme } from 'react-native';
@@ -8,7 +16,7 @@ import { Platform, useColorScheme } from 'react-native';
 import { AuthProvider, useAuth } from '@/auth/context';
 import { takeReturnTo } from '@/auth/storage';
 import { notificationPath } from '@/notifications/push';
-import { SharedLinkProvider } from '@/share/shared-link';
+import { SharedLinkProvider, useSharedLink } from '@/share/shared-link';
 import * as Notifications from 'expo-notifications';
 
 SplashScreen.preventAutoHideAsync();
@@ -45,6 +53,14 @@ function RootNavigator() {
     const path = takeReturnTo();
     if (path?.startsWith('/') && !path.startsWith('//')) router.replace(path as never);
   }, [signedIn]);
+
+  // A link shared from another app's share sheet (Android) opens /add, which starts a new item from it.
+  // This also covers shares arriving while the app is already open.
+  const shared = useSharedLink();
+  const pathname = usePathname();
+  useEffect(() => {
+    if (shared.link && status !== 'loading' && pathname !== '/add') router.push('/add');
+  }, [pathname, shared.link, status]);
 
   // Mounting the navigator only once the session is known keeps deep links (such as /settings) intact,
   // instead of redirecting them to sign-in while the saved session is still loading.
