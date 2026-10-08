@@ -8,6 +8,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/", include("core.urls")),
     path("api/v1/", include("accounts.urls")),
+    # Before wishlists, so items/autofill/ isn't read as an item id.
+    path("api/v1/", include("autofill.urls")),
     path("api/v1/", include("wishlists.urls")),
     path("api/v1/", include("sharing.urls")),
     path("api/v1/", include("notifications.urls")),
