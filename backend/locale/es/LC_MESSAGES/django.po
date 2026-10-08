@@ -133,18 +133,16 @@ msgid "That code is wrong or has expired."
 msgstr "El código es incorrecto o ha caducado."
 
 #: autofill/views.py:54
-#, fuzzy
-#| msgid "Too many attempts. Wait a few minutes and try again."
 msgid "Too many links at once. Wait a few minutes."
-msgstr "Demasiados intentos. Espera unos minutos y vuelve a intentarlo."
+msgstr "Demasiados enlaces a la vez. Espera unos minutos."
 
 #: autofill/views.py:64
 msgid "This link can't be read: it isn't a public web address."
-msgstr ""
+msgstr "Este enlace no se puede leer: no es una dirección web pública."
 
 #: autofill/views.py:111
 msgid "That picture couldn't be downloaded. Add one from your device."
-msgstr ""
+msgstr "No se pudo descargar esa imagen. Añade una desde tu dispositivo."
 
 #: core/views.py:41
 msgid "The server is running."
