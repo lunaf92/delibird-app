@@ -31,3 +31,20 @@ jest.mock('expo-notifications', () => {
     AndroidImportance: { DEFAULT: 3 },
   };
 });
+
+// Receiving shares from other apps: tests set `shareIntent` through the module's __state.
+jest.mock('expo-share-intent', () => {
+  const state = { shareIntent: null as null | { text?: string; webUrl?: string | null } };
+  return {
+    __state: state,
+    ShareIntentProvider: ({ children }: { children: unknown }) => children,
+    useShareIntentContext: () => ({
+      hasShareIntent: state.shareIntent !== null,
+      shareIntent: state.shareIntent ?? {},
+      resetShareIntent: () => {
+        state.shareIntent = null;
+      },
+    }),
+    getShareExtensionKey: () => 'delibirdShareKey',
+  };
+});

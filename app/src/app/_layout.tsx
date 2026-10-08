@@ -8,6 +8,7 @@ import { Platform, useColorScheme } from 'react-native';
 import { AuthProvider, useAuth } from '@/auth/context';
 import { takeReturnTo } from '@/auth/storage';
 import { notificationPath } from '@/notifications/push';
+import { SharedLinkProvider } from '@/share/shared-link';
 import * as Notifications from 'expo-notifications';
 
 SplashScreen.preventAutoHideAsync();
@@ -17,9 +18,11 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AuthProvider>
-        <RootNavigator />
-      </AuthProvider>
+      <SharedLinkProvider>
+        <AuthProvider>
+          <RootNavigator />
+        </AuthProvider>
+      </SharedLinkProvider>
     </ThemeProvider>
   );
 }

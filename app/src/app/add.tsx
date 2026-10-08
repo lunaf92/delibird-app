@@ -6,6 +6,7 @@ import { ActivityIndicator } from 'react-native';
 import { fetchLists } from '@/api/client';
 import { errorMessage, isUnauthorized } from '@/api/errors';
 import { firstLink } from '@/api/links';
+import { useSharedLink } from '@/share/shared-link';
 import { useAuth } from '@/auth/context';
 import { rememberReturnTo } from '@/auth/storage';
 import { Body, Message, Screen, Title } from '@/components/ui';
@@ -18,7 +19,9 @@ export default function AddFromLinkScreen() {
   const { t, i18n } = useTranslation();
   const { status, token, forget } = useAuth();
   const params = useLocalSearchParams<{ url?: string; text?: string }>();
-  const link = firstLink(params.url) ?? firstLink(params.text);
+  // From the address (/add?url=…), or shared from another app's share sheet on Android.
+  const shared = useSharedLink();
+  const link = firstLink(params.url) ?? firstLink(params.text) ?? shared.link;
   const [error, setError] = useState<string | null>(link ? null : t('add.noLink'));
 
   useEffect(() => {
@@ -36,6 +39,7 @@ export default function AddFromLinkScreen() {
         const main = lists.find((list) => list.is_default);
         if (active && main) {
           router.replace({ pathname: '/lists/[id]/new', params: { id: String(main.id), url: link } });
+          shared.done();
         }
       },
       (failure: unknown) => {
@@ -47,7 +51,7 @@ export default function AddFromLinkScreen() {
     return () => {
       active = false;
     };
-  }, [forget, i18n.language, link, status, t, token]);
+  }, [forget, i18n.language, link, shared, status, t, token]);
 
   return (
     <Screen>
