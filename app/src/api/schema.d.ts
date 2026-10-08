@@ -170,6 +170,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/items/{id}/image/from-url/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Downloads a picture (for example the one autofill found) and stores it as the item's picture. */
+    post: operations['items_image_from_url_create'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/items/{id}/reservation/': {
     parameters: {
       query?: never;
@@ -189,6 +206,26 @@ export interface paths {
      *     reserve the item, the owner included, the answer is the same 404 as for an item that doesn't exist.
      */
     delete: operations['items_reservation_destroy'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/items/autofill/': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * @description Reads a shop page and suggests the item's name, price, currency, description and picture. When the
+     *     shop can't be read, `found` is false and the link is still returned, so it can be saved as it is.
+     */
+    post: operations['items_autofill_create'];
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -451,6 +488,19 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    Autofill: {
+      /** @description Whether anything was read. If not, keep the link and type the rest. */
+      found: boolean;
+      /** @description The link to save: the one sent, or where it led. */
+      url: string;
+      name: string;
+      description: string;
+      /** Format: decimal */
+      price: string | null;
+      currency: string | null;
+      /** @description A picture to fetch with image/from-url/. */
+      image_url: string | null;
+    };
     Detail: {
       detail: string;
     };
@@ -518,6 +568,10 @@ export interface components {
      * @enum {string}
      */
     LanguageEnum: 'en' | 'it' | 'es';
+    LinkRequest: {
+      /** Format: uri */
+      url: string;
+    };
     /** @description A share as its owner sees it. */
     NewShare: {
       readonly id: number;
@@ -1022,6 +1076,33 @@ export interface operations {
       };
     };
   };
+  items_image_from_url_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['LinkRequest'];
+        'application/x-www-form-urlencoded': components['schemas']['LinkRequest'];
+        'multipart/form-data': components['schemas']['LinkRequest'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Item'];
+        };
+      };
+    };
+  };
   items_reservation_create: {
     parameters: {
       query?: never;
@@ -1080,6 +1161,31 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  items_autofill_create: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['LinkRequest'];
+        'application/x-www-form-urlencoded': components['schemas']['LinkRequest'];
+        'multipart/form-data': components['schemas']['LinkRequest'];
+      };
+    };
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Autofill'];
+        };
       };
     };
   };

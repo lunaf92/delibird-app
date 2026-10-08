@@ -118,7 +118,10 @@
     "sharedWarning": "Someone may already have bought this. Continue?",
     "continue": "Continue",
     "lists": "Lists",
-    "listsHelp": "Choose every list this item should be on. It always stays on your default list."
+    "listsHelp": "Choose every list this item should be on. It always stays on your default list.",
+    "autofill": "Fill in from link",
+    "autofillDone": "Filled in from the shop. Check the details before saving.",
+    "autofillNothing": "This shop didn't share its details. The link is kept; type the rest."
   },
   "reorder": {
     "up": "Move {{name}} up",
@@ -172,5 +175,9 @@
     "web": "Phone notifications are available in the Delibird app.",
     "simulator": "Phone notifications need a real phone.",
     "not-configured": "Phone notifications aren't set up in this build of the app yet."
+  },
+  "add": {
+    "title": "Add from a link",
+    "noLink": "There's no web link to add here."
   }
 }

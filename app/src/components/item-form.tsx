@@ -1,16 +1,21 @@
 import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import type { Item, PickedImage, Wishlist } from '@/api/client';
+import { ApiError, type Autofill, type Item, type PickedImage, type Wishlist } from '@/api/client';
 
 import { CURRENCIES, parsePrice } from './price';
 import { RatingPicker } from './rating';
 import { BLUE, Body, Button, Heading, Message, TextField } from './ui';
 
-export type ImageChange = { kind: 'keep' } | { kind: 'new'; image: PickedImage } | { kind: 'remove' };
+export type ImageChange =
+  | { kind: 'keep' }
+  | { kind: 'new'; image: PickedImage }
+  /** A picture found on a shop page; the server downloads it when the item is saved. */
+  | { kind: 'url'; url: string }
+  | { kind: 'remove' };
 
 export type ItemValues = {
   name: string;
@@ -31,13 +36,19 @@ type Props = {
   busy: boolean;
   error: string | null;
   onSubmit: (values: ItemValues, image: ImageChange) => void;
+  /** Reads a shop link and suggests details for the empty fields. */
+  autofill: (url: string) => Promise<Autofill>;
+  /** A link to start from, for example one shared from a shop's app; it is read straight away. */
+  initialUrl?: string;
 };
 
+const LINK = /^https?:\/\/\S+\.\S+/i;
+
 /** The item form: only the name is required. */
-export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit }: Props) {
+export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit, autofill, initialUrl }: Props) {
   const { t } = useTranslation();
   const [name, setName] = useState(item?.name ?? '');
-  const [url, setUrl] = useState(item?.url ?? '');
+  const [url, setUrl] = useState(item?.url ?? initialUrl ?? '');
   const [description, setDescription] = useState(item?.description ?? '');
   const [rating, setRating] = useState<number | null>(item?.rating ?? null);
   const [priceText, setPriceText] = useState(item?.price ?? '');
@@ -45,9 +56,67 @@ export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit }: Pr
   const [onLists, setOnLists] = useState<number[]>(item?.lists ?? []);
   const [image, setImage] = useState<ImageChange>({ kind: 'keep' });
   const [problem, setProblem] = useState<string | null>(null);
+  const [filling, setFilling] = useState(Boolean(initialUrl));
+  const [fillNote, setFillNote] = useState<{ tone: 'success' | 'error'; text: string } | null>(null);
+  const started = useRef(false);
+
+  /** Fills only the fields that are still empty, so nothing the person typed is overwritten. */
+  const apply = (found: Autofill) => {
+    setFilling(false);
+    setUrl(found.url);
+    if (!found.found) {
+      setFillNote({ tone: 'error', text: t('items.autofillNothing') });
+      return;
+    }
+    setName((current) => current.trim() || found.name);
+    setDescription((current) => current.trim() || found.description);
+    // Price and currency go together: both are filled only when no price was typed yet.
+    if (found.price && !priceText.trim()) {
+      setPriceText(found.price);
+      if (found.currency) setCurrency(found.currency);
+    }
+    if (found.image_url && !item?.image && image.kind === 'keep') {
+      setImage({ kind: 'url', url: found.image_url });
+    }
+    setFillNote({ tone: 'success', text: t('items.autofillDone') });
+  };
+
+  const failed = (error: unknown) => {
+    setFilling(false);
+    setFillNote({
+      tone: 'error',
+      text: error instanceof ApiError && error.detail ? error.detail : t('items.autofillNothing'),
+    });
+  };
+
+  const fillFromLink = () => {
+    const link = url.trim();
+    if (!LINK.test(link)) {
+      setFillNote({ tone: 'error', text: t('items.urlInvalid') });
+      return;
+    }
+    setFilling(true);
+    setFillNote(null);
+    autofill(link).then(apply, failed);
+  };
+
+  // A link handed over when the form opens (from the share sheet or /add) is read straight away.
+  useEffect(() => {
+    if (!initialUrl || started.current) return;
+    started.current = true;
+    autofill(initialUrl).then(apply, failed);
+    // Runs once, for the link the form opened with.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const preview =
-    image.kind === 'new' ? image.image.uri : image.kind === 'remove' ? null : (item?.image ?? null);
+    image.kind === 'new'
+      ? image.image.uri
+      : image.kind === 'url'
+        ? image.url
+        : image.kind === 'remove'
+          ? null
+          : (item?.image ?? null);
   const currencies = CURRENCIES.includes(currency as (typeof CURRENCIES)[number])
     ? CURRENCIES
     : [...CURRENCIES, currency];
@@ -71,7 +140,7 @@ export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit }: Pr
     const trimmedUrl = url.trim();
     const price = priceText.trim() === '' ? null : parsePrice(priceText);
     if (!name.trim()) return setProblem(t('items.nameRequired'));
-    if (trimmedUrl && !/^https?:\/\/\S+\.\S+/i.test(trimmedUrl)) return setProblem(t('items.urlInvalid'));
+    if (trimmedUrl && !LINK.test(trimmedUrl)) return setProblem(t('items.urlInvalid'));
     if (priceText.trim() !== '' && price === null) return setProblem(t('items.priceInvalid'));
     setProblem(null);
     onSubmit(
@@ -88,26 +157,38 @@ export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit }: Pr
     );
   };
 
-  return (
+  const linkField = (
     <>
-      <TextField
-        label={t('items.name')}
-        value={name}
-        onChangeText={setName}
-        maxLength={200}
-        autoFocus={!item}
-      />
       <TextField
         label={t('items.url')}
         value={url}
         onChangeText={setUrl}
+        onSubmitEditing={fillFromLink}
         placeholder="https://"
         autoCapitalize="none"
         autoCorrect={false}
         keyboardType="url"
         inputMode="url"
         maxLength={2000}
+        autoFocus={!item && !initialUrl}
       />
+      <Button
+        variant="secondary"
+        label={t('items.autofill')}
+        onPress={fillFromLink}
+        busy={filling}
+        disabled={!url.trim()}
+      />
+      {fillNote && <Message tone={fillNote.tone}>{fillNote.text}</Message>}
+    </>
+  );
+
+  return (
+    <>
+      {/* For a new item the shop link usually comes first: it fills in the rest. */}
+      {!item && linkField}
+      <TextField label={t('items.name')} value={name} onChangeText={setName} maxLength={200} />
+      {item && linkField}
       <TextField
         label={t('items.description')}
         value={description}
