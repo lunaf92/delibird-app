@@ -78,16 +78,21 @@ export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit, auto
   const started = useRef(false);
 
   /** Fills only the fields that are still empty, so nothing the person typed is overwritten. */
+  /** Suggests a name from the link itself, when the page couldn't be read and no name was typed yet. */
+  const guessName = (link: string) => {
+    const guess = nameFromLink(link);
+    if (guess && !typedName.current.trim()) {
+      setName(guess);
+      setNameGuessed(true);
+    }
+  };
+
   const apply = (found: Autofill) => {
     setFilling(false);
     setUrl(found.url);
     if (!found.found) {
       setFillNote({ tone: 'error', text: t(PROBLEM_TEXT[found.problem ?? 'none']) });
-      const guess = nameFromLink(found.url);
-      if (guess && !typedName.current.trim()) {
-        setName(guess);
-        setNameGuessed(true);
-      }
+      guessName(found.url);
       return;
     }
     setName((current) => current.trim() || found.name);
@@ -103,13 +108,14 @@ export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit, auto
     setFillNote({ tone: 'success', text: t('items.autofillDone') });
   };
 
-  const failed = (error: unknown) => {
+  const failed = (link: string) => (error: unknown) => {
     setFilling(false);
     let text = t('items.autofillNothing');
     // The only link the server refuses outright is one that isn't on the public internet.
     if (error instanceof ApiError && error.status === 400) text = t('items.autofillNotPublic');
     else if (error instanceof ApiError && error.detail) text = error.detail;
     setFillNote({ tone: 'error', text });
+    guessName(link);
   };
 
   const fillFromLink = () => {
@@ -120,14 +126,14 @@ export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit, auto
     }
     setFilling(true);
     setFillNote(null);
-    autofill(link).then(apply, failed);
+    autofill(link).then(apply, failed(link));
   };
 
   // A link handed over when the form opens (from the share sheet or /add) is read straight away.
   useEffect(() => {
     if (!initialUrl || started.current) return;
     started.current = true;
-    autofill(initialUrl).then(apply, failed);
+    autofill(initialUrl).then(apply, failed(initialUrl));
     // Runs once, for the link the form opened with.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

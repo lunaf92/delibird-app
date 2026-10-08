@@ -261,3 +261,21 @@ test('short links with nothing to go on leave the name empty', async () => {
   expect(screen.getByLabelText('Name').props.value).toBe('');
   expect(screen.queryByText(/Guessed from the link/)).not.toBeOnTheScreen();
 });
+
+test('a link refused for not being a public address still gets a guessed name', async () => {
+  const link = 'https://www.amazon.co.uk/Le-Creuset-Signature-Round-Casserole/dp/B00A2HD40E';
+  const { ready } = openNewItem({
+    'POST items/autofill/': {
+      status: 400,
+      body: { url: ["This link can't be read: it isn't a public web address."] },
+    },
+  });
+  await ready;
+
+  await fireEvent.changeText(screen.getByLabelText('Link'), link);
+  await fireEvent.press(screen.getByRole('button', { name: 'Fill in from link' }));
+
+  await screen.findByText(/Delibird won't open this link/);
+  expect(screen.getByLabelText('Name').props.value).toBe('Le Creuset Signature Round Casserole');
+  expect(screen.getByText(/Guessed from the link/)).toBeOnTheScreen();
+});
