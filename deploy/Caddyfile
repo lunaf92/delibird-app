@@ -1,13 +1,12 @@
 # The home server's single entry point, on port 80: the web app, plus the API, admin, static files and
 # uploaded pictures behind the same address, so the app and its links all use one origin.
 {
-	# Plain HTTP on the home network for now. With a domain, remove this line and replace ":80" below by
-	# the domain name: Caddy then fetches a certificate and serves HTTPS by itself.
+	# Caddy itself speaks plain HTTP. HTTPS for the domain is ended by nginx on the server, which forwards
+	# here (see "HTTPS with a domain" in the README).
 	auto_https off
 	admin off
-	# When an HTTPS proxy on the same machine (such as nginx with a certbot certificate) sits in front, keep
-	# the X-Forwarded-Proto it sends instead of overwriting it with "http". Only proxies on private
-	# addresses are trusted.
+	# Keep the X-Forwarded-Proto that nginx sends, so Django knows the request came over HTTPS. Only
+	# private addresses are trusted: from the internet, requests go through nginx, which sets the header.
 	servers {
 		trusted_proxies static private_ranges
 	}
