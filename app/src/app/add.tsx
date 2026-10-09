@@ -15,6 +15,9 @@ import { Body, Message, Screen, Title } from '@/components/ui';
  * /add?url=… (or ?text=…) opens a new item on the main list with that link, and reads the shop page.
  * It's where the phone's share sheet will land, and it works as a bookmark on the web too.
  */
+/** How long /add waits for a share to arrive before saying there's no link in it. */
+export const SHARE_GRACE_MS = 3000;
+
 export default function AddFromLinkScreen() {
   const { t, i18n } = useTranslation();
   const { status, token, forget } = useAuth();
@@ -23,8 +26,14 @@ export default function AddFromLinkScreen() {
   const shared = useSharedLink();
   const link = firstLink(params.url) ?? firstLink(params.text) ?? shared.link;
   const [error, setError] = useState<string | null>(null);
-  // A share arrives a moment after the app opens, so only once it has been read is a missing link final.
-  const noLink = !link && shared.ready;
+  // A share reaches the app a moment after it opens (on Android it may even restart in its own task), so give
+  // it a little time before saying there is no link.
+  const [waited, setWaited] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setWaited(true), SHARE_GRACE_MS);
+    return () => clearTimeout(timer);
+  }, []);
+  const noLink = !link && waited;
 
   useEffect(() => {
     if (!link) return;

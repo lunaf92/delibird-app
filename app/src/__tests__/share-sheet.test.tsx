@@ -2,17 +2,18 @@ import * as ShareIntent from 'expo-share-intent';
 import { screen } from 'expo-router/testing-library';
 
 import { redirectSystemPath } from '@/app/+native-intent';
+import { SHARE_GRACE_MS } from '@/app/add';
 import i18n from '@/i18n';
 import { ANN, callsTo, DEFAULT_LIST, mockApi } from '@/test-utils/api';
 import { renderApp } from '@/test-utils/render';
 import { storeToken } from '@/test-utils/storage';
 
-const shareState = (ShareIntent as unknown as { __state: { shareIntent: unknown; ready: boolean } }).__state;
+const shareState = (ShareIntent as unknown as { __state: { shareIntent: unknown; options: unknown } })
+  .__state;
 
 beforeEach(async () => {
   storeToken('my-token');
   shareState.shareIntent = null;
-  shareState.ready = true;
   await i18n.changeLanguage('en');
 });
 
@@ -107,14 +108,16 @@ test('a link shared without https:// still starts a new item', async () => {
   expect(callsTo(calls, 'POST', 'items/autofill/')[0].body).toEqual({ url: 'https://amzn.eu/d/abc123' });
 });
 
-test('while the share is still on its way, /add waits instead of saying there is no link', async () => {
-  shareState.ready = false;
+test('/add gives a share time to arrive before saying there is no link', async () => {
   mockApi({ 'GET me/': { body: ANN } });
 
   await renderApp('/add');
 
   expect(await screen.findByText('Add from a link')).toBeOnTheScreen();
   expect(screen.queryByText("There's no web link to add here.")).toBeNull();
+  expect(
+    await screen.findByText("There's no web link to add here.", {}, { timeout: SHARE_GRACE_MS + 1000 }),
+  ).toBeOnTheScreen();
 });
 
 test('a share without a link says so and shows what arrived', async () => {
@@ -123,6 +126,15 @@ test('a share without a link says so and shows what arrived', async () => {
 
   await renderApp('/add');
 
-  expect(await screen.findByText("There's no web link to add here.")).toBeOnTheScreen();
+  expect(
+    await screen.findByText("There's no web link to add here.", {}, { timeout: SHARE_GRACE_MS + 1000 }),
+  ).toBeOnTheScreen();
   expect(screen.getByText('What was shared: Just some words')).toBeOnTheScreen();
+});
+
+test('shares survive the app restarting in its own task', async () => {
+  // Shared from another app's task, Strena restarts in its own, which looks like going to the background.
+  mockApi({ 'GET me/': { body: ANN } });
+  await renderApp('/');
+  expect(shareState.options).toMatchObject({ resetOnBackground: false });
 });

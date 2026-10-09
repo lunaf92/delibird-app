@@ -5,8 +5,8 @@ export function SharedLinkProvider({ children }: PropsWithChildren) {
   return children;
 }
 
-export type SharedLink = { link: string | null; text: string | null; ready: boolean; done: () => void };
+export type SharedLink = { link: string | null; text: string | null; done: () => void };
 
 export function useSharedLink(): SharedLink {
-  return { link: null, text: null, ready: true, done: () => undefined };
+  return { link: null, text: null, done: () => undefined };
 }

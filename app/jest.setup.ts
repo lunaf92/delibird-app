@@ -34,13 +34,17 @@ jest.mock('expo-notifications', () => {
 
 // Receiving shares from other apps: tests set `shareIntent` through the module's __state.
 jest.mock('expo-share-intent', () => {
-  // `ready` is false until the phone has handed over the share, a moment after the app opens.
-  const state = { shareIntent: null as null | { text?: string; webUrl?: string | null }, ready: true };
+  const state = {
+    shareIntent: null as null | { text?: string; webUrl?: string | null },
+    options: null as unknown,
+  };
   return {
     __state: state,
-    ShareIntentProvider: ({ children }: { children: unknown }) => children,
+    ShareIntentProvider: ({ children, options }: { children: unknown; options: unknown }) => {
+      state.options = options;
+      return children;
+    },
     useShareIntentContext: () => ({
-      isReady: state.ready,
       hasShareIntent: state.shareIntent !== null,
       shareIntent: state.shareIntent ?? {},
       resetShareIntent: () => {
