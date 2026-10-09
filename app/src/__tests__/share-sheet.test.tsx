@@ -18,7 +18,7 @@ beforeEach(async () => {
 });
 
 test('a share from another app is sent to /add; other links open as usual', () => {
-  expect(redirectSystemPath({ path: 'delibird://dataUrl=delibirdShareKey', initial: true })).toBe('/add');
+  expect(redirectSystemPath({ path: 'strena://dataUrl=strenaShareKey', initial: true })).toBe('/add');
   expect(redirectSystemPath({ path: '/shared/abc', initial: false })).toBe('/shared/abc');
 });
 

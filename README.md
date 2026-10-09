@@ -3,9 +3,9 @@
 A wishlist app for friends and family: keep several gift lists, share each one with chosen people, and let them
 quietly mark what they are buying without the owner ever finding out.
 
-The app was called Delibird while it was being built. Behind the scenes some names still say `delibird` (the
-repository, the Android package, the database and the backup files), so phones that already have it installed
-update in place and existing data keeps working.
+The app had a working name while it was being built. A few names behind the scenes still use it (the repository,
+the Android package id, the database and the Docker project), because changing them means reinstalling the app or
+moving the server's data.
 
 - [Requirements](https://claude.ai/code/artifact/7993bc48-24eb-4fb6-a142-0e8b93826293)
 - [Implementation plan](https://claude.ai/code/artifact/aff4b9db-bd93-4a46-809c-6128edc8bc9f)
@@ -171,19 +171,19 @@ what the server is doing, and `ps` shows each part's health.
 newest. Run it every night from cron (`crontab -e`, with the path to your checkout):
 
 ```
-0 3 * * * cd /path/to/delibird-app && ./deploy/backup.sh >> backups/backup.log 2>&1
+0 3 * * * cd /path/to/checkout && ./deploy/backup.sh >> backups/backup.log 2>&1
 ```
 
 Copy `backups/` somewhere else from time to time (another disk or a cloud drive): a backup on the same disk
 doesn't survive the disk. To restore one (this replaces everything since, and stops the app meanwhile):
-`./deploy/restore.sh backups/delibird-db-<date>.dump backups/delibird-media-<date>.tar.gz`.
+`./deploy/restore.sh backups/strena-db-<date>.dump backups/strena-media-<date>.tar.gz`.
 
 **The Android app** has the server's address built in: in `app/.env` set `EXPO_PUBLIC_API_URL=https://strena.app`,
 then `cd app && npx expo prebuild --platform android --clean && cd android && ./gradlew assembleRelease`, and install
 `app/android/app/build/outputs/apk/release/app-release.apk` on each phone (copy it over, or `adb install`).
 
 Release builds are signed with Strena's own key, kept outside the repo in
-`~/.local/share/delibird-android/strena-release.jks` with its passwords in `strena-release.properties` next to it
+`~/.local/share/strena-android/strena-release.jks` with its passwords in `strena-release.properties` next to it
 (or the properties file named by `STRENA_RELEASE_KEY`; see `app/plugins/release-signing.js`). **Back both files up**:
 a phone only installs an update signed with the same key, and the key's fingerprint in
 `app/public/.well-known/assetlinks.json` is what lets sign-in links in emails open the app directly (Android App

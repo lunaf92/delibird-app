@@ -1,10 +1,10 @@
 #!/bin/sh
-# Puts a backup made by backup.sh back: ./deploy/restore.sh backups/delibird-db-<stamp>.dump backups/delibird-media-<stamp>.tar.gz
+# Puts a backup made by backup.sh back: ./deploy/restore.sh backups/strena-db-<stamp>.dump backups/strena-media-<stamp>.tar.gz
 # Everything added since that backup is replaced by it. The app is stopped while it runs.
 set -eu
 cd "$(dirname "$0")/.."
 COMPOSE=${COMPOSE:-"docker compose -f docker-compose.prod.yml"}
-DB_DUMP=${1:?Give the database dump (delibird-db-....dump)}
+DB_DUMP=${1:?Give the database dump (strena-db-....dump)}
 MEDIA_TAR=${2:-}
 
 $COMPOSE stop web api worker beat

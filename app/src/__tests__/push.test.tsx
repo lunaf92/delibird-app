@@ -18,7 +18,7 @@ const VIEWER_LIST = { id: 11, name: 'Christmas', owner_name: 'Bob', item_count: 
 
 beforeEach(async () => {
   storeToken('my-token');
-  await SecureStore.deleteItemAsync('delibird.pushToken');
+  await SecureStore.deleteItemAsync('strena.pushToken');
   availability.mockReturnValue('available');
   notificationsMock.permission = 'granted';
   tappedNotification(null);
@@ -68,7 +68,7 @@ test('builds without push say so instead of offering it', async () => {
 });
 
 test('signing out stops notifications to this phone', async () => {
-  await SecureStore.setItemAsync('delibird.pushToken', 'ExponentPushToken[test-phone]');
+  await SecureStore.setItemAsync('strena.pushToken', 'ExponentPushToken[test-phone]');
   const { calls, ready } = openSettings({
     'DELETE devices/': { status: 204 },
     'POST auth/logout/': { status: 204 },

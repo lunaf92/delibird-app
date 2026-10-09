@@ -1,7 +1,7 @@
 # Strena backend translations.
 msgid ""
 msgstr ""
-"Project-Id-Version: delibird\n"
+"Project-Id-Version: strena\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-10-09 08:13+0000\n"
 "Language: es\n"

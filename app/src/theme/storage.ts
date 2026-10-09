@@ -4,7 +4,7 @@ import { Platform } from 'react-native';
 import { DEFAULT_SETTINGS, isDarkMode, isLookName, type LookSettings } from './looks';
 
 // Before signing in, the look is kept on the device: localStorage on the web, secure storage on phones.
-const KEY = 'delibird.look';
+const KEY = 'strena.look';
 
 function parse(saved: string | null | undefined): LookSettings {
   try {
