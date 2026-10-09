@@ -1,4 +1,4 @@
-# Delibird backend translations.
+# Strena backend translations.
 msgid ""
 msgstr ""
 "Project-Id-Version: delibird\n"
@@ -120,8 +120,8 @@ msgstr "Invia un'email e un codice, oppure un token."
 
 #: accounts/tasks.py:22
 #, python-format
-msgid "Your Delibird sign-in code: %(code)s"
-msgstr "Il tuo codice di accesso a Delibird: %(code)s"
+msgid "Your Strena sign-in code: %(code)s"
+msgstr "Il tuo codice di accesso a Strena: %(code)s"
 
 #: accounts/templates/accounts/email/sign_in.html:9
 #: accounts/templates/accounts/email/sign_in.txt:1
@@ -132,8 +132,8 @@ msgstr "Ciao,"
 
 #: accounts/templates/accounts/email/sign_in.html:10
 #: accounts/templates/accounts/email/sign_in.txt:3
-msgid "Your code to sign in to Delibird is:"
-msgstr "Il tuo codice per accedere a Delibird è:"
+msgid "Your code to sign in to Strena is:"
+msgstr "Il tuo codice per accedere a Strena è:"
 
 #: accounts/templates/accounts/email/sign_in.html:14
 #: accounts/templates/accounts/email/sign_in.txt:7
@@ -141,8 +141,8 @@ msgid "Or open this link on the device you're signing in on:"
 msgstr "Oppure apri questo link sul dispositivo da cui stai accedendo:"
 
 #: accounts/templates/accounts/email/sign_in.html:17
-msgid "Sign in to Delibird"
-msgstr "Accedi a Delibird"
+msgid "Sign in to Strena"
+msgstr "Accedi a Strena"
 
 #: accounts/templates/accounts/email/sign_in.html:22
 #: accounts/templates/accounts/email/sign_in.txt:10
@@ -239,10 +239,10 @@ msgstr "%(owner)s ha rimosso da “%(list)s” qualcosa che avresti preso tu."
 #: notifications/templates/notifications/email/notification.html:12
 #: notifications/templates/notifications/email/notification.txt:3
 #, python-format
-msgid "%(owner)s shared their wishlist “%(list)s” with you on Delibird."
+msgid "%(owner)s shared their wishlist “%(list)s” with you on Strena."
 msgstr ""
 "%(owner)s ha condiviso con te la sua lista dei desideri “%(list)s” su "
-"Delibird."
+"Strena."
 
 #: notifications/templates/notifications/email/notification.html:14
 #: notifications/templates/notifications/email/notification.txt:12

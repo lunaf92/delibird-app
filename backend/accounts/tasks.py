@@ -19,7 +19,7 @@ def send_login_email(email: str, code: str, token: str, language: str) -> None:
             "minutes": int(settings.LOGIN_CODE_LIFETIME.total_seconds() // 60),
         }
         message = EmailMultiAlternatives(
-            subject=_("Your Delibird sign-in code: %(code)s") % {"code": code},
+            subject=_("Your Strena sign-in code: %(code)s") % {"code": code},
             body=render_to_string("accounts/email/sign_in.txt", context),
             to=[email],
         )

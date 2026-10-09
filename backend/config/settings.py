@@ -181,7 +181,7 @@ MAILERS = {
         },
     }
 }
-DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", "Delibird <noreply@localhost>")
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", "Strena <noreply@localhost>")
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
@@ -190,8 +190,8 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Delibird API",
-    "DESCRIPTION": "API for the Delibird wishlist app.",
+    "TITLE": "Strena API",
+    "DESCRIPTION": "API for the Strena wishlist app.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
     "SERVE_AUTHENTICATION": [],

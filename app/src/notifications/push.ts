@@ -42,7 +42,7 @@ export async function savedPushToken(): Promise<string | null> {
 export async function turnOnPush(session: string, language: string): Promise<boolean> {
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('default', {
-      name: 'Delibird',
+      name: 'Strena',
       importance: Notifications.AndroidImportance.DEFAULT,
     });
   }

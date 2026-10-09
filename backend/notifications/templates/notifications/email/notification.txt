@@ -1,7 +1,7 @@
 {% load i18n %}{% autoescape off %}{% translate "Hello," %}
 
 {% if kind == "list_shared" %}{% blocktranslate trimmed %}
-{{ owner }} shared their wishlist “{{ list }}” with you on Delibird.
+{{ owner }} shared their wishlist “{{ list }}” with you on Strena.
 {% endblocktranslate %}
 
 {% translate "Open it here:" %}

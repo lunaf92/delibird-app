@@ -136,7 +136,7 @@ test('an expired magic link explains what to do', async () => {
 
   expect(await screen.findByText('That code is wrong or has expired.')).toBeOnTheScreen();
   await fireEvent.press(screen.getByRole('button', { name: 'Back to sign in' }));
-  expect(await screen.findByText('Welcome to Delibird')).toBeOnTheScreen();
+  expect(await screen.findByText('Welcome to Strena')).toBeOnTheScreen();
 });
 
 describe('opening the magic link in the app', () => {

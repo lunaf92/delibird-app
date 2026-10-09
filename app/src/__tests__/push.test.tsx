@@ -51,7 +51,7 @@ test('a refused permission is explained and nothing is registered', async () => 
   await fireEvent.press(screen.getByRole('button', { name: 'Also notify this phone' }));
 
   expect(
-    await screen.findByText("Notifications are turned off for Delibird in this phone's settings."),
+    await screen.findByText("Notifications are turned off for Strena in this phone's settings."),
   ).toBeOnTheScreen();
   expect(callsTo(calls, 'POST', 'devices/')).toHaveLength(0);
 });
@@ -78,7 +78,7 @@ test('signing out stops notifications to this phone', async () => {
 
   await fireEvent.press(screen.getByRole('button', { name: 'Sign out' }));
 
-  await screen.findByText('Welcome to Delibird');
+  await screen.findByText('Welcome to Strena');
   expect(callsTo(calls, 'DELETE', 'devices/')[0].body).toEqual({ token: 'ExponentPushToken[test-phone]' });
   expect(calls.findIndex((c) => c.path === 'devices/')).toBeLessThan(
     calls.findIndex((c) => c.path === 'auth/logout/'),

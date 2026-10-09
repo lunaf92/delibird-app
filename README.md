@@ -1,7 +1,11 @@
-# Delibird
+# Strena
 
 A wishlist app for friends and family: keep several gift lists, share each one with chosen people, and let them
 quietly mark what they are buying without the owner ever finding out.
+
+The app was called Delibird while it was being built. Behind the scenes some names still say `delibird` (the
+repository, the Android package, the database and the backup files), so phones that already have it installed
+update in place and existing data keeps working.
 
 - [Requirements](https://claude.ai/code/artifact/7993bc48-24eb-4fb6-a142-0e8b93826293)
 - [Implementation plan](https://claude.ai/code/artifact/aff4b9db-bd93-4a46-809c-6128edc8bc9f)
@@ -183,7 +187,7 @@ phone (copy it over, or `adb install`). Plain HTTP to the server is already allo
 from other apps there is a free Shortcuts workaround, **not tested yet**: in the Shortcuts app make a new
 shortcut, turn on "Show in Share Sheet" (receives URLs and Safari web pages), add "URL Encode" with the
 Shortcut Input, then "Open URLs" with `http://192.168.0.24/add?url=` followed by the encoded text. Sharing a
-page to that shortcut opens Delibird's new-item screen with the link filled in.
+page to that shortcut opens Strena's new-item screen with the link filled in.
 
 **If a device can't reach the server:** with NordVPN on that device (or on the server), turn on its LAN access
 with `nordvpn set lan-discovery on`, or the VPN hides the home network. On the server only port 80 is used, so

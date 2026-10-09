@@ -1,5 +1,5 @@
 {
-  "appName": "Delibird",
+  "appName": "Strena",
   "home": {
     "greeting": "Hi, {{name}}",
     "greetingNoName": "Hi!",
@@ -11,7 +11,7 @@
   },
   "signIn": {
     "title": "Sign in",
-    "welcome": "Welcome to Delibird",
+    "welcome": "Welcome to Strena",
     "emailIntro": "Enter your email and we'll send you a code to sign in. If you're new, this creates your account.",
     "email": "Email",
     "sendCode": "Send me a code",
@@ -129,11 +129,11 @@
     "autofill": "Fill in from link",
     "autofillDone": "Filled in from the shop. Check the details before saving.",
     "autofillNothing": "This shop didn't share its details. The link is kept; type the rest.",
-    "autofillBlocked": "The shop blocked Delibird from reading this page. The link is kept; type the rest.",
+    "autofillBlocked": "The shop blocked Strena from reading this page. The link is kept; type the rest.",
     "autofillTimeout": "The shop took too long to answer. The link is kept; type the rest or try again later.",
-    "autofillUnreachable": "Delibird couldn't reach this shop. Check the link; it's kept, so you can type the rest.",
-    "autofillUnreadable": "Delibird couldn't read this page. The link is kept; type the rest.",
-    "autofillNotPublic": "Delibird won't open this link: it points to an address that isn't on the public internet. The link is kept; type the rest.",
+    "autofillUnreachable": "Strena couldn't reach this shop. Check the link; it's kept, so you can type the rest.",
+    "autofillUnreadable": "Strena couldn't read this page. The link is kept; type the rest.",
+    "autofillNotPublic": "Strena won't open this link: it points to an address that isn't on the public internet. The link is kept; type the rest.",
     "nameGuessed": "Guessed from the link, since the shop's page couldn't be read. Check it before saving."
   },
   "reorder": {
@@ -184,8 +184,8 @@
     "email": "You get an email when a list is shared with you, or when something you're getting changes.",
     "turnOn": "Also notify this phone",
     "on": "This phone gets notifications too.",
-    "denied": "Notifications are turned off for Delibird in this phone's settings.",
-    "web": "Phone notifications are available in the Delibird app.",
+    "denied": "Notifications are turned off for Strena in this phone's settings.",
+    "web": "Phone notifications are available in the Strena app.",
     "simulator": "Phone notifications need a real phone.",
     "not-configured": "Phone notifications aren't set up in this build of the app yet."
   },

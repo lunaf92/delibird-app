@@ -1,9 +1,9 @@
 {
     "openapi": "3.0.3",
     "info": {
-        "title": "Delibird API",
+        "title": "Strena API",
         "version": "1.0.0",
-        "description": "API for the Delibird wishlist app."
+        "description": "API for the Strena wishlist app."
     },
     "paths": {
         "/api/v1/auth/logout/": {

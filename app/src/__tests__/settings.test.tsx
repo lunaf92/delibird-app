@@ -87,7 +87,7 @@ test('signing out ends the session and returns to sign-in', async () => {
 
   await fireEvent.press(screen.getByRole('button', { name: 'Sign out' }));
 
-  expect(await screen.findByText('Welcome to Delibird')).toBeOnTheScreen();
+  expect(await screen.findByText('Welcome to Strena')).toBeOnTheScreen();
   expect(app.pathname()).toBe('/sign-in');
   expect(callsTo(calls, 'POST', 'auth/logout/')).toHaveLength(1);
   expect(storedToken()).toBeUndefined();
@@ -106,7 +106,7 @@ test('deleting the account needs a confirmation', async () => {
   await fireEvent.press(screen.getByRole('button', { name: 'Delete my account…' }));
   await fireEvent.press(screen.getByRole('button', { name: 'Delete permanently' }));
 
-  expect(await screen.findByText('Welcome to Delibird')).toBeOnTheScreen();
+  expect(await screen.findByText('Welcome to Strena')).toBeOnTheScreen();
   expect(app.pathname()).toBe('/sign-in');
   expect(callsTo(calls, 'DELETE', 'me/')).toHaveLength(1);
   expect(storedToken()).toBeUndefined();
@@ -120,7 +120,7 @@ test('a session ended elsewhere signs this device out', async () => {
 
   const app = await renderApp('/settings');
 
-  expect(await screen.findByText('Welcome to Delibird')).toBeOnTheScreen();
+  expect(await screen.findByText('Welcome to Strena')).toBeOnTheScreen();
   expect(app.pathname()).toBe('/sign-in');
   expect(storedToken()).toBeUndefined();
 });
