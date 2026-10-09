@@ -169,3 +169,65 @@ test('server validation errors are shown', async () => {
 
   expect(await screen.findByText('Something about the item was wrong.')).toBeOnTheScreen();
 });
+
+const PICTURE = {
+  canceled: false,
+  assets: [{ uri: 'file:///photos/scarf.jpg', fileName: 'scarf.jpg', mimeType: 'image/jpeg' }],
+};
+
+async function saveNewItemWithPicture() {
+  pickImage.mockResolvedValue(PICTURE);
+  await fireEvent.changeText(screen.getByLabelText('Name'), 'Scarf');
+  await fireEvent.press(screen.getByRole('button', { name: 'Add a picture' }));
+  await screen.findByRole('button', { name: 'Change picture' });
+  await fireEvent.press(screen.getByRole('button', { name: 'Save' }));
+}
+
+test('a new item whose picture fails is removed again, and the form keeps what was typed', async () => {
+  // The upload has no handler, so it fails like an unreachable server.
+  const { calls } = await openNewItemForm({ 'DELETE items/105/': { status: 204 } });
+
+  await saveNewItemWithPicture();
+
+  expect(await screen.findByText(/nothing was saved/)).toBeOnTheScreen();
+  expect(callsTo(calls, 'POST', 'lists/11/items/')).toHaveLength(1);
+  expect(callsTo(calls, 'DELETE', 'items/105/')).toHaveLength(1);
+  expect(screen.getByDisplayValue('Scarf')).toBeOnTheScreen();
+  expect(screen.getByText('New item', { exact: true })).toBeOnTheScreen();
+});
+
+test('if the new item cannot be removed either, Save only retries the picture', async () => {
+  let uploads = 0;
+  const { calls } = await openNewItemForm({
+    'PATCH items/105/': (body) => ({ body: item({ id: 105, lists: [10, 11], ...(body as object) }) }),
+    'PUT items/105/image/': () => {
+      uploads += 1;
+      if (uploads === 1) throw new TypeError('Network request failed');
+      return { body: item({ id: 105, image: 'http://localhost:8000/media/items/x.jpg' }) };
+    },
+  });
+
+  await saveNewItemWithPicture();
+  expect(await screen.findByText(/The item was saved, but its picture/)).toBeOnTheScreen();
+
+  await fireEvent.press(screen.getByRole('button', { name: 'Save' }));
+  await waitFor(() => expect(uploads).toBe(2));
+  expect(callsTo(calls, 'POST', 'lists/11/items/')).toHaveLength(1);
+  expect(callsTo(calls, 'PATCH', 'items/105/')).toHaveLength(1);
+});
+
+test('editing an item says so when only the picture fails', async () => {
+  pickImage.mockResolvedValue(PICTURE);
+  mockApi({
+    'GET me/': { body: ANN },
+    'GET lists/': { body: [DEFAULT_LIST, CHRISTMAS] },
+    'GET items/101/': { body: SCARF },
+    'PATCH items/101/': (body) => ({ body: { ...SCARF, ...(body as object) } }),
+  });
+  await renderApp('/items/101');
+
+  await fireEvent.press(await screen.findByRole('button', { name: 'Change picture' }));
+  await fireEvent.press(screen.getByRole('button', { name: 'Save' }));
+
+  expect(await screen.findByText(/Your changes were saved, but the picture/)).toBeOnTheScreen();
+});

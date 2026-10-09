@@ -10,6 +10,9 @@ import { useApi, useResource } from '@/api/use-api';
 import { ItemForm, type ImageChange, type ItemValues } from '@/components/item-form';
 import { Body, Button, Card, Heading, Message, Screen, Title } from '@/components/ui';
 
+/** The changes were saved but the picture did not go through. */
+class PictureFailed extends Error {}
+
 export default function EditItemScreen() {
   const { t } = useTranslation();
   const api = useApi();
@@ -37,10 +40,15 @@ export default function EditItemScreen() {
     setError(null);
     try {
       const saved = await api((token, language) => updateItem(token, id, values, language));
-      await saveImage(api, saved, image);
+      try {
+        await saveImage(api, saved, image);
+      } catch (failure) {
+        // The changes themselves are saved; say so, and Save tries the picture again.
+        throw new PictureFailed(`${t('items.pictureFailedEdit')} ${errorMessage(failure, t)}`);
+      }
       router.back();
     } catch (failure) {
-      setError(errorMessage(failure, t));
+      setError(failure instanceof PictureFailed ? failure.message : errorMessage(failure, t));
       setBusy(false);
     }
   };
