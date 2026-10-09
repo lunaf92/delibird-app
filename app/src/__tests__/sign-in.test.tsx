@@ -1,5 +1,7 @@
+import { Linking } from 'react-native';
 import { fireEvent, screen } from 'expo-router/testing-library';
 
+import * as openInApp from '@/auth/open-in-app';
 import i18n from '@/i18n';
 import { ANN, callsTo, mockApi } from '@/test-utils/api';
 import { renderApp } from '@/test-utils/render';
@@ -135,4 +137,43 @@ test('an expired magic link explains what to do', async () => {
   expect(await screen.findByText('That code is wrong or has expired.')).toBeOnTheScreen();
   await fireEvent.press(screen.getByRole('button', { name: 'Back to sign in' }));
   expect(await screen.findByText('Welcome to Delibird')).toBeOnTheScreen();
+});
+
+describe('opening the magic link in the app', () => {
+  afterEach(() => jest.restoreAllMocks());
+
+  test('an Android browser offers the app first and does not use the token yet', async () => {
+    jest.spyOn(openInApp, 'canOpenAppFromBrowser').mockReturnValue(true);
+    const calls = mockApi({ 'POST auth/verify/': SIGNED_IN });
+    const open = jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
+
+    await renderApp('/sign-in/verify?token=magic-token');
+
+    expect(await screen.findByText('Open Delibird')).toBeOnTheScreen();
+    expect(open).toHaveBeenCalledWith(
+      expect.stringContaining('intent://sign-in/verify?token=magic-token#Intent;'),
+    );
+    expect(callsTo(calls, 'POST', 'auth/verify/')).toHaveLength(0);
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Continue in the browser' }));
+    expect(await screen.findByText('Hi, Ann')).toBeOnTheScreen();
+    expect(callsTo(calls, 'POST', 'auth/verify/')).toHaveLength(1);
+  });
+
+  test('the website choice (web=1) signs in straight away', async () => {
+    jest.spyOn(openInApp, 'canOpenAppFromBrowser').mockReturnValue(true);
+    mockApi({ 'POST auth/verify/': SIGNED_IN });
+
+    await renderApp('/sign-in/verify?token=magic-token&web=1');
+
+    expect(await screen.findByText('Hi, Ann')).toBeOnTheScreen();
+  });
+
+  test('the intent link names the app and falls back to the website', () => {
+    const url = openInApp.androidIntentUrl('a b', '/sign-in/verify?token=a%20b&web=1');
+    expect(url).toContain(
+      'intent://sign-in/verify?token=a%20b#Intent;scheme=delibird;package=com.lunaf92.delibird;',
+    );
+    expect(url).toContain('S.browser_fallback_url=%2Fsign-in%2Fverify%3Ftoken%3Da%2520b%26web%3D1;end');
+  });
 });
