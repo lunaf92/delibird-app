@@ -2,10 +2,10 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { autofillLink, createItem, deleteItem, updateItem, type Item } from '@/api/client';
+import { autofillLink, createItem, deleteItem, fetchLists, updateItem, type Item } from '@/api/client';
 import { errorMessage } from '@/api/errors';
 import { saveImage } from '@/api/items';
-import { useApi } from '@/api/use-api';
+import { useApi, useResource } from '@/api/use-api';
 import { ItemForm, type ImageChange, type ItemValues } from '@/components/item-form';
 import { Screen, Title } from '@/components/ui';
 
@@ -17,6 +17,7 @@ export default function NewItemScreen() {
   const api = useApi();
   const params = useLocalSearchParams<{ id: string; url?: string }>();
   const listId = Number(params.id);
+  const { data: lists } = useResource(fetchLists);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // An item that was created but whose picture is not stored yet, when removing it again failed too.
@@ -28,9 +29,15 @@ export default function NewItemScreen() {
     try {
       // Saving is all or nothing: if the picture can't be stored, the new item is removed again, so nothing
       // is left half saved and the form still holds everything that was typed.
+      // The item goes on the lists ticked in the form (the default list always). Unticking the list it was
+      // started from means it is added through the default list instead.
+      const target =
+        values.lists && !values.lists.includes(listId)
+          ? (lists?.find((list) => list.is_default)?.id ?? listId)
+          : listId;
       const item = unfinished.current
         ? await api((token, language) => updateItem(token, unfinished.current!.id, values, language))
-        : await api((token, language) => createItem(token, listId, values, language));
+        : await api((token, language) => createItem(token, target, values, language));
       try {
         await saveImage(api, item, image);
         unfinished.current = null;
@@ -49,7 +56,7 @@ export default function NewItemScreen() {
       // Started from a shared link (/add or the share sheet), "back" may be another app or an older form:
       // show the list the item went on instead.
       if (params.url || !router.canGoBack()) {
-        router.replace({ pathname: '/lists/[id]', params: { id: String(listId) } });
+        router.replace({ pathname: '/lists/[id]', params: { id: String(target) } });
       } else {
         router.back();
       }
@@ -63,6 +70,8 @@ export default function NewItemScreen() {
     <Screen>
       <Title>{t('items.newTitle')}</Title>
       <ItemForm
+        lists={lists ?? undefined}
+        initialLists={[listId]}
         submitLabel={t('items.save')}
         busy={busy}
         error={error}

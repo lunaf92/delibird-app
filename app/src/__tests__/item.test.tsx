@@ -63,7 +63,48 @@ test('adding an item with every field', async () => {
     rating: 4,
     price: '39.90',
     currency: 'GBP',
+    lists: [11],
   });
+});
+
+const BIRTHDAY = { ...DEFAULT_LIST, id: 12, name: 'Birthday', is_default: false };
+
+test('a new item can go on more lists straight away', async () => {
+  const { calls, app } = await openNewItemForm({
+    'GET lists/': { body: [DEFAULT_LIST, CHRISTMAS, BIRTHDAY] },
+  });
+
+  await fireEvent.changeText(screen.getByLabelText('Name'), 'Book');
+  // It starts on the list it is added to (and always on the default list).
+  expect(await screen.findByRole('checkbox', { name: 'Christmas' })).toBeChecked();
+  expect(screen.getByRole('checkbox', { name: 'My wishlist' })).toBeChecked();
+  await fireEvent.press(screen.getByRole('checkbox', { name: 'Birthday' }));
+  await fireEvent.press(screen.getByRole('button', { name: 'Save' }));
+
+  await waitFor(() => expect(app.pathname()).toBe('/lists/11'));
+  expect(callsTo(calls, 'POST', 'lists/11/items/')[0].body).toMatchObject({ name: 'Book', lists: [11, 12] });
+});
+
+test('unticking the list it was started from adds the item through the default list', async () => {
+  const { calls, app } = await openNewItemForm({
+    'GET lists/': { body: [DEFAULT_LIST, CHRISTMAS, BIRTHDAY] },
+    'GET lists/10/': { body: { ...DEFAULT_LIST, items: [] } },
+    'POST lists/10/items/': (body) => ({
+      status: 201,
+      body: item({ id: 106, lists: [10, 12], ...(body as object) }),
+    }),
+  });
+
+  await fireEvent.changeText(screen.getByLabelText('Name'), 'Book');
+  await fireEvent.press(await screen.findByRole('checkbox', { name: 'Christmas' }));
+  await fireEvent.press(screen.getByRole('checkbox', { name: 'Birthday' }));
+  await fireEvent.press(screen.getByRole('button', { name: 'Save' }));
+
+  await waitFor(() => expect(callsTo(calls, 'POST', 'lists/10/items/')).toHaveLength(1));
+  // Back where the item was started from.
+  await waitFor(() => expect(app.pathname()).toBe('/lists/11'));
+  expect(callsTo(calls, 'POST', 'lists/11/items/')).toHaveLength(0);
+  expect(callsTo(calls, 'POST', 'lists/10/items/')[0].body).toMatchObject({ name: 'Book', lists: [12] });
 });
 
 test('only the name is required', async () => {

@@ -28,14 +28,16 @@ export type ItemValues = {
   rating: number | null;
   price: string | null;
   currency: string;
-  /** Every list the item should be on. Only sent when editing; the default list is always included. */
+  /** Every list the item should be on, sent when the form shows the lists; the default list is always included. */
   lists?: number[];
 };
 
 type Props = {
   item?: Item;
-  /** The owner's lists, to choose which ones the item is on. Left out when adding. */
+  /** The owner's lists, to choose which ones the item is on. */
   lists?: Wishlist[];
+  /** The lists a new item starts on, such as the one it is being added to. */
+  initialLists?: number[];
   submitLabel: string;
   busy: boolean;
   error: string | null;
@@ -58,7 +60,17 @@ const PROBLEM_TEXT = {
 } as const;
 
 /** The item form: only the name is required. */
-export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit, autofill, initialUrl }: Props) {
+export function ItemForm({
+  item,
+  lists,
+  initialLists,
+  submitLabel,
+  busy,
+  error,
+  onSubmit,
+  autofill,
+  initialUrl,
+}: Props) {
   const { t } = useTranslation();
   const { colors } = useLook();
   const [name, setName] = useState(item?.name ?? '');
@@ -67,7 +79,7 @@ export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit, auto
   const [rating, setRating] = useState<number | null>(item?.rating ?? null);
   const [priceText, setPriceText] = useState(item?.price ?? '');
   const [currency, setCurrency] = useState(item?.currency ?? 'EUR');
-  const [onLists, setOnLists] = useState<number[]>(item?.lists ?? []);
+  const [onLists, setOnLists] = useState<number[]>(item?.lists ?? initialLists ?? []);
   const [image, setImage] = useState<ImageChange>({ kind: 'keep' });
   const [problem, setProblem] = useState<string | null>(null);
   const [filling, setFilling] = useState(Boolean(initialUrl));
@@ -184,7 +196,7 @@ export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit, auto
         rating,
         price,
         currency,
-        ...(item && lists ? { lists: onLists } : {}),
+        ...(lists ? { lists: onLists } : {}),
       },
       image,
     );
