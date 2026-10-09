@@ -1,6 +1,6 @@
 {% load i18n %}{% autoescape off %}{% translate "Hello," %}
 
-{% translate "Your code to sign in to Delibird is:" %}
+{% translate "Your code to sign in to Strena is:" %}
 
     {{ code }}
 

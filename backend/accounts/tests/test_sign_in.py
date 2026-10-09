@@ -29,7 +29,7 @@ def test_request_code_emails_a_code_and_magic_link(client: APIClient, settings: 
     assert message.to == ["ann@example.com"]
     code = code_from(message)
     token = token_from(message)
-    assert message.subject == f"Your Delibird sign-in code: {code}"
+    assert message.subject == f"Your Strena sign-in code: {code}"
     assert f"http://192.168.1.50:8081/sign-in/verify?token={token}" in message.body
     assert code in html_of(message)
     assert f"http://192.168.1.50:8081/sign-in/verify?token={token}" in html_of(message)
@@ -254,9 +254,9 @@ def test_verify_is_rate_limited_per_ip(client: APIClient, settings: Settings) ->
 @pytest.mark.parametrize(
     ("language", "subject_start", "body_text"),
     [
-        ("en", "Your Delibird sign-in code", "Your code to sign in to Delibird is:"),
-        ("it", "Il tuo codice di accesso a Delibird", "Il tuo codice per accedere a Delibird è:"),
-        ("es", "Tu código para entrar en Delibird", "Tu código para entrar en Delibird es:"),
+        ("en", "Your Strena sign-in code", "Your code to sign in to Strena is:"),
+        ("it", "Il tuo codice di accesso a Strena", "Il tuo codice per accedere a Strena è:"),
+        ("es", "Tu código para entrar en Strena", "Tu código para entrar en Strena es:"),
     ],
 )
 def test_email_is_in_the_account_language(
@@ -276,7 +276,7 @@ def test_email_is_in_the_account_language(
 def test_new_account_uses_the_language_it_signed_up_in(client: APIClient) -> None:
     request_code(client, "ann@example.com", **{"Accept-Language": "es"})
     code = code_from(mail.outbox[0])
-    assert mail.outbox[0].subject.startswith("Tu código para entrar en Delibird")
+    assert mail.outbox[0].subject.startswith("Tu código para entrar en Strena")
 
     client.post(
         reverse("auth-verify"),

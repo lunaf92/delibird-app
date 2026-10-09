@@ -128,17 +128,17 @@ test('links the server refuses are explained in plain words', async () => {
 
   expect(
     await screen.findByText(
-      "Delibird won't open this link: it points to an address that isn't on the public internet. The link is kept; type the rest.",
+      "Strena won't open this link: it points to an address that isn't on the public internet. The link is kept; type the rest.",
     ),
   ).toBeOnTheScreen();
   expect(screen.getByLabelText('Link').props.value).toBe('http://192.168.1.1/');
 });
 
 test.each([
-  ['blocked', 'The shop blocked Delibird from reading this page. The link is kept; type the rest.'],
+  ['blocked', 'The shop blocked Strena from reading this page. The link is kept; type the rest.'],
   ['timeout', 'The shop took too long to answer. The link is kept; type the rest or try again later.'],
-  ['unreachable', "Delibird couldn't reach this shop. Check the link; it's kept, so you can type the rest."],
-  ['unreadable', "Delibird couldn't read this page. The link is kept; type the rest."],
+  ['unreachable', "Strena couldn't reach this shop. Check the link; it's kept, so you can type the rest."],
+  ['unreadable', "Strena couldn't read this page. The link is kept; type the rest."],
 ])('when nothing could be read (%s), the app says why and fills nothing', async (problem, text) => {
   const { ready } = openNewItem({
     'POST items/autofill/': {
@@ -187,7 +187,7 @@ test('/add signed out goes through sign-in and comes back', async () => {
 
   const app = await renderApp('/add?url=https%3A%2F%2Fshop.example.com%2Fscarf');
 
-  expect(await screen.findByText('Welcome to Delibird')).toBeOnTheScreen();
+  expect(await screen.findByText('Welcome to Strena')).toBeOnTheScreen();
   expect(app.pathname()).toBe('/sign-in');
 });
 
@@ -212,7 +212,7 @@ test('when a shop blocks us, the name is guessed from the link and marked as a g
 
   expect(
     await screen.findByText(
-      'The shop blocked Delibird from reading this page. The link is kept; type the rest.',
+      'The shop blocked Strena from reading this page. The link is kept; type the rest.',
     ),
   ).toBeOnTheScreen();
   expect(screen.getByLabelText('Name').props.value).toBe('Kallax shelving unit white stained oak effect');
@@ -236,7 +236,7 @@ test('a guessed name never replaces one already typed, and the note goes once it
   await fireEvent.changeText(screen.getByLabelText('Name'), 'Pumpkin pot');
   await fireEvent.changeText(screen.getByLabelText('Link'), link);
   await fireEvent.press(screen.getByRole('button', { name: 'Fill in from link' }));
-  await screen.findByText(/The shop blocked Delibird/);
+  await screen.findByText(/The shop blocked Strena/);
   expect(screen.getByLabelText('Name').props.value).toBe('Pumpkin pot');
   expect(screen.queryByText(/Guessed from the link/)).not.toBeOnTheScreen();
 
@@ -257,7 +257,7 @@ test('short links with nothing to go on leave the name empty', async () => {
   await fireEvent.changeText(screen.getByLabelText('Link'), 'https://ebay.io/m/wYOGiR');
   await fireEvent.press(screen.getByRole('button', { name: 'Fill in from link' }));
 
-  await screen.findByText(/The shop blocked Delibird/);
+  await screen.findByText(/The shop blocked Strena/);
   expect(screen.getByLabelText('Name').props.value).toBe('');
   expect(screen.queryByText(/Guessed from the link/)).not.toBeOnTheScreen();
 });
@@ -275,7 +275,7 @@ test('a link refused for not being a public address still gets a guessed name', 
   await fireEvent.changeText(screen.getByLabelText('Link'), link);
   await fireEvent.press(screen.getByRole('button', { name: 'Fill in from link' }));
 
-  await screen.findByText(/Delibird won't open this link/);
+  await screen.findByText(/Strena won't open this link/);
   expect(screen.getByLabelText('Name').props.value).toBe('Le Creuset Signature Round Casserole');
   expect(screen.getByText(/Guessed from the link/)).toBeOnTheScreen();
 });

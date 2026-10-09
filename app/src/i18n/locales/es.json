@@ -1,5 +1,5 @@
 {
-  "appName": "Delibird",
+  "appName": "Strena",
   "home": {
     "greeting": "Hola, {{name}}",
     "greetingNoName": "¡Hola!",
@@ -11,7 +11,7 @@
   },
   "signIn": {
     "title": "Entrar",
-    "welcome": "Te damos la bienvenida a Delibird",
+    "welcome": "Te damos la bienvenida a Strena",
     "emailIntro": "Escribe tu correo y te enviaremos un código para entrar. Si eres nuevo, así se crea tu cuenta.",
     "email": "Correo electrónico",
     "sendCode": "Envíame un código",
@@ -122,11 +122,11 @@
     "autofill": "Rellenar desde el enlace",
     "autofillDone": "Rellenado desde la tienda. Revisa los datos antes de guardar.",
     "autofillNothing": "Esta tienda no ha compartido sus datos. El enlace se guarda; escribe tú el resto.",
-    "autofillBlocked": "La tienda no ha dejado que Delibird lea esta página. El enlace se guarda; escribe el resto.",
+    "autofillBlocked": "La tienda no ha dejado que Strena lea esta página. El enlace se guarda; escribe el resto.",
     "autofillTimeout": "La tienda ha tardado demasiado en responder. El enlace se guarda; escribe el resto o inténtalo más tarde.",
-    "autofillUnreachable": "Delibird no ha podido llegar a esta tienda. Revisa el enlace; se guarda, así que puedes escribir el resto.",
-    "autofillUnreadable": "Delibird no ha podido leer esta página. El enlace se guarda; escribe el resto.",
-    "autofillNotPublic": "Delibird no abre este enlace: apunta a una dirección que no está en internet. El enlace se guarda; escribe el resto.",
+    "autofillUnreachable": "Strena no ha podido llegar a esta tienda. Revisa el enlace; se guarda, así que puedes escribir el resto.",
+    "autofillUnreadable": "Strena no ha podido leer esta página. El enlace se guarda; escribe el resto.",
+    "autofillNotPublic": "Strena no abre este enlace: apunta a una dirección que no está en internet. El enlace se guarda; escribe el resto.",
     "nameGuessed": "Sacado del enlace, porque no se ha podido leer la página de la tienda. Revísalo antes de guardar."
   },
   "reorder": {
@@ -177,8 +177,8 @@
     "email": "Recibes un correo cuando alguien comparte una lista contigo, o cuando cambia algo que vas a regalar.",
     "turnOn": "Avisar también en este teléfono",
     "on": "Este teléfono también recibe notificaciones.",
-    "denied": "Las notificaciones de Delibird están desactivadas en los ajustes de este teléfono.",
-    "web": "Las notificaciones en el teléfono están disponibles en la app Delibird.",
+    "denied": "Las notificaciones de Strena están desactivadas en los ajustes de este teléfono.",
+    "web": "Las notificaciones en el teléfono están disponibles en la app Strena.",
     "simulator": "Las notificaciones en el teléfono necesitan un teléfono de verdad.",
     "not-configured": "Las notificaciones en el teléfono todavía no están configuradas en esta versión de la app."
   },

@@ -15,7 +15,7 @@ test('signed-out people land on sign-in', async () => {
 
   const app = await renderApp('/');
 
-  expect(await screen.findByText('Welcome to Delibird')).toBeOnTheScreen();
+  expect(await screen.findByText('Welcome to Strena')).toBeOnTheScreen();
   expect(app.pathname()).toBe('/sign-in');
 });
 
@@ -24,7 +24,7 @@ test('signed-out deep links to settings go to sign-in', async () => {
 
   const app = await renderApp('/settings');
 
-  expect(await screen.findByText('Welcome to Delibird')).toBeOnTheScreen();
+  expect(await screen.findByText('Welcome to Strena')).toBeOnTheScreen();
   expect(app.pathname()).toBe('/sign-in');
 });
 
@@ -45,6 +45,6 @@ test('an expired saved session is forgotten', async () => {
 
   const app = await renderApp('/');
 
-  expect(await screen.findByText('Welcome to Delibird')).toBeOnTheScreen();
+  expect(await screen.findByText('Welcome to Strena')).toBeOnTheScreen();
   expect(app.pathname()).toBe('/sign-in');
 });

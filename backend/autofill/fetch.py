@@ -14,7 +14,7 @@ import zlib
 from dataclasses import dataclass
 from urllib.parse import urljoin, urlsplit
 
-USER_AGENT = "Mozilla/5.0 (compatible; Delibird/1.0; wishlist link preview)"
+USER_AGENT = "Mozilla/5.0 (compatible; Strena/1.0; wishlist link preview)"
 TIMEOUT_SECONDS = 6
 MAX_REDIRECTS = 5
 

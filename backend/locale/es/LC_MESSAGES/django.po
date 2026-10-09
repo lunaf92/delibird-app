@@ -1,4 +1,4 @@
-# Delibird backend translations.
+# Strena backend translations.
 msgid ""
 msgstr ""
 "Project-Id-Version: delibird\n"
@@ -120,8 +120,8 @@ msgstr "Envía un correo y un código, o un token."
 
 #: accounts/tasks.py:22
 #, python-format
-msgid "Your Delibird sign-in code: %(code)s"
-msgstr "Tu código para entrar en Delibird: %(code)s"
+msgid "Your Strena sign-in code: %(code)s"
+msgstr "Tu código para entrar en Strena: %(code)s"
 
 #: accounts/templates/accounts/email/sign_in.html:9
 #: accounts/templates/accounts/email/sign_in.txt:1
@@ -132,8 +132,8 @@ msgstr "Hola:"
 
 #: accounts/templates/accounts/email/sign_in.html:10
 #: accounts/templates/accounts/email/sign_in.txt:3
-msgid "Your code to sign in to Delibird is:"
-msgstr "Tu código para entrar en Delibird es:"
+msgid "Your code to sign in to Strena is:"
+msgstr "Tu código para entrar en Strena es:"
 
 #: accounts/templates/accounts/email/sign_in.html:14
 #: accounts/templates/accounts/email/sign_in.txt:7
@@ -141,8 +141,8 @@ msgid "Or open this link on the device you're signing in on:"
 msgstr "O abre este enlace en el dispositivo con el que estás entrando:"
 
 #: accounts/templates/accounts/email/sign_in.html:17
-msgid "Sign in to Delibird"
-msgstr "Entrar en Delibird"
+msgid "Sign in to Strena"
+msgstr "Entrar en Strena"
 
 #: accounts/templates/accounts/email/sign_in.html:22
 #: accounts/templates/accounts/email/sign_in.txt:10
@@ -236,9 +236,9 @@ msgstr "%(owner)s ha quitado de «%(list)s» algo que ibas a regalar."
 #: notifications/templates/notifications/email/notification.html:12
 #: notifications/templates/notifications/email/notification.txt:3
 #, python-format
-msgid "%(owner)s shared their wishlist “%(list)s” with you on Delibird."
+msgid "%(owner)s shared their wishlist “%(list)s” with you on Strena."
 msgstr ""
-"%(owner)s ha compartido contigo su lista de deseos «%(list)s» en Delibird."
+"%(owner)s ha compartido contigo su lista de deseos «%(list)s» en Strena."
 
 #: notifications/templates/notifications/email/notification.html:14
 #: notifications/templates/notifications/email/notification.txt:12
