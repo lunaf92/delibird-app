@@ -149,7 +149,7 @@ describe('opening the magic link in the app', () => {
 
     await renderApp('/sign-in/verify?token=magic-token');
 
-    expect(await screen.findByText('Open Delibird')).toBeOnTheScreen();
+    expect(await screen.findByText('Open Strena')).toBeOnTheScreen();
     expect(open).toHaveBeenCalledWith(
       expect.stringContaining('intent://sign-in/verify?token=magic-token#Intent;'),
     );

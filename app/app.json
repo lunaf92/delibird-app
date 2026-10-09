@@ -23,7 +23,21 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.lunaf92.delibird"
+      "package": "com.lunaf92.delibird",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "strena.app",
+              "pathPrefix": "/sign-in/verify"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "output": "single",
@@ -64,7 +78,8 @@
           "androidIntentFilters": ["text/*"],
           "disableIOS": true
         }
-      ]
+      ],
+      "./plugins/release-signing"
     ],
     "experiments": {
       "typedRoutes": true,

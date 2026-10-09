@@ -178,10 +178,16 @@ Copy `backups/` somewhere else from time to time (another disk or a cloud drive)
 doesn't survive the disk. To restore one (this replaces everything since, and stops the app meanwhile):
 `./deploy/restore.sh backups/delibird-db-<date>.dump backups/delibird-media-<date>.tar.gz`.
 
-**The Android app** has the server's address built in, so rebuild it once for the home server: in `app/.env`
-set `EXPO_PUBLIC_API_URL=http://192.168.0.24`, then `cd app && npx expo prebuild --platform android && cd android
-&& ./gradlew assembleRelease`, and install `app/android/app/build/outputs/apk/release/app-release.apk` on each
-phone (copy it over, or `adb install`). Plain HTTP to the server is already allowed in the app's settings.
+**The Android app** has the server's address built in: in `app/.env` set `EXPO_PUBLIC_API_URL=https://strena.app`,
+then `cd app && npx expo prebuild --platform android --clean && cd android && ./gradlew assembleRelease`, and install
+`app/android/app/build/outputs/apk/release/app-release.apk` on each phone (copy it over, or `adb install`).
+
+Release builds are signed with Strena's own key, kept outside the repo in
+`~/.local/share/delibird-android/strena-release.jks` with its passwords in `strena-release.properties` next to it
+(or the properties file named by `STRENA_RELEASE_KEY`; see `app/plugins/release-signing.js`). **Back both files up**:
+a phone only installs an update signed with the same key, and the key's fingerprint in
+`app/public/.well-known/assetlinks.json` is what lets sign-in links in emails open the app directly (Android App
+Links). Without the key, the build falls back to the debug key, and those links go through the website instead.
 
 **iPhones** use the website: open `http://192.168.0.24` in Safari and "Add to Home Screen". For sharing links
 from other apps there is a free Shortcuts workaround, **not tested yet**: in the Shortcuts app make a new
