@@ -31,6 +31,13 @@ def env_list(name: str, default: str = "") -> list[str]:
 
 DEBUG = env_bool("DJANGO_DEBUG")
 SECRET_KEY = env("DJANGO_SECRET_KEY")
+
+# The placeholders from .env.example. Outside development they would leave the server open, so refuse them.
+EXAMPLE_VALUES = {"DJANGO_SECRET_KEY": "change-me-to-a-long-random-string", "POSTGRES_PASSWORD": "change-me"}
+if not DEBUG:
+    for name, example in EXAMPLE_VALUES.items():
+        if os.environ.get(name, "") in ("", example):
+            raise ImproperlyConfigured(f"Set {name} in .env to a real secret before running in production.")
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")
 CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS")
 CORS_ALLOWED_ORIGINS = env_list("DJANGO_CORS_ALLOWED_ORIGINS")
@@ -169,6 +176,8 @@ MAILERS = {
             "username": env("EMAIL_HOST_USER", ""),
             "password": env("EMAIL_HOST_PASSWORD", ""),
             "use_tls": env_bool("EMAIL_USE_TLS"),
+            # For providers that want SSL from the start (usually port 465) instead of STARTTLS (587).
+            "use_ssl": env_bool("EMAIL_USE_SSL"),
         },
     }
 }

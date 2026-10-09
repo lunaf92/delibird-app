@@ -7,8 +7,8 @@ if [ "${SKIP_MIGRATIONS:-0}" != "1" ]; then
     python manage.py migrate --noinput
 fi
 
-# In development runserver serves static files itself.
-if [ "${DJANGO_DEBUG:-false}" != "true" ]; then
+# In development runserver serves static files itself; the worker and beat don't need them.
+if [ "${DJANGO_DEBUG:-false}" != "true" ] && [ "${SKIP_MIGRATIONS:-0}" != "1" ]; then
     python manage.py collectstatic --noinput --verbosity 0
 fi
 
