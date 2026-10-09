@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
@@ -195,6 +196,7 @@ export default function SettingsScreen() {
         />
       )}
 
+      <Button variant="link" label={t('privacy.link')} onPress={() => router.push('/privacy')} />
       <ServerStatus />
     </Screen>
   );

@@ -55,6 +55,8 @@ export default function EmailScreen() {
 
       <Heading>{t('home.language')}</Heading>
       <LanguageSwitcher />
+
+      <Button variant="link" label={t('privacy.link')} onPress={() => router.push('/privacy')} />
     </Screen>
   );
 }

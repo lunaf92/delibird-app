@@ -1,17 +1,19 @@
 from collections.abc import Callable
+from datetime import timedelta
 from typing import Any
 
 import pytest
 from django.core import mail
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework.test import APIClient
 
 from accounts.models import User
 from accounts.tests.helpers import html_of
 from notifications import push
 from notifications.models import Notification, PushDevice, PushTicket
-from notifications.tasks import notify_buyers
-from sharing.models import Reservation
+from notifications.tasks import forget_sent, notify_buyers
+from sharing.models import ItemChange, Reservation
 from sharing.services import NewShare
 from wishlists.models import Item, Wishlist
 from wishlists.tests.helpers import add_item
@@ -299,3 +301,27 @@ def test_an_unreachable_push_service_does_not_stop_email(
     notify_buyers.apply()
 
     assert len(mail.outbox) == 1
+
+
+def test_sent_notifications_and_their_changes_are_forgotten_a_day_later(
+    client: APIClient, scarf: Item, bob_share: NewShare, bob_client: APIClient
+) -> None:
+    reserve(bob_client, scarf)
+    client.patch(reverse("item", args=[scarf.pk]), {"price": "45.00"}, format="json")
+    notify_buyers.apply()
+    assert ItemChange.objects.exists()
+    assert Notification.objects.exists()
+
+    forget_sent.apply()
+    assert ItemChange.objects.exists()
+    assert Notification.objects.exists()
+
+    a_day_ago = timezone.now() - timedelta(days=1, minutes=1)
+    ItemChange.objects.update(notified_at=a_day_ago)
+    Notification.objects.update(sent_at=a_day_ago)
+    client.patch(reverse("item", args=[scarf.pk]), {"price": "50.00"}, format="json")
+    forget_sent.apply()
+
+    # Only the new, not yet sent change is left.
+    assert list(ItemChange.objects.values_list("notified_at", flat=True)) == [None]
+    assert not Notification.objects.exists()

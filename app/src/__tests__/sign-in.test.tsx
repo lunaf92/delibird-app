@@ -177,3 +177,22 @@ describe('opening the magic link in the app', () => {
     expect(url).toContain('S.browser_fallback_url=%2Fsign-in%2Fverify%3Ftoken%3Da%2520b%26web%3D1;end');
   });
 });
+
+test('the privacy policy opens from sign-in without an account', async () => {
+  mockApi({});
+  const app = await renderApp('/sign-in');
+
+  await fireEvent.press(await screen.findByRole('button', { name: 'Privacy policy' }));
+
+  expect(await screen.findByText('Who runs Strena')).toBeOnTheScreen();
+  expect(screen.getAllByText(/infostrena@proton\.me/)[0]).toBeOnTheScreen();
+  expect(app.pathname()).toBe('/privacy');
+});
+
+test('the privacy policy is in the chosen language', async () => {
+  mockApi({});
+  await i18n.changeLanguage('it');
+  await renderApp('/privacy');
+
+  expect(await screen.findByText('Chi gestisce Strena')).toBeOnTheScreen();
+});

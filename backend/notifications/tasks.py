@@ -25,3 +25,9 @@ def notify_buyers() -> int:
 def check_push_receipts() -> None:
     """Run by Celery beat every 15 minutes."""
     push.check_receipts()
+
+
+@shared_task
+def forget_sent() -> int:
+    """Run by Celery beat every hour."""
+    return services.forget_sent()

@@ -62,7 +62,7 @@ function NavigationLook({ children }: PropsWithChildren) {
 }
 
 /** Signed-out people only reach the sign-in screens; everything in (app) needs a session. Share links
- * (/shared/…) open either way. */
+ * (/shared/…) and the privacy policy (/privacy) open either way. */
 function RootNavigator() {
   const { t } = useTranslation();
   const { status } = useAuth();
@@ -108,6 +108,7 @@ function RootNavigator() {
         </Stack.Protected>
         <Stack.Screen name="shared/[token]" options={{ headerShown: true, title: t('appName') }} />
         <Stack.Screen name="add" options={{ headerShown: true, title: t('add.title') }} />
+        <Stack.Screen name="privacy" options={{ headerShown: true, title: t('privacy.title') }} />
       </Stack>
     </>
   );

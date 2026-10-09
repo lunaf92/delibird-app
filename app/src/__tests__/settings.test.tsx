@@ -124,3 +124,12 @@ test('a session ended elsewhere signs this device out', async () => {
   expect(app.pathname()).toBe('/sign-in');
   expect(storedToken()).toBeUndefined();
 });
+
+test('settings link to the privacy policy', async () => {
+  const { app } = await openSettings();
+
+  await fireEvent.press(screen.getByRole('button', { name: 'Privacy policy' }));
+
+  expect(await screen.findByText('Who runs Strena')).toBeOnTheScreen();
+  expect(app.pathname()).toBe('/privacy');
+});

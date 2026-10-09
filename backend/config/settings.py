@@ -145,6 +145,10 @@ CELERY_BEAT_SCHEDULE: dict[str, dict[str, object]] = {
         "task": "notifications.tasks.check_push_receipts",
         "schedule": timedelta(minutes=15),
     },
+    "forget-sent-notifications": {
+        "task": "notifications.tasks.forget_sent",
+        "schedule": timedelta(hours=1),
+    },
 }
 
 # Push notifications go through Expo's push service, which needs no key.

@@ -210,5 +210,67 @@
       "dark": "Siempre oscuro"
     },
     "plainFont": "Usar una letra sencilla y fácil de leer"
+  },
+  "privacy": {
+    "title": "Política de privacidad",
+    "link": "Política de privacidad",
+    "updated": "Última actualización: 9 de octubre de 2026",
+    "intro": "Strena es una app de listas de deseos para familia y amigos. Esta página explica qué datos guarda sobre ti, por qué, quién más interviene y cómo pedir que se borren.",
+    "sections": [
+      {
+        "heading": "Quién gestiona Strena",
+        "body": [
+          "Strena la gestiona Federico Lunardon, un particular en el Reino Unido, que es el responsable de tus datos. Para cualquier pregunta o solicitud sobre tus datos, escribe a infostrena@proton.me."
+        ]
+      },
+      {
+        "heading": "Qué guarda Strena",
+        "body": [
+          "Tu cuenta: tu dirección de email, el nombre que muestras a los demás, tu idioma y el aspecto elegido, y la fecha en que te registraste.",
+          "Tus listas y artículos: lo que añades, como nombres, enlaces, descripciones, precios, valoraciones y fotos.",
+          "Compartir y regalos: las direcciones de email con las que compartes listas, y qué artículos se reservan como regalo. El dueño de una lista nunca ve las reservas; las demás personas con quienes se comparte la lista ven quién reservó un artículo, para que no se compre el mismo regalo dos veces.",
+          "Inicio de sesión: los códigos y enlaces de inicio de sesión se guardan solo cifrados y caducan a los 10 minutos. Cada dispositivo en el que inicias sesión se recuerda con un nombre (como el modelo del teléfono) hasta que cierras la sesión en él. La app guarda tu sesión en el almacenamiento seguro del teléfono; la web la guarda en el almacenamiento del navegador. Strena no usa cookies.",
+          "Notificaciones: si las permites, la dirección de notificaciones push de tu teléfono. Cuando cambia un artículo que reservaste, se guarda una breve nota del cambio hasta que se te ha avisado, y se borra un día después.",
+          "Registros del servidor: el servidor web anota la dirección IP, la hora y la página de cada petición, para mantener el servicio funcionando y seguro. Los registros se borran a los 14 días."
+        ]
+      },
+      {
+        "heading": "Para qué se usan",
+        "body": [
+          "Solo para que Strena funcione para ti: para iniciar tu sesión, mostrar tus listas a las personas con quienes las compartes, y enviarte códigos de inicio de sesión y notificaciones. No hay publicidad, ni estadísticas ni seguimiento, y tus datos nunca se venden ni se usan para crear perfiles.",
+          "Según la ley británica de protección de datos, este tratamiento es necesario para prestarte el servicio que pediste y, en el caso de los registros del servidor, responde al interés legítimo de mantenerlo seguro."
+        ]
+      },
+      {
+        "heading": "Quién más los trata",
+        "body": [
+          "Mailjet (en la UE) envía los emails de Strena, así que recibe tu dirección de email y el mensaje.",
+          "Si permites las notificaciones push, las entregan Expo (en EE. UU.) y Firebase Cloud Messaging de Google, que reciben la dirección push de tu teléfono y el texto de la notificación.",
+          "Cuando añades un artículo desde un enlace, el servidor de Strena visita esa página para rellenar los datos. La tienda ve la dirección del servidor, no la tuya.",
+          "Nadie más recibe tus datos."
+        ]
+      },
+      {
+        "heading": "Dónde se guardan, y durante cuánto tiempo",
+        "body": [
+          "Tus datos se guardan en el servidor de Strena en el Reino Unido, hasta que los borras tú o borras tu cuenta. Las copias de seguridad se guardan hasta 14 días.",
+          "Borrar tu cuenta (en Ajustes) elimina al momento tu cuenta, listas, artículos, fotos, listas compartidas, reservas y dispositivos conectados. Las copias de seguridad desaparecen en 14 días."
+        ]
+      },
+      {
+        "heading": "Tus derechos",
+        "body": [
+          "Puedes pedir una copia de tus datos, corregirlos o borrarlos, u oponerte a su uso, escribiendo a infostrena@proton.me. También puedes presentar una reclamación ante la Information Commissioner's Office (ico.org.uk) o la autoridad de protección de datos del país donde vives (en España, la Agencia Española de Protección de Datos)."
+        ]
+      },
+      {
+        "heading": "Menores",
+        "body": ["Strena no está pensada para menores de 13 años."]
+      },
+      {
+        "heading": "Cambios",
+        "body": ["Si esta política cambia, esta página se actualiza junto con la fecha de arriba."]
+      }
+    ]
   }
 }

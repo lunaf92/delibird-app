@@ -210,5 +210,67 @@
       "dark": "Always dark"
     },
     "plainFont": "Use a plain, easy-to-read font"
+  },
+  "privacy": {
+    "title": "Privacy policy",
+    "link": "Privacy policy",
+    "updated": "Last updated: 9 October 2026",
+    "intro": "Strena is a wishlist app for family and friends. This page explains what it stores about you, why, who else is involved, and how to have it deleted.",
+    "sections": [
+      {
+        "heading": "Who runs Strena",
+        "body": [
+          "Strena is run by Federico Lunardon, a private individual in the United Kingdom, who is responsible for your data. For any question or request about your data, write to infostrena@proton.me."
+        ]
+      },
+      {
+        "heading": "What Strena stores",
+        "body": [
+          "Your account: your email address, the name you show to others, your language and look settings, and when you joined.",
+          "Your lists and items: what you add to them, such as names, links, descriptions, prices, ratings and pictures.",
+          "Sharing and gifts: the email addresses you share lists with, and which items people reserve as gifts. The owner of a list never sees reservations; other people the list is shared with see who reserved an item, so the same gift isn't bought twice.",
+          "Signing in: sign-in codes and links are stored only in scrambled form and expire after 10 minutes. Each device you sign in on is remembered with a name (such as the phone's model) until you sign out of it. The app keeps your sign-in in the phone's secure storage; the website keeps it in your browser's storage. Strena uses no cookies.",
+          "Notifications: if you allow them, your phone's push notification address. When an item you reserved changes, a short note of the change is kept until you have been told, and deleted a day later.",
+          "Server logs: the web server records the IP address, the time and the page of each request, to keep the service running and secure. Logs are deleted after 14 days."
+        ]
+      },
+      {
+        "heading": "How it is used",
+        "body": [
+          "Only to run Strena for you: to sign you in, show your lists to the people you share them with, and send you sign-in codes and notifications. There are no ads, no analytics or tracking, and your data is never sold or used for profiling.",
+          "Under UK data protection law, this processing is necessary to provide the service you asked for, and, for the server logs, in the legitimate interest of keeping it secure."
+        ]
+      },
+      {
+        "heading": "Who else handles it",
+        "body": [
+          "Mailjet (in the EU) sends Strena's emails, so it receives your email address and the message.",
+          "If you allow push notifications, Expo (in the US) and Google's Firebase Cloud Messaging deliver them, so they receive your phone's push address and the notification text.",
+          "When you add an item from a link, the Strena server visits that page to fill in the details. The shop sees the server's address, not yours.",
+          "Nobody else receives your data."
+        ]
+      },
+      {
+        "heading": "Where it is kept, and for how long",
+        "body": [
+          "Your data is kept on Strena's server in the United Kingdom, until you delete it or your account. Backup copies are kept for up to 14 days.",
+          "Deleting your account (in Settings) removes your account, lists, items, pictures, shares, reservations and signed-in devices straight away. Backup copies disappear within 14 days."
+        ]
+      },
+      {
+        "heading": "Your rights",
+        "body": [
+          "You can ask for a copy of your data, have it corrected or deleted, or object to how it is used, by writing to infostrena@proton.me. You can also complain to the Information Commissioner's Office (ico.org.uk) or the data protection authority where you live."
+        ]
+      },
+      {
+        "heading": "Children",
+        "body": ["Strena is not meant for children under 13."]
+      },
+      {
+        "heading": "Changes",
+        "body": ["If this policy changes, this page is updated and the date at the top changes with it."]
+      }
+    ]
   }
 }

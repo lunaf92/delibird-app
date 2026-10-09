@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.core.mail import EmailMultiAlternatives
 from django.db import transaction
 from django.utils import timezone
@@ -105,3 +107,12 @@ def remove_orphaned_reservations() -> int:
     """Reservations of items deleted without a record (for example with the owner's account)."""
     deleted, _ = Reservation.objects.exclude(item_id__in=Item.objects.values("pk")).delete()
     return deleted
+
+
+def forget_sent(after: timedelta = timedelta(days=1)) -> int:
+    """Deletes item changes and notifications a day after they were sent: they hold item, list and owner
+    names, and nothing reads them once delivered."""
+    cutoff = timezone.now() - after
+    changes, _ = ItemChange.objects.filter(notified_at__lt=cutoff).delete()
+    notifications, _ = Notification.objects.filter(sent_at__lt=cutoff).delete()
+    return changes + notifications
