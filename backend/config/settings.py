@@ -41,6 +41,10 @@ if not DEBUG:
 ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1")
 CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS")
 CORS_ALLOWED_ORIGINS = env_list("DJANGO_CORS_ALLOWED_ORIGINS")
+# Behind an HTTPS proxy (the server's nginx, then Caddy) requests reach Django as plain HTTP. Caddy passes on
+# the X-Forwarded-Proto header the outer proxy set, so trust it: picture links then start with https and the
+# browser doesn't block them on an HTTPS page.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 INSTALLED_APPS = [
     "django.contrib.admin",

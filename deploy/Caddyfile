@@ -5,6 +5,12 @@
 	# the domain name: Caddy then fetches a certificate and serves HTTPS by itself.
 	auto_https off
 	admin off
+	# When an HTTPS proxy on the same machine (such as nginx with a certbot certificate) sits in front, keep
+	# the X-Forwarded-Proto it sends instead of overwriting it with "http". Only proxies on private
+	# addresses are trusted.
+	servers {
+		trusted_proxies static private_ranges
+	}
 }
 
 :80 {

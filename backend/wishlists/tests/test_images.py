@@ -51,6 +51,19 @@ def test_upload_is_resized_and_stored_as_jpeg(client: APIClient, item: Item, med
         assert saved.size == (1600, 800)
 
 
+def test_picture_link_is_https_behind_https_proxy(client: APIClient, item: Item, media_root: Path) -> None:
+    response = client.put(
+        reverse("item-image", args=[item.pk]),
+        {"image": picture(size=(400, 300))},
+        format="multipart",
+        HTTP_HOST="testserver",
+        HTTP_X_FORWARDED_PROTO="https",
+    )
+
+    assert response.status_code == 200
+    assert str(response.json()["image"]).startswith("https://testserver/media/items/")
+
+
 def test_metadata_is_removed(client: APIClient, item: Item, media_root: Path) -> None:
     upload(client, item, picture(size=(400, 300), fmt="JPEG", mode="RGB"))
 
