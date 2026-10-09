@@ -6,6 +6,7 @@ import { deleteMe, endSession, fetchSessions, updateMe, type Session, type UserU
 import { errorMessage, isUnauthorized } from '@/api/errors';
 import { useSignedIn } from '@/auth/context';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { LookSettingsSection } from '@/components/look-settings';
 import { ServerStatus } from '@/components/server-status';
 import { pushAvailability, savedPushToken, turnOnPush } from '@/notifications/push';
 import { Body, Button, Card, Heading, Message, Screen, TextField } from '@/components/ui';
@@ -127,6 +128,8 @@ export default function SettingsScreen() {
       <Heading>{t('home.language')}</Heading>
       <LanguageSwitcher onChange={changeLanguage} disabled={saving !== null} />
       {profileMessage && <Message tone={profileMessage.tone}>{profileMessage.text}</Message>}
+
+      <LookSettingsSection />
 
       <PushSettings />
 

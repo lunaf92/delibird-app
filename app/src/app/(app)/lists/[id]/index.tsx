@@ -1,4 +1,3 @@
-import { Image } from 'expo-image';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +9,7 @@ import { useApi, useResource } from '@/api/use-api';
 import { MoveButtons, moved } from '@/components/move-buttons';
 import { formatPrice } from '@/components/price';
 import { Stars } from '@/components/rating';
+import { Thumb } from '@/components/thumb';
 import { Body, Button, Card, Heading, Message, Screen, TextField, Title } from '@/components/ui';
 
 /** One list: its items in order, and the list's own settings. */
@@ -185,18 +185,14 @@ function ItemRow({
   const [confirming, setConfirming] = useState(false);
   const price = formatPrice(item.price, item.currency, language);
   return (
-    <Card>
+    <Card flip={index % 2 === 1}>
       <View style={styles.row}>
         <Pressable
           accessibilityRole="link"
           accessibilityLabel={item.name}
           style={[styles.row, styles.grow]}
           onPress={() => router.push({ pathname: '/items/[id]', params: { id: String(item.id) } })}>
-          {item.image ? (
-            <Image source={{ uri: item.image }} style={styles.thumb} contentFit="cover" />
-          ) : (
-            <View style={[styles.thumb, styles.noThumb]} />
-          )}
+          <Thumb uri={item.image} seed={item.id} size={64} />
           <View style={styles.grow}>
             <Body>{item.name}</Body>
             {price && <Body muted>{price}</Body>}
@@ -228,7 +224,5 @@ function ItemRow({
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, flexWrap: 'wrap' },
-  grow: { flex: 1, gap: 2 },
-  thumb: { width: 56, height: 56, borderRadius: 8 },
-  noThumb: { backgroundColor: '#E6EAF0' },
+  grow: { flex: 1, gap: 2, minHeight: 44 },
 });

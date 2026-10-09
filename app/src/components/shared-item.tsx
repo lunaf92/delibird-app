@@ -1,4 +1,3 @@
-import { Image } from 'expo-image';
 import type { PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Linking, StyleSheet, View } from 'react-native';
@@ -7,6 +6,7 @@ import type { SharedItem } from '@/api/client';
 
 import { formatPrice } from './price';
 import { Stars } from './rating';
+import { Thumb } from './thumb';
 import { Body, Button, Card } from './ui';
 
 /** An item as someone the list is shared with sees it. `children` holds any reservation controls. */
@@ -14,13 +14,9 @@ export function SharedItemCard({ item, children }: PropsWithChildren<{ item: Sha
   const { t, i18n } = useTranslation();
   const price = formatPrice(item.price, item.currency, i18n.language);
   return (
-    <Card>
+    <Card flip={item.id % 2 === 1}>
       <View style={styles.row}>
-        {item.image ? (
-          <Image source={{ uri: item.image }} style={styles.thumb} contentFit="cover" />
-        ) : (
-          <View style={[styles.thumb, styles.noThumb]} />
-        )}
+        <Thumb uri={item.image} seed={item.id} />
         <View style={styles.grow}>
           <Body>{item.name}</Body>
           {price && <Body muted>{price}</Body>}
@@ -37,8 +33,6 @@ export function SharedItemCard({ item, children }: PropsWithChildren<{ item: Sha
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   grow: { flex: 1, gap: 2 },
-  thumb: { width: 64, height: 64, borderRadius: 8 },
-  noThumb: { backgroundColor: '#E6EAF0' },
 });

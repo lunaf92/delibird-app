@@ -1,5 +1,8 @@
 import '@/i18n';
 
+import { PatrickHand_400Regular } from '@expo-google-fonts/patrick-hand';
+import { PermanentMarker_400Regular } from '@expo-google-fonts/permanent-marker';
+import { useFonts } from 'expo-font';
 import {
   DarkTheme,
   DefaultTheme,
@@ -9,30 +12,53 @@ import {
   ThemeProvider,
   usePathname,
 } from 'expo-router';
-import { useEffect } from 'react';
+import { useEffect, type PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Platform, useColorScheme } from 'react-native';
+import { Platform } from 'react-native';
 
 import { AuthProvider, useAuth } from '@/auth/context';
 import { takeReturnTo } from '@/auth/storage';
 import { notificationPath } from '@/notifications/push';
 import { SharedLinkProvider, useSharedLink } from '@/share/shared-link';
+import { LookProvider, useLook } from '@/theme/context';
 import * as Notifications from 'expo-notifications';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <SharedLinkProvider>
-        <AuthProvider>
-          <RootNavigator />
-        </AuthProvider>
-      </SharedLinkProvider>
-    </ThemeProvider>
+    <SharedLinkProvider>
+      <AuthProvider>
+        <LookProvider>
+          <NavigationLook>
+            <RootNavigator />
+          </NavigationLook>
+        </LookProvider>
+      </AuthProvider>
+    </SharedLinkProvider>
   );
+}
+
+/** Header bars and screen backgrounds follow the chosen look. */
+function NavigationLook({ children }: PropsWithChildren) {
+  const { colors, dark, fonts } = useLook();
+  const base = dark ? DarkTheme : DefaultTheme;
+  const theme = {
+    ...base,
+    dark,
+    colors: {
+      primary: colors.ink,
+      background: colors.bg,
+      card: colors.bg,
+      text: colors.ink,
+      border: colors.ink,
+      notification: colors.accent,
+    },
+    fonts: fonts.heading
+      ? { ...base.fonts, bold: { fontFamily: fonts.heading, fontWeight: '400' as const } }
+      : base.fonts,
+  };
+  return <ThemeProvider value={theme}>{children}</ThemeProvider>;
 }
 
 /** Signed-out people only reach the sign-in screens; everything in (app) needs a session. Share links
@@ -41,11 +67,14 @@ function RootNavigator() {
   const { t } = useTranslation();
   const { status } = useAuth();
   const signedIn = status === 'signedIn';
+  // The handwriting fonts. If they fail to load, the system font is used instead.
+  const [fontsLoaded, fontError] = useFonts({ PermanentMarker_400Regular, PatrickHand_400Regular });
+  const ready = status !== 'loading' && (fontsLoaded || !!fontError);
 
-  // Keep the splash screen up until we know whether a saved session exists.
+  // Keep the splash screen up until we know whether a saved session exists, and the fonts are in.
   useEffect(() => {
-    if (status !== 'loading') SplashScreen.hide();
-  }, [status]);
+    if (ready) SplashScreen.hide();
+  }, [ready]);
 
   // After signing in, go back to where sign-in was asked for, such as a share link.
   useEffect(() => {
@@ -64,7 +93,7 @@ function RootNavigator() {
 
   // Mounting the navigator only once the session is known keeps deep links (such as /settings) intact,
   // instead of redirecting them to sign-in while the saved session is still loading.
-  if (status === 'loading') return null;
+  if (!ready) return null;
 
   return (
     <>
