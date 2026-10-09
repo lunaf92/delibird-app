@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { screen, waitFor } from 'expo-router/testing-library';
 
 import { redirectSystemPath } from '@/app/+native-intent';
+import { clearSharedLink } from '@/share/shared-link.native';
 import { SHARE_GRACE_MS } from '@/app/add';
 import i18n from '@/i18n';
 import { ANN, callsTo, DEFAULT_LIST, mockApi } from '@/test-utils/api';
@@ -41,6 +42,7 @@ const shareState = (ShareIntent as unknown as { __state: { shareIntent: unknown;
 beforeEach(async () => {
   storeToken('my-token');
   shareState.shareIntent = null;
+  clearSharedLink();
   fonts.loaded = false;
   await i18n.changeLanguage('en');
 });

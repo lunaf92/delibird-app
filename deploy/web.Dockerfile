@@ -2,6 +2,8 @@
 FROM node:22-slim AS build
 WORKDIR /app
 COPY app/package.json app/package-lock.json ./
+# npm ci applies these fixes to dependencies (patch-package).
+COPY app/patches ./patches
 RUN npm ci
 COPY app/ ./
 # Where the app finds the API. On the home server that is the same address as the app itself.

@@ -11,9 +11,10 @@ import {
   Stack,
   ThemeProvider,
   usePathname,
-  useNavigationContainerRef,
 } from 'expo-router';
-import { useEffect, useState, type PropsWithChildren } from 'react';
+// The navigator expo-router checks before navigating; not exported publicly.
+import { store } from 'expo-router/build/global-state/store';
+import { useEffect, type PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform } from 'react-native';
 
@@ -72,9 +73,6 @@ function RootNavigator() {
   const [fontsLoaded, fontError] = useFonts({ PermanentMarker_400Regular, PatrickHand_400Regular });
   const ready = status !== 'loading' && (fontsLoaded || !!fontError);
 
-  // Navigating before the navigator below is mounted throws (and closes the app), so wait for it.
-  const navigationReady = useNavigatorReady(ready);
-
   // Keep the splash screen up until we know whether a saved session exists, and the fonts are in.
   useEffect(() => {
     if (ready) SplashScreen.hide();
@@ -82,19 +80,21 @@ function RootNavigator() {
 
   // After signing in, go back to where sign-in was asked for, such as a share link.
   useEffect(() => {
-    if (!signedIn || !navigationReady) return;
+    if (!signedIn || !ready) return;
     const path = takeReturnTo();
-    if (path?.startsWith('/') && !path.startsWith('//')) router.replace(path as never);
-  }, [signedIn, navigationReady]);
+    if (path?.startsWith('/') && !path.startsWith('//')) {
+      return whenNavigatorReady(() => router.replace(path as never));
+    }
+  }, [signedIn, ready]);
 
   // A link shared from another app's share sheet (Android) opens /add, which starts a new item from it.
   // This also covers shares arriving while the app is already open. A share often arrives while the app is
-  // still starting (fonts loading), so it waits for the navigator.
+  // still starting, so it waits for the navigator.
   const shared = useSharedLink();
   const pathname = usePathname();
   useEffect(() => {
-    if (shared.link && navigationReady && pathname !== '/add') router.push('/add');
-  }, [pathname, shared.link, navigationReady]);
+    if (shared.link && ready && pathname !== '/add') return whenNavigatorReady(() => router.push('/add'));
+  }, [pathname, shared.link, ready]);
 
   // Mounting the navigator only once the session is known keeps deep links (such as /settings) intact,
   // instead of redirecting them to sign-in while the saved session is still loading.
@@ -120,23 +120,19 @@ function RootNavigator() {
 }
 
 /**
- * True once the navigator is mounted and can be navigated, which is what expo-router checks before any
- * navigation. That happens a frame or so after it first renders, so this looks again each frame until then.
+ * Runs `go` as soon as expo-router can navigate: navigating earlier throws ("Attempted to navigate before
+ * mounting the Root Layout") and closes the app. Its navigator becomes ready a few frames after the first
+ * render, so this asks again each frame. The check is on expo-router's own navigator, the one it asserts
+ * on; the container handed to the navigation queue can report ready sooner. Returns a way to cancel.
  */
-function useNavigatorReady(rendered: boolean): boolean {
-  const navigation = useNavigationContainerRef();
-  const [isReady, setIsReady] = useState(false);
-  useEffect(() => {
-    if (!rendered || isReady) return;
-    let frame = 0;
-    const check = () => {
-      if (navigation.isReady()) setIsReady(true);
-      else frame = requestAnimationFrame(check);
-    };
-    check();
-    return () => cancelAnimationFrame(frame);
-  }, [rendered, isReady, navigation]);
-  return isReady;
+function whenNavigatorReady(go: () => void): () => void {
+  let frame = 0;
+  const attempt = () => {
+    if (store.navigationRef.isReady()) go();
+    else frame = requestAnimationFrame(attempt);
+  };
+  attempt();
+  return () => cancelAnimationFrame(frame);
 }
 
 /** Tapping a notification opens the list it is about. */

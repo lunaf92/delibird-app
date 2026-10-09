@@ -6,7 +6,7 @@ import { ActivityIndicator } from 'react-native';
 import { fetchLists } from '@/api/client';
 import { errorMessage, isUnauthorized } from '@/api/errors';
 import { firstLink } from '@/api/links';
-import { useSharedLink } from '@/share/shared-link';
+import { askForShare, useSharedLink } from '@/share/shared-link';
 import { useAuth } from '@/auth/context';
 import { rememberReturnTo } from '@/auth/storage';
 import { Body, Message, Screen, Title } from '@/components/ui';
@@ -34,6 +34,13 @@ export default function AddFromLinkScreen() {
     return () => clearTimeout(timer);
   }, []);
   const noLink = !link && waited;
+  // A share can be waiting in the app without having reached this screen yet (see askForShare).
+  useEffect(() => {
+    if (link) return;
+    askForShare();
+    const timer = setInterval(askForShare, 250);
+    return () => clearInterval(timer);
+  }, [link]);
 
   useEffect(() => {
     if (!link) return;

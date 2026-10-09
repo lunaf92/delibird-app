@@ -10,3 +10,6 @@ export type SharedLink = { link: string | null; text: string | null; done: () =>
 export function useSharedLink(): SharedLink {
   return { link: null, text: null, done: () => undefined };
 }
+
+/** Nothing to ask for on the web. */
+export function askForShare() {}

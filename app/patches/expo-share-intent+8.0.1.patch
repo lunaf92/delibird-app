@@ -1,0 +1,22 @@
+diff --git a/node_modules/expo-share-intent/android/src/main/java/expo/modules/shareintent/ExpoShareIntentModule.kt b/node_modules/expo-share-intent/android/src/main/java/expo/modules/shareintent/ExpoShareIntentModule.kt
+index ff5b100..7c0f685 100644
+--- a/node_modules/expo-share-intent/android/src/main/java/expo/modules/shareintent/ExpoShareIntentModule.kt
++++ b/node_modules/expo-share-intent/android/src/main/java/expo/modules/shareintent/ExpoShareIntentModule.kt
+@@ -112,15 +112,8 @@ class ExpoShareIntentModule : Module() {
+         }
+ 
+         fun handleShareIntent(intent: Intent) {
+-            val activity = instance?.currentActivity
+-            if (activity != null && !activity.isTaskRoot) {
+-                val newIntent = Intent(intent).apply {
+-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+-                }
+-                activity.startActivity(newIntent)
+-                activity.finish()
+-                return
+-            }
++            // Strena: no restart in a task of its own when opened inside another app's task (Amazon's, on some
++            // phones). The restart briefly ran two copies of the app, and the share reached the wrong one.
+             if (intent.type == null) return
+             if (intent.type!!.startsWith("text/plain")) {
+                 // text / urls
