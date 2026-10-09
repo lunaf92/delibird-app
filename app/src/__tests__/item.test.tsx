@@ -1,3 +1,4 @@
+import { File } from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 import { fireEvent, screen, waitFor } from 'expo-router/testing-library';
 
@@ -113,6 +114,12 @@ test('a picture is uploaded after the item is saved', async () => {
   const upload = callsTo(calls, 'PUT', 'items/105/image/')[0];
   expect(upload.body).toBeInstanceOf(FormData);
   expect(upload.headers['Content-Type']).toBeUndefined();
+  // On a phone the picture goes in as a File (a Blob Expo's fetch can send), not as a { uri, name, type }
+  // object, which Expo's fetch fails on before sending anything.
+  const part = (upload.body as FormData).get('image') as Blob & { name?: string };
+  expect(part).toBeInstanceOf(Blob);
+  expect(part.name).toBe('scarf.jpg');
+  expect((File as unknown as { created: string[] }).created).toContain('file:///photos/scarf.jpg');
 });
 
 test('editing an item, choosing its lists and removing its picture', async () => {
