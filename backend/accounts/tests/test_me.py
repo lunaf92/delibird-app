@@ -24,7 +24,47 @@ def test_get_profile(client: APIClient, ann: User) -> None:
         "email": "ann@example.com",
         "display_name": "Ann",
         "language": "en",
+        "theme": "ink",
+        "dark_mode": "follow",
+        "plain_font": False,
     }
+
+
+def test_the_look_is_saved_on_the_account(client: APIClient, ann: User) -> None:
+    response = client.patch(
+        reverse("me"), {"theme": "chalk", "dark_mode": "dark", "plain_font": True}, format="json"
+    )
+
+    assert response.status_code == 200
+    assert {k: response.json()[k] for k in ("theme", "dark_mode", "plain_font")} == {
+        "theme": "chalk",
+        "dark_mode": "dark",
+        "plain_font": True,
+    }
+    ann.refresh_from_db()
+    assert (ann.theme, ann.dark_mode, ann.plain_font) == ("chalk", "dark", True)
+
+
+@pytest.mark.parametrize("change", [{"theme": "neon"}, {"dark_mode": "sometimes"}, {"plain_font": "maybe"}])
+def test_unknown_looks_are_refused(client: APIClient, ann: User, change: dict[str, str]) -> None:
+    response = client.patch(reverse("me"), change, format="json")
+
+    assert response.status_code == 400
+    ann.refresh_from_db()
+    assert (ann.theme, ann.dark_mode, ann.plain_font) == ("ink", "follow", False)
+
+
+def test_the_look_is_only_for_the_account_itself(ann: User) -> None:
+    """Nobody else's requests can read or change it: /me/ is always the signed-in person."""
+    bob = User.objects.create_user("bob@example.com", theme="sky")
+    bob_client = APIClient()
+    sign_in_as(bob_client, bob)
+
+    bob_client.patch(reverse("me"), {"theme": "meadow"}, format="json")
+
+    ann.refresh_from_db()
+    assert ann.theme == "ink"
+    assert APIClient().get(reverse("me")).status_code == 401
 
 
 def test_update_display_name_and_language(client: APIClient, ann: User) -> None:

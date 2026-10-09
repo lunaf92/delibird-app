@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: delibird\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-08 08:23+0000\n"
+"POT-Creation-Date: 2026-10-09 08:13+0000\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -38,35 +38,79 @@ msgstr "Italiano"
 msgid "Spanish"
 msgstr "Spagnolo"
 
-#: accounts/models.py:42
+#: accounts/models.py:27
+msgid "Black ink"
+msgstr "Inchiostro nero"
+
+#: accounts/models.py:28
+msgid "Paper and red marker"
+msgstr "Carta e pennarello rosso"
+
+#: accounts/models.py:29
+msgid "Chalkboard"
+msgstr "Lavagna"
+
+#: accounts/models.py:30
+msgid "Light blue"
+msgstr "Azzurro"
+
+#: accounts/models.py:31
+msgid "Green"
+msgstr "Verde"
+
+#: accounts/models.py:35
+msgid "Follow my phone"
+msgstr "Come il telefono"
+
+#: accounts/models.py:36
+msgid "Always light"
+msgstr "Sempre chiaro"
+
+#: accounts/models.py:37
+msgid "Always dark"
+msgstr "Sempre scuro"
+
+#: accounts/models.py:58
 msgid "email"
 msgstr "email"
 
-#: accounts/models.py:43
+#: accounts/models.py:59
 msgid "display name"
 msgstr "nome visualizzato"
 
-#: accounts/models.py:44
+#: accounts/models.py:60
 msgid "language"
 msgstr "lingua"
 
-#: accounts/models.py:45
+#: accounts/models.py:62
+msgid "look"
+msgstr "aspetto"
+
+#: accounts/models.py:63
+msgid "dark mode"
+msgstr "modalità scura"
+
+#: accounts/models.py:64
+msgid "plain font"
+msgstr "carattere semplice"
+
+#: accounts/models.py:65
 msgid "staff status"
 msgstr "stato staff"
 
-#: accounts/models.py:46
+#: accounts/models.py:66
 msgid "active"
 msgstr "attivo"
 
-#: accounts/models.py:47
+#: accounts/models.py:67
 msgid "date joined"
 msgstr "data di iscrizione"
 
-#: accounts/models.py:56
+#: accounts/models.py:76
 msgid "user"
 msgstr "utente"
 
-#: accounts/models.py:57
+#: accounts/models.py:77
 msgid "users"
 msgstr "utenti"
 
@@ -133,17 +177,19 @@ msgstr ""
 msgid "That code is wrong or has expired."
 msgstr "Il codice è sbagliato o è scaduto."
 
-#: autofill/views.py:54
+#: autofill/views.py:61
 msgid "Too many links at once. Wait a few minutes."
 msgstr "Troppi link tutti insieme. Aspetta qualche minuto."
 
-#: autofill/views.py:64
+#: autofill/views.py:71
 msgid "This link can't be read: it isn't a public web address."
 msgstr "Questo link non si può leggere: non è un indirizzo web pubblico."
 
-#: autofill/views.py:111
+#: autofill/views.py:129
 msgid "That picture couldn't be downloaded. Add one from your device."
-msgstr "Non è stato possibile scaricare l'immagine. Aggiungine una dal tuo dispositivo."
+msgstr ""
+"Non è stato possibile scaricare l'immagine. Aggiungine una dal tuo "
+"dispositivo."
 
 #: core/views.py:41
 msgid "The server is running."

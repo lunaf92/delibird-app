@@ -21,6 +21,22 @@ class Language(models.TextChoices):
     SPANISH = "es", _("Spanish")
 
 
+class Look(models.TextChoices):
+    """The app's hand-drawn colour schemes."""
+
+    INK = "ink", _("Black ink")
+    PAPER = "paper", _("Paper and red marker")
+    CHALK = "chalk", _("Chalkboard")
+    SKY = "sky", _("Light blue")
+    MEADOW = "meadow", _("Green")
+
+
+class DarkMode(models.TextChoices):
+    FOLLOW = "follow", _("Follow my phone")
+    LIGHT = "light", _("Always light")
+    DARK = "dark", _("Always dark")
+
+
 class UserManager(BaseUserManager["User"]):
     def create_user(self, email: str, **extra_fields: Any) -> User:
         user = self.model(email=normalize_email(email), **extra_fields)
@@ -42,6 +58,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(_("email"), unique=True)
     display_name = models.CharField(_("display name"), max_length=100, blank=True)
     language = models.CharField(_("language"), max_length=2, choices=Language, default=Language.ENGLISH)
+    # How the app looks, kept on the account so it follows the person to every device.
+    theme = models.CharField(_("look"), max_length=10, choices=Look, default=Look.INK)
+    dark_mode = models.CharField(_("dark mode"), max_length=10, choices=DarkMode, default=DarkMode.FOLLOW)
+    plain_font = models.BooleanField(_("plain font"), default=False)
     is_staff = models.BooleanField(_("staff status"), default=False)
     is_active = models.BooleanField(_("active"), default=True)
     date_joined = models.DateTimeField(_("date joined"), default=timezone.now)

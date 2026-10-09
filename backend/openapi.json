@@ -1506,6 +1506,15 @@
                     "url"
                 ]
             },
+            "DarkModeEnum": {
+                "enum": [
+                    "follow",
+                    "light",
+                    "dark"
+                ],
+                "type": "string",
+                "description": "* `follow` - Follow my phone\n* `light` - Always light\n* `dark` - Always dark"
+            },
             "Detail": {
                 "type": "object",
                 "properties": {
@@ -1876,6 +1885,20 @@
                     },
                     "language": {
                         "$ref": "#/components/schemas/LanguageEnum"
+                    },
+                    "theme": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ThemeEnum"
+                            }
+                        ],
+                        "title": "Look"
+                    },
+                    "dark_mode": {
+                        "$ref": "#/components/schemas/DarkModeEnum"
+                    },
+                    "plain_font": {
+                        "type": "boolean"
                     }
                 }
             },
@@ -2162,6 +2185,17 @@
                     "user"
                 ]
             },
+            "ThemeEnum": {
+                "enum": [
+                    "ink",
+                    "paper",
+                    "chalk",
+                    "sky",
+                    "meadow"
+                ],
+                "type": "string",
+                "description": "* `ink` - Black ink\n* `paper` - Paper and red marker\n* `chalk` - Chalkboard\n* `sky` - Light blue\n* `meadow` - Green"
+            },
             "User": {
                 "type": "object",
                 "properties": {
@@ -2180,13 +2214,30 @@
                     },
                     "language": {
                         "$ref": "#/components/schemas/LanguageEnum"
+                    },
+                    "theme": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/ThemeEnum"
+                            }
+                        ],
+                        "title": "Look"
+                    },
+                    "dark_mode": {
+                        "$ref": "#/components/schemas/DarkModeEnum"
+                    },
+                    "plain_font": {
+                        "type": "boolean"
                     }
                 },
                 "required": [
+                    "dark_mode",
                     "display_name",
                     "email",
                     "id",
-                    "language"
+                    "language",
+                    "plain_font",
+                    "theme"
                 ]
             },
             "VerifyRequest": {
