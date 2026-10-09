@@ -48,3 +48,14 @@ jest.mock('expo-share-intent', () => {
     getShareExtensionKey: () => 'delibirdShareKey',
   };
 });
+
+// Local files on a phone: a stand-in File (a Blob, as the real one is) that remembers which path it was made from.
+jest.mock('expo-file-system', () => {
+  const created: string[] = [];
+  function LocalFile(uri: string) {
+    created.push(uri);
+    return new Blob(['picture']);
+  }
+  LocalFile.created = created;
+  return { File: LocalFile };
+});

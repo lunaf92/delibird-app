@@ -1,3 +1,4 @@
+import { File } from 'expo-file-system';
 import type { components } from './schema';
 
 /**
@@ -177,8 +178,12 @@ export function uploadItemImage(
 ): Promise<Item> {
   const form = new FormData();
   if (image.file) form.append('image', image.file, image.name);
-  // React Native's FormData takes a { uri, name, type } object for local files.
-  else form.append('image', { uri: image.uri, name: image.name, type: image.type } as unknown as Blob);
+  else {
+    // Expo replaces the global fetch, and that fetch can't send React Native's { uri, name, type } form
+    // parts (it fails before anything is sent, which looked like an unreachable server). A File from
+    // expo-file-system is a Blob it can read and send.
+    form.append('image', new File(image.uri) as unknown as Blob, image.name);
+  }
   return request(`items/${id}/image/`, { method: 'PUT', body: form, token, language });
 }
 
