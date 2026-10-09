@@ -11,6 +11,7 @@ import {
   Stack,
   ThemeProvider,
   usePathname,
+  useRootNavigationState,
 } from 'expo-router';
 import { useEffect, type PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -71,6 +72,10 @@ function RootNavigator() {
   const [fontsLoaded, fontError] = useFonts({ PermanentMarker_400Regular, PatrickHand_400Regular });
   const ready = status !== 'loading' && (fontsLoaded || !!fontError);
 
+  // Navigating before the navigator below is mounted throws (and closes the app), so wait for it.
+  const navigationKey = useRootNavigationState()?.key;
+  const navigationReady = ready && Boolean(navigationKey);
+
   // Keep the splash screen up until we know whether a saved session exists, and the fonts are in.
   useEffect(() => {
     if (ready) SplashScreen.hide();
@@ -78,18 +83,19 @@ function RootNavigator() {
 
   // After signing in, go back to where sign-in was asked for, such as a share link.
   useEffect(() => {
-    if (!signedIn) return;
+    if (!signedIn || !navigationReady) return;
     const path = takeReturnTo();
     if (path?.startsWith('/') && !path.startsWith('//')) router.replace(path as never);
-  }, [signedIn]);
+  }, [signedIn, navigationReady]);
 
   // A link shared from another app's share sheet (Android) opens /add, which starts a new item from it.
-  // This also covers shares arriving while the app is already open.
+  // This also covers shares arriving while the app is already open. A share often arrives while the app is
+  // still starting (fonts loading), so it waits for the navigator.
   const shared = useSharedLink();
   const pathname = usePathname();
   useEffect(() => {
-    if (shared.link && status !== 'loading' && pathname !== '/add') router.push('/add');
-  }, [pathname, shared.link, status]);
+    if (shared.link && navigationReady && pathname !== '/add') router.push('/add');
+  }, [pathname, shared.link, navigationReady]);
 
   // Mounting the navigator only once the session is known keeps deep links (such as /settings) intact,
   // instead of redirecting them to sign-in while the saved session is still loading.

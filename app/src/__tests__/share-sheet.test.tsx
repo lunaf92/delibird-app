@@ -1,5 +1,6 @@
 import * as ShareIntent from 'expo-share-intent';
-import { screen } from 'expo-router/testing-library';
+import { router } from 'expo-router';
+import { screen, waitFor } from 'expo-router/testing-library';
 
 import { redirectSystemPath } from '@/app/+native-intent';
 import { SHARE_GRACE_MS } from '@/app/add';
@@ -8,12 +9,35 @@ import { ANN, callsTo, DEFAULT_LIST, mockApi } from '@/test-utils/api';
 import { renderApp } from '@/test-utils/render';
 import { storeToken } from '@/test-utils/storage';
 
+// The handwriting fonts load a moment after the app starts, as on a phone: a share often arrives before.
+jest.mock('expo-font', () => {
+  const { useEffect, useState } = jest.requireActual<typeof import('react')>('react');
+  const fonts = { loaded: false };
+  return {
+    ...jest.requireActual('expo-font'),
+    __fonts: fonts,
+    useFonts: () => {
+      const [loaded, setLoaded] = useState(false);
+      useEffect(() => {
+        const timer = setTimeout(() => {
+          fonts.loaded = true;
+          setLoaded(true);
+        }, 50);
+        return () => clearTimeout(timer);
+      }, []);
+      return [loaded, null];
+    },
+  };
+});
+const fonts = jest.requireMock<{ __fonts: { loaded: boolean } }>('expo-font').__fonts;
+
 const shareState = (ShareIntent as unknown as { __state: { shareIntent: unknown; options: unknown } })
   .__state;
 
 beforeEach(async () => {
   storeToken('my-token');
   shareState.shareIntent = null;
+  fonts.loaded = false;
   await i18n.changeLanguage('en');
 });
 
@@ -52,6 +76,22 @@ test('a link shared from a shop app starts a new item from it', async () => {
   });
   // Handled, so it isn't picked up again.
   expect(shareState.shareIntent).toBeNull();
+});
+
+test('a share arriving while the app starts waits for it before opening /add', async () => {
+  // On a phone, navigating before the navigator is mounted throws and closes the app.
+  const pushedEarly: string[] = [];
+  const push = jest.spyOn(router, 'push').mockImplementation((href) => {
+    if (!fonts.loaded) pushedEarly.push(String(href));
+  });
+  shareState.shareIntent = { text: 'https://shop.example.com/scarf', webUrl: null };
+  mockApi({ 'GET me/': { body: ANN } });
+
+  await renderApp('/');
+
+  await waitFor(() => expect(push).toHaveBeenCalledWith('/add'));
+  expect(pushedEarly).toEqual([]);
+  push.mockRestore();
 });
 
 test('a share arriving while the app shows something else still opens a new item', async () => {
