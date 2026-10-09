@@ -1,0 +1,11 @@
+# Build context for deploy/web.Dockerfile (the backend image uses backend/ as its own context).
+**/node_modules
+**/.env
+**/.env.*
+app/android
+app/ios
+app/dist
+app/.expo
+backend
+backups
+.git

@@ -128,6 +128,67 @@ docker compose exec api python manage.py shell -c "from core.tasks import ping; 
 Android allows plain HTTP to the LAN server through `expo-build-properties`. iPhones need the paid Apple Developer
 account for development builds, so until then iPhone users use the website.
 
+## Run it on the home server
+
+The home server (a Linux machine at `192.168.0.24`) runs a production-style stack from
+`docker-compose.prod.yml`: Caddy on port 80 serves the web app and passes `/api`, `/admin`, `/static` and
+`/media` to Django, which runs under gunicorn with the Celery worker and beat beside it. Postgres and Redis are
+only reachable inside Docker, everything restarts by itself after a crash or a reboot, and email goes out
+through a real SMTP account (Mailpit is only for development). It is plain HTTP on the home Wi-Fi for now; with
+a domain later, Caddy can switch to HTTPS by itself (see `deploy/Caddyfile`).
+
+**Once, on the router:** reserve `192.168.0.24` for the server (a DHCP reservation for its network card), so
+the address in everyone's links never changes.
+
+**Once, on the server** (Docker with the compose plugin installed):
+
+1. Get the code: `git clone git@github.com:lunaf92/delibird-app.git && cd delibird-app`.
+2. `cp .env.example .env`, then edit `.env` following its "Home server" section:
+   - `DJANGO_DEBUG=false`, and a real `DJANGO_SECRET_KEY` and `POSTGRES_PASSWORD`. Make them with
+     `python3 -c "import secrets; print(secrets.token_urlsafe(50))"`. The server refuses to start with the
+     example values.
+   - The addresses: `APP_URL=http://192.168.0.24`, and the matching `DJANGO_ALLOWED_HOSTS`,
+     `DJANGO_CSRF_TRUSTED_ORIGINS` and `DJANGO_CORS_ALLOWED_ORIGINS`.
+   - The email account sign-in codes are sent from: `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`,
+     `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS` (port 587) or `EMAIL_USE_SSL` (port 465), and `DEFAULT_FROM_EMAIL`.
+     Any SMTP account works: for Gmail, turn on 2-step verification, create an app password and use
+     `smtp.gmail.com`, port 587, TLS; providers such as Brevo or Mailjet have free tiers too.
+3. Start it: `docker compose -f docker-compose.prod.yml up -d --build`. The first build takes a few minutes
+   (it builds the web app too). Then open `http://192.168.0.24` on any device on the Wi-Fi.
+4. Optionally, an admin account for `http://192.168.0.24/admin/`:
+   `docker compose -f docker-compose.prod.yml exec api python manage.py createsuperuser`. Everyone else simply
+   signs in with their email in the app; the first sign-in creates the account.
+
+**Updating** to the latest `master`: `git pull && docker compose -f docker-compose.prod.yml up -d --build`.
+Migrations run by themselves when the API starts. `docker compose -f docker-compose.prod.yml logs -f api` shows
+what the server is doing, and `ps` shows each part's health.
+
+**Backups:** `./deploy/backup.sh` saves the database and the uploaded pictures into `backups/` and keeps the 14
+newest. Run it every night from cron (`crontab -e`, with the path to your checkout):
+
+```
+0 3 * * * cd /path/to/delibird-app && ./deploy/backup.sh >> backups/backup.log 2>&1
+```
+
+Copy `backups/` somewhere else from time to time (another disk or a cloud drive): a backup on the same disk
+doesn't survive the disk. To restore one (this replaces everything since, and stops the app meanwhile):
+`./deploy/restore.sh backups/delibird-db-<date>.dump backups/delibird-media-<date>.tar.gz`.
+
+**The Android app** has the server's address built in, so rebuild it once for the home server: in `app/.env`
+set `EXPO_PUBLIC_API_URL=http://192.168.0.24`, then `cd app && npx expo prebuild --platform android && cd android
+&& ./gradlew assembleRelease`, and install `app/android/app/build/outputs/apk/release/app-release.apk` on each
+phone (copy it over, or `adb install`). Plain HTTP to the server is already allowed in the app's settings.
+
+**iPhones** use the website: open `http://192.168.0.24` in Safari and "Add to Home Screen". For sharing links
+from other apps there is a free Shortcuts workaround, **not tested yet**: in the Shortcuts app make a new
+shortcut, turn on "Show in Share Sheet" (receives URLs and Safari web pages), add "URL Encode" with the
+Shortcut Input, then "Open URLs" with `http://192.168.0.24/add?url=` followed by the encoded text. Sharing a
+page to that shortcut opens Delibird's new-item screen with the link filled in.
+
+**If a device can't reach the server:** with NordVPN on that device (or on the server), turn on its LAN access
+with `nordvpn set lan-discovery on`, or the VPN hides the home network. On the server only port 80 is used, so
+the clash over port 8000 on the laptop doesn't apply there.
+
 ## Tests and checks
 
 Backend (inside Docker, so nothing needs installing):
