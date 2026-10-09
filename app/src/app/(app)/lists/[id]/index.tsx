@@ -88,7 +88,7 @@ export default function ListScreen() {
   }
 
   return (
-    <Screen>
+    <Screen scrollToEnd={confirmingDelete}>
       <Stack.Screen options={{ title: list.name }} />
       <Title>{list.name}</Title>
       <Message tone="error">{actionError}</Message>

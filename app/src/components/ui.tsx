@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react';
+import { useLayoutEffect, useRef, type PropsWithChildren } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -27,15 +27,31 @@ function useText(size: number, heading = false): TextStyle {
   };
 }
 
-/** A scrollable screen body with the standard padding. */
-export function Screen({ children }: PropsWithChildren) {
+/**
+ * A scrollable screen body with the standard padding. When `scrollToEnd` turns on, it scrolls to the bottom once
+ * the content has grown, so a confirmation that opens at the end of the screen shows its buttons.
+ */
+export function Screen({ children, scrollToEnd = false }: PropsWithChildren<{ scrollToEnd?: boolean }>) {
   const { colors } = useLook();
+  const scroll = useRef<ScrollView>(null);
+  // The new content is only measured after rendering, so wait for its size change before scrolling.
+  const pending = useRef(false);
+  useLayoutEffect(() => {
+    pending.current = scrollToEnd;
+  }, [scrollToEnd]);
   return (
     <ScrollView
+      ref={scroll}
       testID="screen"
       style={{ backgroundColor: colors.bg }}
       contentContainerStyle={styles.screen}
-      keyboardShouldPersistTaps="handled">
+      keyboardShouldPersistTaps="handled"
+      onContentSizeChange={() => {
+        if (pending.current) {
+          pending.current = false;
+          scroll.current?.scrollToEnd({ animated: true });
+        }
+      }}>
       {children}
     </ScrollView>
   );

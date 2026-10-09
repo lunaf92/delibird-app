@@ -1,6 +1,7 @@
 import { File } from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 import { fireEvent, screen, waitFor } from 'expo-router/testing-library';
+import { ScrollView } from 'react-native';
 
 import i18n from '@/i18n';
 import { ANN, callsTo, DEFAULT_LIST, item, mockApi } from '@/test-utils/api';
@@ -164,6 +165,28 @@ test('deleting an item needs a confirmation', async () => {
   await fireEvent.press(screen.getByRole('button', { name: 'Delete item' }));
 
   await waitFor(() => expect(callsTo(calls, 'DELETE', 'items/101/')).toHaveLength(1));
+});
+
+test('opening the delete confirmation scrolls down to its buttons', async () => {
+  mockApi({
+    'GET me/': { body: ANN },
+    'GET lists/': { body: [DEFAULT_LIST, CHRISTMAS] },
+    'GET items/101/': { body: SCARF },
+  });
+  const scrollToEnd = jest.spyOn(ScrollView.prototype, 'scrollToEnd').mockImplementation(() => {});
+  await renderApp('/items/101');
+  await screen.findByRole('button', { name: 'Delete item…' });
+  // Growing content alone doesn't scroll: only the confirmation opening does.
+  await fireEvent(screen.getByTestId('screen'), 'contentSizeChange', 400, 2000);
+  expect(scrollToEnd).not.toHaveBeenCalled();
+
+  await fireEvent.press(screen.getByRole('button', { name: 'Delete item…' }));
+  await fireEvent(screen.getByTestId('screen'), 'contentSizeChange', 400, 2200);
+  expect(scrollToEnd).toHaveBeenCalledTimes(1);
+  // Once there, it stays put as the screen changes.
+  await fireEvent(screen.getByTestId('screen'), 'contentSizeChange', 400, 2300);
+  expect(scrollToEnd).toHaveBeenCalledTimes(1);
+  scrollToEnd.mockRestore();
 });
 
 test('server validation errors are shown', async () => {

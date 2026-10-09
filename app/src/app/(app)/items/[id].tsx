@@ -69,7 +69,7 @@ export default function EditItemScreen() {
   }
 
   return (
-    <Screen>
+    <Screen scrollToEnd={confirmingDelete}>
       <Title>{t('items.editTitle')}</Title>
       {/* Keyed by id so the form starts from the loaded item. */}
       <ItemForm

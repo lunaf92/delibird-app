@@ -106,7 +106,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <Screen>
+    <Screen scrollToEnd={confirmingDelete}>
       <Heading>{t('settings.profile')}</Heading>
       {user && <Body muted>{t('settings.signedInAs', { email: user.email })}</Body>}
       <TextField
