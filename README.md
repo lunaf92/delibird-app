@@ -193,6 +193,30 @@ page to that shortcut opens Strena's new-item screen with the link filled in.
 with `nordvpn set lan-discovery on`, or the VPN hides the home network. On the server only port 80 is used, so
 the clash over port 8000 on the laptop doesn't apply there.
 
+### HTTPS with a domain
+
+The server is reached from anywhere at `https://strena.app`. The server's own nginx, which already serves other
+sites on ports 80 and 443, ends HTTPS with a Let's Encrypt certificate and forwards to Strena on port 8080
+(`HTTP_PORT=8080` in `.env`).
+
+1. At the domain registrar, point an A record for `strena.app` at the home's public IP, and forward
+   ports 80 and 443 on the router to the server if that isn't done already.
+2. On the server, add the site and get its certificate:
+
+   ```sh
+   sudo cp deploy/nginx-strena.conf /etc/nginx/sites-available/strena
+   sudo ln -s /etc/nginx/sites-available/strena /etc/nginx/sites-enabled/strena
+   sudo nginx -t && sudo systemctl reload nginx
+   sudo certbot --nginx -d strena.app --redirect
+   ```
+
+3. In `.env`: `APP_URL=https://strena.app`, add `strena.app` to `DJANGO_ALLOWED_HOSTS`, and add
+   `https://strena.app` to `DJANGO_CSRF_TRUSTED_ORIGINS` and `DJANGO_CORS_ALLOWED_ORIGINS`. Then
+   `docker compose -f docker-compose.prod.yml up -d --build`: the web app is built with `APP_URL` as its API
+   address, and sign-in emails link there.
+4. Rebuild the Android app with `EXPO_PUBLIC_API_URL=https://strena.app` in `app/.env`, so it works away from home
+   too.
+
 ## Tests and checks
 
 Backend (inside Docker, so nothing needs installing):
