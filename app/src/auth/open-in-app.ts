@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 
-export const APP_SCHEME = 'delibird';
+export const APP_SCHEME = 'strena';
 export const ANDROID_PACKAGE = 'com.lunaf92.delibird';
 
 /** True in an Android web browser, the only place the sign-in link can hand over to the installed app. */

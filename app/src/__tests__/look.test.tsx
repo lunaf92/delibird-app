@@ -11,7 +11,7 @@ import { activeLook, contrastRatio, DEFAULT_SETTINGS, LOOK_NAMES, PALETTES } fro
 const store = (SecureStore as unknown as { __store: Map<string, string> }).__store;
 
 beforeEach(async () => {
-  store.delete('delibird.look');
+  store.delete('strena.look');
   storeToken('my-token');
   await i18n.changeLanguage('en');
 });
@@ -83,7 +83,7 @@ test('picking a look shows it at once and saves it on the account', async () => 
   expect(screen.getByRole('radio', { name: 'Paper and red marker' })).toBeSelected();
   expect(screen.getByRole('radio', { name: 'Black ink' })).not.toBeSelected();
   // Remembered on this device too, for before the next sign-in.
-  expect(JSON.parse(store.get('delibird.look')!)).toMatchObject({ theme: 'paper' });
+  expect(JSON.parse(store.get('strena.look')!)).toMatchObject({ theme: 'paper' });
 });
 
 test('always dark uses the chalkboard, whatever the look', async () => {
@@ -131,7 +131,7 @@ test('a look that could not be saved goes back, and says why', async () => {
 
 test('before signing in, the look this device last had is used', async () => {
   storeToken(null);
-  store.set('delibird.look', JSON.stringify({ theme: 'paper', dark_mode: 'light', plain_font: false }));
+  store.set('strena.look', JSON.stringify({ theme: 'paper', dark_mode: 'light', plain_font: false }));
   mockApi({});
 
   await renderApp('/sign-in');

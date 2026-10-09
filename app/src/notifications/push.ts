@@ -6,7 +6,7 @@ import { Platform } from 'react-native';
 
 import { registerDevice, unregisterDevice } from '@/api/client';
 
-const TOKEN_KEY = 'delibird.pushToken';
+const TOKEN_KEY = 'strena.pushToken';
 
 if (Platform.OS !== 'web') {
   Notifications.setNotificationHandler({

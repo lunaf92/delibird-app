@@ -51,7 +51,7 @@ jest.mock('expo-share-intent', () => {
         state.shareIntent = null;
       },
     }),
-    getShareExtensionKey: () => 'delibirdShareKey',
+    getShareExtensionKey: () => 'strenaShareKey',
   };
 });
 

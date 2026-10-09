@@ -161,7 +161,7 @@ CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
         "LOCATION": env("REDIS_CACHE_URL", REDIS_URL),
-        "KEY_PREFIX": "delibird",
+        "KEY_PREFIX": "strena",
     }
 }
 

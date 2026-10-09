@@ -172,7 +172,7 @@ describe('opening the magic link in the app', () => {
   test('the intent link names the app and falls back to the website', () => {
     const url = openInApp.androidIntentUrl('a b', '/sign-in/verify?token=a%20b&web=1');
     expect(url).toContain(
-      'intent://sign-in/verify?token=a%20b#Intent;scheme=delibird;package=com.lunaf92.delibird;',
+      'intent://sign-in/verify?token=a%20b#Intent;scheme=strena;package=com.lunaf92.delibird;',
     );
     expect(url).toContain('S.browser_fallback_url=%2Fsign-in%2Fverify%3Ftoken%3Da%2520b%26web%3D1;end');
   });

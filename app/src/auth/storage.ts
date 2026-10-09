@@ -2,7 +2,7 @@ import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
 // The session token lives in the phone's secure storage, and in localStorage on the web.
-const KEY = 'delibird.session';
+const KEY = 'strena.session';
 
 export async function loadToken(): Promise<string | null> {
   if (Platform.OS === 'web') {
@@ -31,7 +31,7 @@ export async function saveToken(token: string | null): Promise<void> {
 
 // Where to go after signing in, for example a share link opened while signed out. Kept in localStorage on
 // the web so it survives the magic link opening in a new tab; in memory on phones.
-const RETURN_KEY = 'delibird.returnTo';
+const RETURN_KEY = 'strena.returnTo';
 let returnTo: string | null = null;
 
 export function rememberReturnTo(path: string | null): void {

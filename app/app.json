@@ -1,14 +1,14 @@
 {
   "expo": {
     "name": "Strena",
-    "slug": "delibird",
+    "slug": "strena",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "delibird",
+    "scheme": "strena",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "bundleIdentifier": "com.lunaf92.delibird",
+      "bundleIdentifier": "com.lunaf92.strena",
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsLocalNetworking": true
@@ -33,6 +33,26 @@
               "scheme": "https",
               "host": "strena.app",
               "pathPrefix": "/sign-in/verify"
+            },
+            {
+              "scheme": "https",
+              "host": "strena.app",
+              "pathPrefix": "/shared/"
+            },
+            {
+              "scheme": "https",
+              "host": "strena.app",
+              "pathPrefix": "/shared-with-me/"
+            },
+            {
+              "scheme": "https",
+              "host": "strena.app",
+              "pathPrefix": "/lists/"
+            },
+            {
+              "scheme": "https",
+              "host": "strena.app",
+              "pathPrefix": "/items/"
             }
           ],
           "category": ["BROWSABLE", "DEFAULT"]
