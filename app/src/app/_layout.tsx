@@ -11,9 +11,9 @@ import {
   Stack,
   ThemeProvider,
   usePathname,
-  useRootNavigationState,
+  useNavigationContainerRef,
 } from 'expo-router';
-import { useEffect, type PropsWithChildren } from 'react';
+import { useEffect, useState, type PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Platform } from 'react-native';
 
@@ -73,8 +73,7 @@ function RootNavigator() {
   const ready = status !== 'loading' && (fontsLoaded || !!fontError);
 
   // Navigating before the navigator below is mounted throws (and closes the app), so wait for it.
-  const navigationKey = useRootNavigationState()?.key;
-  const navigationReady = ready && Boolean(navigationKey);
+  const navigationReady = useNavigatorReady(ready);
 
   // Keep the splash screen up until we know whether a saved session exists, and the fonts are in.
   useEffect(() => {
@@ -118,6 +117,26 @@ function RootNavigator() {
       </Stack>
     </>
   );
+}
+
+/**
+ * True once the navigator is mounted and can be navigated, which is what expo-router checks before any
+ * navigation. That happens a frame or so after it first renders, so this looks again each frame until then.
+ */
+function useNavigatorReady(rendered: boolean): boolean {
+  const navigation = useNavigationContainerRef();
+  const [isReady, setIsReady] = useState(false);
+  useEffect(() => {
+    if (!rendered || isReady) return;
+    let frame = 0;
+    const check = () => {
+      if (navigation.isReady()) setIsReady(true);
+      else frame = requestAnimationFrame(check);
+    };
+    check();
+    return () => cancelAnimationFrame(frame);
+  }, [rendered, isReady, navigation]);
+  return isReady;
 }
 
 /** Tapping a notification opens the list it is about. */

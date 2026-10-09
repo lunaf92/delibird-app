@@ -29,6 +29,10 @@ jest.mock('expo-font', () => {
     },
   };
 });
+// What expo-router checks before navigating: the navigator below the root layout is mounted.
+const navigation = jest.requireActual<{
+  storeRef: { current: { navigationRef: { isReady: () => boolean } } };
+}>('expo-router/build/global-state/store').storeRef;
 const fonts = jest.requireMock<{ __fonts: { loaded: boolean } }>('expo-font').__fonts;
 
 const shareState = (ShareIntent as unknown as { __state: { shareIntent: unknown; options: unknown } })
@@ -82,7 +86,7 @@ test('a share arriving while the app starts waits for it before opening /add', a
   // On a phone, navigating before the navigator is mounted throws and closes the app.
   const pushedEarly: string[] = [];
   const push = jest.spyOn(router, 'push').mockImplementation((href) => {
-    if (!fonts.loaded) pushedEarly.push(String(href));
+    if (!fonts.loaded || !navigation.current.navigationRef.isReady()) pushedEarly.push(String(href));
   });
   shareState.shareIntent = { text: 'https://shop.example.com/scarf', webUrl: null };
   mockApi({ 'GET me/': { body: ANN } });
