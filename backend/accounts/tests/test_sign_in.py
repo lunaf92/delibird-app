@@ -65,7 +65,15 @@ def test_first_sign_in_creates_the_account(client: APIClient) -> None:
     user = User.objects.get()
     assert user.email == "ann@example.com"
     assert not user.has_usable_password()
-    assert body["user"] == {"id": user.pk, "email": "ann@example.com", "display_name": "", "language": "en"}
+    assert body["user"] == {
+        "id": user.pk,
+        "email": "ann@example.com",
+        "display_name": "",
+        "language": "en",
+        "theme": "ink",
+        "dark_mode": "follow",
+        "plain_font": False,
+    }
     assert Session.objects.get().token_hash == hash_token(str(body["token"]))
 
 
@@ -81,6 +89,9 @@ def test_signing_in_again_uses_the_same_account(client: APIClient) -> None:
         "email": "ann@example.com",
         "display_name": "Ann",
         "language": "en",
+        "theme": "ink",
+        "dark_mode": "follow",
+        "plain_font": False,
     }
     assert User.objects.count() == 1
 

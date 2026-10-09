@@ -70,6 +70,17 @@ Shops that block it (an error status, or a robot-check or captcha page such as A
 phone share sheet will land once it's added. The server only fetches public internet addresses (never the home
 network), over http or https, with a short timeout and size limits.
 
+### Looks
+
+The app is drawn as if in pen on paper: thick wobbly outlines, offset shadows, pencil-shaded tiles for items
+without a picture, Permanent Marker for titles and main buttons and Patrick Hand for the rest. Settings has
+five looks (Black ink, Paper and red marker, Chalkboard, Light blue, Green), a dark mode that follows the phone
+or is always light or dark (dark uses Chalkboard), and a plain, easy-to-read font instead of handwriting. The
+choice is saved on the account (`theme`, `dark_mode`, `plain_font` on `/api/v1/me/`), so it follows the person
+to every device; before signing in the device remembers its own. The palettes live in `app/src/theme/looks.ts`,
+and a test checks every look's contrast. Phones draw slightly simpler corners than the web, which can draw the
+uneven elliptical ones.
+
 ### Notifications
 
 The worker sends emails (seen in Mailpit locally) when a list is shared with someone, and, within a minute, when

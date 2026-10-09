@@ -510,6 +510,13 @@ export interface components {
        */
       problem: (components['schemas']['ProblemEnum'] | components['schemas']['NullEnum']) | null;
     };
+    /**
+     * @description * `follow` - Follow my phone
+     *     * `light` - Always light
+     *     * `dark` - Always dark
+     * @enum {string}
+     */
+    DarkModeEnum: 'follow' | 'light' | 'dark';
     Detail: {
       detail: string;
     };
@@ -617,6 +624,10 @@ export interface components {
     PatchedUserRequest: {
       display_name?: string;
       language?: components['schemas']['LanguageEnum'];
+      /** Look */
+      theme?: components['schemas']['ThemeEnum'];
+      dark_mode?: components['schemas']['DarkModeEnum'];
+      plain_font?: boolean;
     };
     PatchedWishlistDetailRequest: {
       name?: string;
@@ -705,12 +716,25 @@ export interface components {
       token: string;
       user: components['schemas']['User'];
     };
+    /**
+     * @description * `ink` - Black ink
+     *     * `paper` - Paper and red marker
+     *     * `chalk` - Chalkboard
+     *     * `sky` - Light blue
+     *     * `meadow` - Green
+     * @enum {string}
+     */
+    ThemeEnum: 'ink' | 'paper' | 'chalk' | 'sky' | 'meadow';
     User: {
       readonly id: number;
       /** Format: email */
       readonly email: string;
       display_name: string;
       language: components['schemas']['LanguageEnum'];
+      /** Look */
+      theme: components['schemas']['ThemeEnum'];
+      dark_mode: components['schemas']['DarkModeEnum'];
+      plain_font: boolean;
     };
     /** @description Either the email and the six-digit code, or the token from the magic link. */
     VerifyRequest: {

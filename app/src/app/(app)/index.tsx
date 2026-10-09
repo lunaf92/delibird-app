@@ -15,11 +15,13 @@ import { errorMessage } from '@/api/errors';
 import { useApi, useResource } from '@/api/use-api';
 import { useAuth } from '@/auth/context';
 import { MoveButtons, moved } from '@/components/move-buttons';
-import { Body, BLUE, Button, Card, Heading, Message, Screen, TextField, Title } from '@/components/ui';
+import { Body, Button, Card, Heading, Message, Screen, TextField, Title } from '@/components/ui';
+import { useLook } from '@/theme/context';
 
 /** Home: the signed-in person's lists, in their order. */
 export default function ListsScreen() {
   const { t } = useTranslation();
+  const { colors, fonts } = useLook();
   const { user } = useAuth();
   const api = useApi();
   const { data: lists, setData: setLists, error, reload } = useResource(fetchLists);
@@ -68,7 +70,13 @@ export default function ListsScreen() {
       <Stack.Screen
         options={{
           headerRight: () => (
-            <Link href="/settings" style={styles.headerLink} accessibilityRole="button">
+            <Link
+              href="/settings"
+              style={[
+                styles.headerLink,
+                { color: colors.ink, fontFamily: fonts.body, fontSize: 18 * fonts.scale },
+              ]}
+              accessibilityRole="button">
               {t('settings.title')}
             </Link>
           ),
@@ -120,7 +128,7 @@ function ListRow({
 }) {
   const { t } = useTranslation();
   return (
-    <Card>
+    <Card flip={index % 2 === 1}>
       <View style={styles.row}>
         <Pressable
           accessibilityRole="link"
@@ -142,7 +150,7 @@ function ListRow({
 function SharedListRow({ list }: { list: ViewerListSummary }) {
   const { t } = useTranslation();
   return (
-    <Card>
+    <Card flip={list.id % 2 === 1}>
       <Pressable
         accessibilityRole="link"
         accessibilityLabel={list.name}
@@ -159,6 +167,6 @@ function SharedListRow({ list }: { list: ViewerListSummary }) {
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  grow: { flex: 1, gap: 2 },
-  headerLink: { color: BLUE, fontSize: 16, fontWeight: '600', paddingHorizontal: 8 },
+  grow: { flex: 1, gap: 2, minHeight: 44, justifyContent: 'center' },
+  headerLink: { textDecorationLine: 'underline', paddingHorizontal: 12, paddingVertical: 10 },
 });

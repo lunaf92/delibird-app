@@ -185,5 +185,23 @@
   "add": {
     "title": "Añadir desde un enlace",
     "noLink": "Aquí no hay ningún enlace web que añadir."
+  },
+  "look": {
+    "title": "Elige un aspecto",
+    "names": {
+      "ink": "Tinta negra",
+      "paper": "Papel y rotulador rojo",
+      "chalk": "Pizarra",
+      "sky": "Azul claro",
+      "meadow": "Verde"
+    },
+    "darkMode": "Modo oscuro",
+    "darkExplained": "En modo oscuro la app usa el aspecto Pizarra.",
+    "darkModes": {
+      "follow": "Como el teléfono",
+      "light": "Siempre claro",
+      "dark": "Siempre oscuro"
+    },
+    "plainFont": "Usar una letra sencilla y fácil de leer"
   }
 }

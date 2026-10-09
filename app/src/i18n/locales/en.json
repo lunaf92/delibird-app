@@ -185,5 +185,23 @@
   "add": {
     "title": "Add from a link",
     "noLink": "There's no web link to add here."
+  },
+  "look": {
+    "title": "Pick a look",
+    "names": {
+      "ink": "Black ink",
+      "paper": "Paper and red marker",
+      "chalk": "Chalkboard",
+      "sky": "Light blue",
+      "meadow": "Green"
+    },
+    "darkMode": "Dark mode",
+    "darkExplained": "In dark mode the app uses the Chalkboard look.",
+    "darkModes": {
+      "follow": "Follow my phone",
+      "light": "Always light",
+      "dark": "Always dark"
+    },
+    "plainFont": "Use a plain, easy-to-read font"
   }
 }

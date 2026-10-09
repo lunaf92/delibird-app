@@ -12,5 +12,5 @@ test('extra styles add to the field instead of replacing its border', async () =
   );
 
   const style = StyleSheet.flatten(screen.getByLabelText('Notes').props.style);
-  expect(style).toMatchObject({ borderWidth: 1, minHeight: 88 });
+  expect(style).toMatchObject({ borderWidth: 3, minHeight: 88 });
 });

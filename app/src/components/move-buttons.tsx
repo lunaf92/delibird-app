@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { BLUE } from './ui';
+import { useLook } from '@/theme/context';
+import { offsetShadow, sketchCorners } from '@/theme/sketch';
 
 type Props = { name: string; index: number; count: number; onMove: (from: number, to: number) => void };
 
@@ -37,16 +38,22 @@ function Arrow({
   disabled: boolean;
   onPress: () => void;
 }) {
+  const { colors } = useLook();
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ disabled }}
       disabled={disabled}
-      hitSlop={6}
       onPress={onPress}
-      style={[styles.arrow, disabled && styles.disabled]}>
-      <Text style={styles.symbol}>{symbol}</Text>
+      style={[
+        styles.arrow,
+        sketchCorners(symbol === '↓', true),
+        { borderColor: colors.ink, backgroundColor: colors.bg },
+        !disabled && offsetShadow(colors.ink, 3),
+        disabled && styles.disabled,
+      ]}>
+      <Text style={[styles.symbol, { color: colors.ink }]}>{symbol}</Text>
     </Pressable>
   );
 }
@@ -60,8 +67,8 @@ export function moved<T>(items: readonly T[], from: number, to: number): T[] {
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', gap: 4 },
-  arrow: { width: 32, height: 32, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
-  disabled: { opacity: 0.25 },
-  symbol: { color: BLUE, fontSize: 18, fontWeight: '600' },
+  row: { flexDirection: 'row', gap: 8 },
+  arrow: { width: 44, height: 44, borderWidth: 3, alignItems: 'center', justifyContent: 'center' },
+  disabled: { opacity: 0.3 },
+  symbol: { fontSize: 20, fontWeight: '700' },
 });

@@ -2,14 +2,17 @@ import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { ApiError, type Autofill, type Item, type PickedImage, type Wishlist } from '@/api/client';
 import { nameFromLink } from '@/api/links';
 
 import { CURRENCIES, parsePrice } from './price';
 import { RatingPicker } from './rating';
-import { BLUE, Body, Button, Heading, Message, TextField } from './ui';
+import { useLook } from '@/theme/context';
+import { sketchCorners } from '@/theme/sketch';
+
+import { Body, Button, Chip, Heading, Message, TextField } from './ui';
 
 export type ImageChange =
   | { kind: 'keep' }
@@ -57,6 +60,7 @@ const PROBLEM_TEXT = {
 /** The item form: only the name is required. */
 export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit, autofill, initialUrl }: Props) {
   const { t } = useTranslation();
+  const { colors } = useLook();
   const [name, setName] = useState(item?.name ?? '');
   const [url, setUrl] = useState(item?.url ?? initialUrl ?? '');
   const [description, setDescription] = useState(item?.description ?? '');
@@ -259,7 +263,7 @@ export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit, auto
       {preview ? (
         <Image
           source={{ uri: preview }}
-          style={styles.preview}
+          style={[styles.preview, { borderColor: colors.ink, backgroundColor: colors.bg }, sketchCorners()]}
           contentFit="contain"
           accessibilityLabel={t('items.picture')}
         />
@@ -313,38 +317,9 @@ export function ItemForm({ item, lists, submitLabel, busy, error, onSubmit, auto
   );
 }
 
-type ChipProps = {
-  label: string;
-  selected: boolean;
-  onPress: () => void;
-  role?: 'radio' | 'checkbox';
-  disabled?: boolean;
-};
-
-function Chip({ label, selected, onPress, role = 'radio', disabled }: ChipProps) {
-  return (
-    <Pressable
-      accessibilityRole={role}
-      accessibilityLabel={label}
-      accessibilityState={role === 'checkbox' ? { checked: selected, disabled } : { selected, disabled }}
-      // react-native-web doesn't turn accessibilityState.checked into aria-checked, so set it directly.
-      aria-checked={role === 'checkbox' ? selected : undefined}
-      disabled={disabled}
-      onPress={onPress}
-      style={[styles.chip, selected && styles.chipSelected, disabled && styles.chipDisabled]}>
-      <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>{label}</Text>
-    </Pressable>
-  );
-}
-
 const styles = StyleSheet.create({
   multiline: { minHeight: 88, textAlignVertical: 'top' },
   row: { flexDirection: 'row', gap: 12, alignItems: 'center', flexWrap: 'wrap' },
-  chips: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
-  chip: { borderWidth: 1, borderColor: BLUE, borderRadius: 16, paddingHorizontal: 14, paddingVertical: 6 },
-  chipSelected: { backgroundColor: BLUE },
-  chipDisabled: { opacity: 0.6 },
-  chipLabel: { color: BLUE, fontSize: 15 },
-  chipLabelSelected: { color: '#FFFFFF', fontWeight: '600' },
-  preview: { width: '100%', height: 220, borderRadius: 12, backgroundColor: '#F2F4F7' },
+  chips: { flexDirection: 'row', gap: 10, flexWrap: 'wrap' },
+  preview: { width: '100%', height: 220, borderWidth: 3 },
 });

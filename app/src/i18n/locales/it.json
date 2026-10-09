@@ -185,5 +185,23 @@
   "add": {
     "title": "Aggiungi da un link",
     "noLink": "Qui non c'è nessun link web da aggiungere."
+  },
+  "look": {
+    "title": "Scegli un aspetto",
+    "names": {
+      "ink": "Inchiostro nero",
+      "paper": "Carta e pennarello rosso",
+      "chalk": "Lavagna",
+      "sky": "Azzurro",
+      "meadow": "Verde"
+    },
+    "darkMode": "Modalità scura",
+    "darkExplained": "In modalità scura l'app usa l'aspetto Lavagna.",
+    "darkModes": {
+      "follow": "Come il telefono",
+      "light": "Sempre chiaro",
+      "dark": "Sempre scuro"
+    },
+    "plainFont": "Usa un carattere semplice e facile da leggere"
   }
 }
