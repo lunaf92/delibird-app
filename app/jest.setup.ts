@@ -34,11 +34,13 @@ jest.mock('expo-notifications', () => {
 
 // Receiving shares from other apps: tests set `shareIntent` through the module's __state.
 jest.mock('expo-share-intent', () => {
-  const state = { shareIntent: null as null | { text?: string; webUrl?: string | null } };
+  // `ready` is false until the phone has handed over the share, a moment after the app opens.
+  const state = { shareIntent: null as null | { text?: string; webUrl?: string | null }, ready: true };
   return {
     __state: state,
     ShareIntentProvider: ({ children }: { children: unknown }) => children,
     useShareIntentContext: () => ({
+      isReady: state.ready,
       hasShareIntent: state.shareIntent !== null,
       shareIntent: state.shareIntent ?? {},
       resetShareIntent: () => {
@@ -59,3 +61,6 @@ jest.mock('expo-file-system', () => {
   LocalFile.created = created;
   return { File: LocalFile };
 });
+
+// Opening other apps (Android intents): nothing to open in tests.
+jest.mock('expo-intent-launcher', () => ({ startActivityAsync: jest.fn(async () => ({ resultCode: 0 })) }));

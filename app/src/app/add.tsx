@@ -22,7 +22,9 @@ export default function AddFromLinkScreen() {
   // From the address (/add?url=…), or shared from another app's share sheet on Android.
   const shared = useSharedLink();
   const link = firstLink(params.url) ?? firstLink(params.text) ?? shared.link;
-  const [error, setError] = useState<string | null>(link ? null : t('add.noLink'));
+  const [error, setError] = useState<string | null>(null);
+  // A share arrives a moment after the app opens, so only once it has been read is a missing link final.
+  const noLink = !link && shared.ready;
 
   useEffect(() => {
     if (!link) return;
@@ -56,8 +58,14 @@ export default function AddFromLinkScreen() {
   return (
     <Screen>
       <Title>{t('add.title')}</Title>
-      {error ? <Message tone="error">{error}</Message> : <ActivityIndicator />}
+      {noLink || error ? (
+        <Message tone="error">{noLink ? t('add.noLink') : error}</Message>
+      ) : (
+        <ActivityIndicator />
+      )}
       {link && <Body muted>{link}</Body>}
+      {/* What the other app shared, so it's clear why no link was found in it. */}
+      {noLink && shared.text && <Body muted>{t('add.received', { text: shared.text })}</Body>}
     </Screen>
   );
 }

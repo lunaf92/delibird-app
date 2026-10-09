@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { requestCode } from '@/api/client';
 import { errorMessage } from '@/api/errors';
 import { useAuth } from '@/auth/context';
+import { canOpenEmailApp, openEmailApp } from '@/auth/open-email';
 import { Body, Button, Message, Screen, TextField, Title } from '@/components/ui';
 
 /** Step two: type the six-digit code from the email. The magic link in the same email skips this screen. */
@@ -54,6 +55,9 @@ export default function CodeScreen() {
     <Screen>
       <Title>{t('signIn.checkEmail')}</Title>
       <Body>{t('signIn.codeIntro', { email })}</Body>
+      {canOpenEmailApp() && (
+        <Button variant="secondary" label={t('signIn.openEmailApp')} onPress={openEmailApp} />
+      )}
       <TextField
         label={t('signIn.code')}
         value={code}

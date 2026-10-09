@@ -1,4 +1,4 @@
-import { Linking } from 'react-native';
+import { Linking, Platform } from 'react-native';
 import { fireEvent, screen } from 'expo-router/testing-library';
 
 import * as openInApp from '@/auth/open-in-app';
@@ -195,4 +195,20 @@ test('the privacy policy is in the chosen language', async () => {
   await renderApp('/privacy');
 
   expect(await screen.findByText('Chi gestisce Strena')).toBeOnTheScreen();
+});
+
+test('on Android, the code screen opens the email app', async () => {
+  const launcher = jest.requireMock<{ startActivityAsync: jest.Mock }>('expo-intent-launcher');
+  const os = jest.replaceProperty(Platform, 'OS', 'android');
+  mockApi({ 'POST auth/request-code/': SENT });
+  await renderApp('/sign-in');
+  await requestCodeFor('ann@example.com');
+
+  await fireEvent.press(screen.getByRole('button', { name: 'Open my email app' }));
+
+  expect(launcher.startActivityAsync).toHaveBeenCalledWith('android.intent.action.MAIN', {
+    category: 'android.intent.category.APP_EMAIL',
+    flags: 0x10000000,
+  });
+  os.restore();
 });

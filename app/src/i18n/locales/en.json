@@ -18,6 +18,7 @@
     "invalidEmail": "Enter a valid email address.",
     "checkEmail": "Check your email",
     "codeIntro": "We sent a six-digit code to {{email}}. Type it here, or open the link in the email.",
+    "openEmailApp": "Open my email app",
     "code": "Code",
     "codeFormat": "The code has six digits.",
     "signIn": "Sign in",
@@ -191,7 +192,8 @@
   },
   "add": {
     "title": "Add from a link",
-    "noLink": "There's no web link to add here."
+    "noLink": "There's no web link to add here.",
+    "received": "What was shared: {{text}}"
   },
   "look": {
     "title": "Pick a look",

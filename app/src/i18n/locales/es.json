@@ -18,6 +18,7 @@
     "invalidEmail": "Escribe una dirección de correo válida.",
     "checkEmail": "Revisa tu correo",
     "codeIntro": "Hemos enviado un código de seis cifras a {{email}}. Escríbelo aquí o abre el enlace del correo.",
+    "openEmailApp": "Abrir la app de correo",
     "code": "Código",
     "codeFormat": "El código tiene seis cifras.",
     "signIn": "Entrar",
@@ -191,7 +192,8 @@
   },
   "add": {
     "title": "Añadir desde un enlace",
-    "noLink": "Aquí no hay ningún enlace web que añadir."
+    "noLink": "Aquí no hay ningún enlace web que añadir.",
+    "received": "Lo que se compartió: {{text}}"
   },
   "look": {
     "title": "Elige un aspecto",

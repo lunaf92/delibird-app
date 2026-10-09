@@ -1,6 +1,13 @@
-/** The first web link in shared text, which often wraps it: "Look at this! https://shop.example/x". */
+/**
+ * The first web link in shared text, which often wraps it: "Look at this! https://shop.example/x". Some apps
+ * leave out the https:// ("amzn.eu/d/abc"); those get it added.
+ */
 export function firstLink(text: string | undefined): string | null {
-  return text?.match(/https?:\/\/[^\s<>"']+/i)?.[0] ?? null;
+  if (!text) return null;
+  const full = text.match(/https?:\/\/[^\s<>"']+/i)?.[0];
+  if (full) return full;
+  const bare = text.match(/(?:^|[\s(])((?:[a-z0-9-]+\.)+[a-z]{2,}\/[^\s<>"']*)/i)?.[1];
+  return bare ? `https://${bare}` : null;
 }
 
 // Path parts that are about the shop's site, not the product: languages, countries and route words.
