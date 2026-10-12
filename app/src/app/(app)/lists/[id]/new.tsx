@@ -15,7 +15,7 @@ class PictureFailed extends Error {}
 export default function NewItemScreen() {
   const { t } = useTranslation();
   const api = useApi();
-  const params = useLocalSearchParams<{ id: string; url?: string }>();
+  const params = useLocalSearchParams<{ id: string; url?: string; name?: string }>();
   const listId = Number(params.id);
   const { data: lists } = useResource(fetchLists);
   const [busy, setBusy] = useState(false);
@@ -78,6 +78,7 @@ export default function NewItemScreen() {
         onSubmit={submit}
         autofill={(link) => api((token, language) => autofillLink(token, link, language))}
         initialUrl={params.url}
+        initialName={params.name}
       />
     </Screen>
   );
