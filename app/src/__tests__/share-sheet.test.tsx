@@ -154,6 +154,35 @@ test('a link shared without https:// still starts a new item', async () => {
   expect(callsTo(calls, 'POST', 'items/autofill/')[0].body).toEqual({ url: 'https://amzn.eu/d/abc123' });
 });
 
+test("a shop that can't be read still gives the item the name from the shared text", async () => {
+  shareState.shareIntent = {
+    text: 'Check this out at Amazon DIVCHI 10L Potting Soil Multi-Purpose Compost https://amzn.eu/d/abc123',
+    webUrl: null,
+  };
+  mockApi({
+    'GET me/': { body: ANN },
+    'GET lists/10/': { body: { ...DEFAULT_LIST, items: [] } },
+    'POST items/autofill/': {
+      body: {
+        found: false,
+        url: 'https://www.amazon.co.uk/dp/B0ABC12345',
+        name: '',
+        description: '',
+        price: null,
+        currency: null,
+        image_url: null,
+        problem: 'blocked',
+      },
+    },
+  });
+
+  await renderApp('/add');
+
+  await waitFor(() =>
+    expect(screen.getByLabelText('Name').props.value).toBe('DIVCHI 10L Potting Soil Multi-Purpose Compost'),
+  );
+});
+
 test('/add gives a share time to arrive before saying there is no link', async () => {
   mockApi({ 'GET me/': { body: ANN } });
 

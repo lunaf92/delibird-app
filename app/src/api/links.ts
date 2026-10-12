@@ -91,3 +91,54 @@ export function nameFromLink(link: string): string | null {
   if (name === name.toLowerCase()) name = name.charAt(0).toUpperCase() + name.slice(1);
   return name.slice(0, 200);
 }
+
+// Words apps put before the product in shared text: "Check this out at Amazon", "Guarda questo su eBay",
+// "Mira esto en Etsy". The shop's name, if given, is taken as the single word after at/on/su/en.
+const LEAD_IN = new RegExp(
+  '^(?:' +
+    [
+      'check (?:this|it) out',
+      'check out this (?:item|product|deal|listing)',
+      'check out',
+      'look (?:at )?(?:this|what i found)',
+      'have a look(?: at this)?',
+      'i found this',
+      'i (?:want|would like) this',
+      'guarda(?: questo| cosa ho trovato)?(?: prodotto| articolo)?',
+      "dai un'occhiata(?: a questo)?(?: prodotto| articolo)?",
+      'mira(?: esto| lo que encontré)?(?: producto| artículo)?',
+      'echa un vistazo(?: a esto)?(?: producto| artículo)?',
+    ].join('|') +
+    ')(?:\\s+(?:at|on|from|in|su|da|in|en|de)\\s+\\S+)?\\s*[:!.,\\-–—]*\\s*',
+  'iu',
+);
+
+/**
+ * Guesses an item name from the text a shop's app shares along with the link, such as Amazon's "Check this out
+ * at Amazon DIVCHI 10L Potting Soil… https://amzn.eu/d/…". Works for any shop: it drops the link, a lead-in
+ * like "Check this out at …", a short "Shop:" in front and a short "| Shop" behind, and keeps the longest line
+ * left. Returns null when nothing that reads like a name is left.
+ */
+export function nameFromSharedText(text: string | null | undefined): string | null {
+  if (!text) return null;
+  const withoutLinks = text
+    .replace(/https?:\/\/[^\s<>"']+/gi, ' ')
+    .replace(/(?:^|[\s(])(?:[a-z0-9-]+\.)+[a-z]{2,}\/[^\s<>"']*/gi, ' ');
+  let best = '';
+  for (const raw of withoutLinks.split(/\r?\n/)) {
+    let line = raw.replace(/\s+/g, ' ').trim().replace(LEAD_IN, '');
+    // "Amazon.co.uk: Wool scarf": a short shop name and a colon in front.
+    line = line.replace(/^[^:]{1,30}:\s+(?=\S.{3,})/u, (lead) =>
+      lead.trim().split(' ').length <= 3 ? '' : lead,
+    );
+    // "Wool scarf | John Lewis" or "Wool scarf - Etsy UK": a short shop name behind.
+    line = line.replace(/\s+[|•·–—-]\s+[^|•·–—-]{1,30}$/u, (tail) =>
+      tail.trim().split(' ').length <= 4 ? '' : tail,
+    );
+    line = line.replace(/^["'“”‘’«»\s]+|["'“”‘’«»\s:,;.!\-–—|]+$/gu, '').trim();
+    if (line.length > best.length) best = line;
+  }
+  // A name has letters, and more than a stray word or two of them.
+  if ((best.match(/\p{L}/gu) ?? []).length < 3) return null;
+  return best.slice(0, 200);
+}

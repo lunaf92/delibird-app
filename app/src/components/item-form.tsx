@@ -46,6 +46,8 @@ type Props = {
   autofill: (url: string) => Promise<Autofill>;
   /** A link to start from, for example one shared from a shop's app; it is read straight away. */
   initialUrl?: string;
+  /** A name to start from, such as the product title a shop's app shared along with the link. */
+  initialName?: string;
 };
 
 const LINK = /^https?:\/\/\S+\.\S+/i;
@@ -70,10 +72,11 @@ export function ItemForm({
   onSubmit,
   autofill,
   initialUrl,
+  initialName,
 }: Props) {
   const { t } = useTranslation();
   const { colors } = useLook();
-  const [name, setName] = useState(item?.name ?? '');
+  const [name, setName] = useState(item?.name ?? initialName ?? '');
   const [url, setUrl] = useState(item?.url ?? initialUrl ?? '');
   const [description, setDescription] = useState(item?.description ?? '');
   const [rating, setRating] = useState<number | null>(item?.rating ?? null);
@@ -111,7 +114,8 @@ export function ItemForm({
       guessName(found.url);
       return;
     }
-    setName((current) => current.trim() || found.name);
+    // The shop page's own name replaces one that only came from the shared text, unless it was edited.
+    setName((current) => (current.trim() && current !== initialName ? current : found.name || current));
     setDescription((current) => current.trim() || found.description);
     // Price and currency go together: both are filled only when no price was typed yet.
     if (found.price && !priceText.trim()) {

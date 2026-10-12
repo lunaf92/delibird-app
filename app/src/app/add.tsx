@@ -5,7 +5,7 @@ import { ActivityIndicator } from 'react-native';
 
 import { fetchLists } from '@/api/client';
 import { errorMessage, isUnauthorized } from '@/api/errors';
-import { firstLink } from '@/api/links';
+import { firstLink, nameFromSharedText } from '@/api/links';
 import { askForShare, useSharedLink } from '@/share/shared-link';
 import { useAuth } from '@/auth/context';
 import { rememberReturnTo } from '@/auth/storage';
@@ -25,6 +25,8 @@ export default function AddFromLinkScreen() {
   // From the address (/add?url=…), or shared from another app's share sheet on Android.
   const shared = useSharedLink();
   const link = firstLink(params.url) ?? firstLink(params.text) ?? shared.link;
+  // The words shared with the link, which shop apps usually fill with the product's name.
+  const name = nameFromSharedText(params.url ? null : (params.text ?? shared.text));
   const [error, setError] = useState<string | null>(null);
   // A share reaches the app a moment after it opens (on Android it may even restart in its own task), so give
   // it a little time before saying there is no link.
@@ -46,7 +48,9 @@ export default function AddFromLinkScreen() {
     if (!link) return;
     if (status === 'signedOut') {
       // Come back here after signing in.
-      rememberReturnTo(`/add?url=${encodeURIComponent(link)}`);
+      // The whole shared text, so the name in it isn't lost on the way.
+      const source = params.url ? link : (params.text ?? shared.text ?? link);
+      rememberReturnTo(`/add?text=${encodeURIComponent(source)}`);
       router.replace('/sign-in');
       return;
     }
@@ -56,7 +60,10 @@ export default function AddFromLinkScreen() {
       (lists) => {
         const main = lists.find((list) => list.is_default);
         if (active && main) {
-          router.replace({ pathname: '/lists/[id]/new', params: { id: String(main.id), url: link } });
+          router.replace({
+            pathname: '/lists/[id]/new',
+            params: { id: String(main.id), url: link, ...(name ? { name } : {}) },
+          });
           shared.done();
         }
       },
@@ -69,7 +76,7 @@ export default function AddFromLinkScreen() {
     return () => {
       active = false;
     };
-  }, [forget, i18n.language, link, shared, status, t, token]);
+  }, [forget, i18n.language, link, name, params.text, params.url, shared, status, t, token]);
 
   return (
     <Screen>
