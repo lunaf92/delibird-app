@@ -62,6 +62,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     theme = models.CharField(_("look"), max_length=10, choices=Look, default=Look.INK)
     dark_mode = models.CharField(_("dark mode"), max_length=10, choices=DarkMode, default=DarkMode.FOLLOW)
     plain_font = models.BooleanField(_("plain font"), default=False)
+    # The welcome tour shows once, after the first sign-in, on whichever device that happens.
+    tour_seen = models.BooleanField(_("welcome tour seen"), default=False)
     is_staff = models.BooleanField(_("staff status"), default=False)
     is_active = models.BooleanField(_("active"), default=True)
     date_joined = models.DateTimeField(_("date joined"), default=timezone.now)

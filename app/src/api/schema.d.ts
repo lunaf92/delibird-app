@@ -628,6 +628,8 @@ export interface components {
       theme?: components['schemas']['ThemeEnum'];
       dark_mode?: components['schemas']['DarkModeEnum'];
       plain_font?: boolean;
+      /** Welcome tour seen */
+      tour_seen?: boolean;
     };
     PatchedWishlistDetailRequest: {
       name?: string;
@@ -735,6 +737,8 @@ export interface components {
       theme: components['schemas']['ThemeEnum'];
       dark_mode: components['schemas']['DarkModeEnum'];
       plain_font: boolean;
+      /** Welcome tour seen */
+      tour_seen: boolean;
     };
     /** @description Either the email and the six-digit code, or the token from the magic link. */
     VerifyRequest: {

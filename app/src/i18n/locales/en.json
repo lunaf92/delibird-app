@@ -53,7 +53,10 @@
     "deleteAccount": "Delete my account…",
     "deleteWarning": "This permanently deletes your account and everything in it. It can't be undone.",
     "deleteConfirm": "Delete permanently",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "help": "Help",
+    "replayTour": "Show the welcome tour again",
+    "startGuide": "Walk me through adding an item"
   },
   "errors": {
     "generic": "Something went wrong. Try again.",
@@ -274,5 +277,41 @@
         "body": ["If this policy changes, this page is updated and the date at the top changes with it."]
       }
     ]
+  },
+  "tour": {
+    "counter": "{{step}} of {{total}}",
+    "skip": "Skip tour",
+    "back": "Back",
+    "next": "Next",
+    "welcomeTitle": "Welcome to Strena",
+    "welcomeBody": "Keep the things you would love to get, and share them with the people who buy you presents. Your main list is already waiting for you.",
+    "addTitle": "Add things from any shop",
+    "addBody": "On your phone, tap Share in a shop's app or in your browser and pick Strena. Or paste a link on the new item page, and Strena fills in the name and picture for you.",
+    "listsTitle": "Lists for every occasion",
+    "listsBody": "Make a list for your birthday, Christmas or the new flat. One thing can sit on several lists, and everything is always on your main list.",
+    "shareTitle": "Share a list",
+    "shareBody": "Open a list and tap Share to invite people by email. You choose who sees each list, and the rest stay private.",
+    "surpriseTitle": "The surprise stays a surprise",
+    "surpriseBody": "Friends can reserve a gift so nobody buys it twice. You never see what was reserved, so keep your lists up to date and let them do the rest.",
+    "readyTitle": "Shall we add your first wish?",
+    "readyBody": "I can walk you through adding one thing to your list and putting it on a second list. It takes a minute, and you can stop whenever you like.",
+    "showMe": "Show me how",
+    "onMyOwn": "I'll look around myself"
+  },
+  "guide": {
+    "label": "Getting started · step {{step}} of 4",
+    "stop": "Stop the guide",
+    "openList": "Open your main list to begin.",
+    "tapAdd": "Tap “Add an item” below to put your first wish on this list.",
+    "fillForm": "Paste a link from a shop and tap “Fill in from link”, or just type a name. Then tap Save at the bottom.",
+    "secondList": "Nice, “{{name}}” is on your list. One thing can sit on several lists. Make a second one for it:",
+    "secondListName": "Name of the second list",
+    "createList": "Make the list",
+    "openItem": "Now tap “{{name}}” to open it, tick “{{list}}” under Lists, and tap Save.",
+    "openItemAny": "Now tap “{{name}}” to open it, tick another of your lists under Lists, and tap Save.",
+    "tick": "Tick “{{list}}” under Lists, then tap Save.",
+    "tickAny": "Tick another of your lists under Lists, then tap Save.",
+    "done": "Done! “{{name}}” is now on more than one list. To show a list to friends, open it and tap “Share this list…”. You can replay this guide from Settings.",
+    "finish": "Finish"
   }
 }

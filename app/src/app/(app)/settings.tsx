@@ -3,8 +3,17 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
-import { deleteMe, endSession, fetchSessions, updateMe, type Session, type UserUpdate } from '@/api/client';
+import {
+  deleteMe,
+  endSession,
+  fetchLists,
+  fetchSessions,
+  updateMe,
+  type Session,
+  type UserUpdate,
+} from '@/api/client';
 import { errorMessage, isUnauthorized } from '@/api/errors';
+import { useApi } from '@/api/use-api';
 import { useSignedIn } from '@/auth/context';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { LookSettingsSection } from '@/components/look-settings';
@@ -12,6 +21,7 @@ import { ServerStatus } from '@/components/server-status';
 import { pushAvailability, savedPushToken, turnOnPush } from '@/notifications/push';
 import { Body, Button, Card, Heading, Message, Screen, TextField } from '@/components/ui';
 import type { Language } from '@/i18n';
+import { useGuide } from '@/tour/guide';
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
@@ -134,6 +144,8 @@ export default function SettingsScreen() {
 
       <PushSettings />
 
+      <HelpSettings />
+
       <Heading>{t('settings.sessions')}</Heading>
       <Body muted>{t('settings.sessionsIntro')}</Body>
       <Message tone="error">{sessionsError}</Message>
@@ -199,6 +211,29 @@ export default function SettingsScreen() {
       <Button variant="link" label={t('privacy.link')} onPress={() => router.push('/privacy')} />
       <ServerStatus />
     </Screen>
+  );
+}
+
+/** The welcome tour and the guided first item, to see again whenever. */
+function HelpSettings() {
+  const { t } = useTranslation();
+  const api = useApi();
+  const guide = useGuide();
+  const [busy, setBusy] = useState(false);
+
+  const startGuide = async () => {
+    setBusy(true);
+    // Starts on the main list; if the lists can't be loaded right now, from the home screen instead.
+    const lists = await api(fetchLists).catch(() => null);
+    guide.start(lists?.find((list) => list.is_default)?.id);
+  };
+
+  return (
+    <>
+      <Heading>{t('settings.help')}</Heading>
+      <Button variant="secondary" label={t('settings.replayTour')} onPress={() => router.push('/tour')} />
+      <Button variant="secondary" label={t('settings.startGuide')} onPress={startGuide} busy={busy} />
+    </>
   );
 }
 
