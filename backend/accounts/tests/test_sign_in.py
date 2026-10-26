@@ -73,6 +73,7 @@ def test_first_sign_in_creates_the_account(client: APIClient) -> None:
         "theme": "ink",
         "dark_mode": "follow",
         "plain_font": False,
+        "tour_seen": False,
     }
     assert Session.objects.get().token_hash == hash_token(str(body["token"]))
 
@@ -92,6 +93,7 @@ def test_signing_in_again_uses_the_same_account(client: APIClient) -> None:
         "theme": "ink",
         "dark_mode": "follow",
         "plain_font": False,
+        "tour_seen": False,
     }
     assert User.objects.count() == 1
 

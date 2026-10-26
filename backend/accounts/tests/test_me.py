@@ -27,6 +27,7 @@ def test_get_profile(client: APIClient, ann: User) -> None:
         "theme": "ink",
         "dark_mode": "follow",
         "plain_font": False,
+        "tour_seen": False,
     }
 
 
@@ -43,6 +44,15 @@ def test_the_look_is_saved_on_the_account(client: APIClient, ann: User) -> None:
     }
     ann.refresh_from_db()
     assert (ann.theme, ann.dark_mode, ann.plain_font) == ("chalk", "dark", True)
+
+
+def test_the_welcome_tour_is_remembered_on_the_account(client: APIClient, ann: User) -> None:
+    response = client.patch(reverse("me"), {"tour_seen": True}, format="json")
+
+    assert response.status_code == 200
+    assert response.json()["tour_seen"] is True
+    ann.refresh_from_db()
+    assert ann.tour_seen
 
 
 @pytest.mark.parametrize("change", [{"theme": "neon"}, {"dark_mode": "sometimes"}, {"plain_font": "maybe"}])

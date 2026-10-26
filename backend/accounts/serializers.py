@@ -28,12 +28,12 @@ class VerifySerializer(serializers.Serializer[None]):
 class UserSerializer(serializers.ModelSerializer[User]):
     class Meta:
         model = User
-        fields = ("id", "email", "display_name", "language", "theme", "dark_mode", "plain_font")
+        fields = ("id", "email", "display_name", "language", "theme", "dark_mode", "plain_font", "tour_seen")
         read_only_fields = ("id", "email")
         # Required so the schema promises them in responses; PATCH is partial, so updates may still omit them.
         extra_kwargs: ClassVar = {
             name: {"required": True}
-            for name in ("display_name", "language", "theme", "dark_mode", "plain_font")
+            for name in ("display_name", "language", "theme", "dark_mode", "plain_font", "tour_seen")
         }
 
 

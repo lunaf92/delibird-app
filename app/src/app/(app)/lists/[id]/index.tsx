@@ -3,7 +3,15 @@ import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 
-import { deleteList, fetchList, renameList, reorderItems, takeOffList, type Item } from '@/api/client';
+import {
+  deleteList,
+  fetchList,
+  fetchLists,
+  renameList,
+  reorderItems,
+  takeOffList,
+  type Item,
+} from '@/api/client';
 import { errorMessage } from '@/api/errors';
 import { useApi, useResource } from '@/api/use-api';
 import { MoveButtons, moved } from '@/components/move-buttons';
@@ -11,6 +19,7 @@ import { formatPrice } from '@/components/price';
 import { Stars } from '@/components/rating';
 import { Thumb } from '@/components/thumb';
 import { Body, Button, Card, Heading, Message, Screen, TextField, Title } from '@/components/ui';
+import { ListGuide, useGuide } from '@/tour/guide';
 
 /** One list: its items in order, and the list's own settings. */
 export default function ListScreen() {
@@ -23,6 +32,9 @@ export default function ListScreen() {
     error,
     reload,
   } = useResource(useCallback((token: string, language: string) => fetchList(token, id, language), [id]));
+  const guiding = useGuide().state !== null;
+  // The guide needs to know whether there are other lists to put an item on.
+  const { data: lists } = useResource(guiding ? fetchLists : skip);
   const [actionError, setActionError] = useState<string | null>(null);
   const [renaming, setRenaming] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -91,6 +103,7 @@ export default function ListScreen() {
     <Screen scrollToEnd={confirmingDelete}>
       <Stack.Screen options={{ title: list.name }} />
       <Title>{list.name}</Title>
+      <ListGuide lists={lists} />
       <Message tone="error">{actionError}</Message>
 
       {list.items.length === 0 && <Body muted>{t('lists.empty')}</Body>}
@@ -164,6 +177,9 @@ export default function ListScreen() {
     </Screen>
   );
 }
+
+/** Loads nothing, for when the guide is off. */
+const skip = async () => null;
 
 function ItemRow({
   item,

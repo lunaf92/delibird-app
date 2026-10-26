@@ -9,6 +9,7 @@ import { saveImage } from '@/api/items';
 import { useApi, useResource } from '@/api/use-api';
 import { ItemForm, type ImageChange, type ItemValues } from '@/components/item-form';
 import { Body, Button, Card, Heading, Message, Screen, Title } from '@/components/ui';
+import { EditItemGuide, useGuide } from '@/tour/guide';
 
 /** The changes were saved but the picture did not go through. */
 class PictureFailed extends Error {}
@@ -21,6 +22,7 @@ export default function EditItemScreen() {
     useCallback((token: string, language: string) => fetchItem(token, id, language), [id]),
   );
   const { data: lists } = useResource(fetchLists);
+  const guide = useGuide();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -46,6 +48,7 @@ export default function EditItemScreen() {
         // The changes themselves are saved; say so, and Save tries the picture again.
         throw new PictureFailed(`${t('items.pictureFailedEdit')} ${errorMessage(failure, t)}`);
       }
+      guide.itemSaved(saved);
       router.back();
     } catch (failure) {
       setError(failure instanceof PictureFailed ? failure.message : errorMessage(failure, t));
@@ -71,6 +74,7 @@ export default function EditItemScreen() {
   return (
     <Screen scrollToEnd={confirmingDelete}>
       <Title>{t('items.editTitle')}</Title>
+      <EditItemGuide itemId={item.id} lists={lists} />
       {/* Keyed by id so the form starts from the loaded item. */}
       <ItemForm
         key={item.id}

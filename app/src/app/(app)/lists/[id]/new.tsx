@@ -8,6 +8,7 @@ import { saveImage } from '@/api/items';
 import { useApi, useResource } from '@/api/use-api';
 import { ItemForm, type ImageChange, type ItemValues } from '@/components/item-form';
 import { Screen, Title } from '@/components/ui';
+import { NewItemGuide, useGuide } from '@/tour/guide';
 
 /** The item part of a save worked or was undone, but the picture did not go through. */
 class PictureFailed extends Error {}
@@ -18,6 +19,7 @@ export default function NewItemScreen() {
   const params = useLocalSearchParams<{ id: string; url?: string; name?: string }>();
   const listId = Number(params.id);
   const { data: lists } = useResource(fetchLists);
+  const guide = useGuide();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // An item that was created but whose picture is not stored yet, when removing it again failed too.
@@ -41,6 +43,7 @@ export default function NewItemScreen() {
       try {
         await saveImage(api, item, image);
         unfinished.current = null;
+        guide.itemAdded(item);
       } catch (failure) {
         try {
           await api((token, language) => deleteItem(token, item.id, language));
@@ -69,6 +72,7 @@ export default function NewItemScreen() {
   return (
     <Screen>
       <Title>{t('items.newTitle')}</Title>
+      <NewItemGuide />
       <ItemForm
         lists={lists ?? undefined}
         initialLists={[listId]}

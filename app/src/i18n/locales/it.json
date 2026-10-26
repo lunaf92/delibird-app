@@ -53,7 +53,10 @@
     "deleteAccount": "Elimina il mio account…",
     "deleteWarning": "Il tuo account e tutto ciò che contiene verranno eliminati per sempre. Non si può annullare.",
     "deleteConfirm": "Elimina per sempre",
-    "cancel": "Annulla"
+    "cancel": "Annulla",
+    "help": "Aiuto",
+    "replayTour": "Rivedi il tour di benvenuto",
+    "startGuide": "Guidami nell’aggiunta di un elemento"
   },
   "errors": {
     "generic": "Qualcosa è andato storto. Riprova.",
@@ -274,5 +277,41 @@
         "body": ["Se questa informativa cambia, questa pagina viene aggiornata insieme alla data in alto."]
       }
     ]
+  },
+  "tour": {
+    "counter": "{{step}} di {{total}}",
+    "skip": "Salta il tour",
+    "back": "Indietro",
+    "next": "Avanti",
+    "welcomeTitle": "Benvenuto in Strena",
+    "welcomeBody": "Tieni le cose che ti piacerebbe ricevere e condividile con chi ti fa i regali. La tua lista principale ti sta già aspettando.",
+    "addTitle": "Aggiungi da qualsiasi negozio",
+    "addBody": "Sul telefono, tocca Condividi nell'app di un negozio o nel browser e scegli Strena. Oppure incolla un link nella pagina del nuovo elemento, e Strena compila nome e foto per te.",
+    "listsTitle": "Una lista per ogni occasione",
+    "listsBody": "Crea una lista per il compleanno, il Natale o la casa nuova. Una cosa può stare su più liste, e tutto è sempre sulla lista principale.",
+    "shareTitle": "Condividi una lista",
+    "shareBody": "Apri una lista e tocca Condividi per invitare persone via email. Scegli tu chi vede ogni lista, le altre restano private.",
+    "surpriseTitle": "La sorpresa resta una sorpresa",
+    "surpriseBody": "Gli amici possono prenotare un regalo così nessuno lo compra due volte. Tu non vedi mai cosa è stato prenotato: tieni aggiornate le liste e lascia fare a loro.",
+    "readyTitle": "Aggiungiamo il tuo primo desiderio?",
+    "readyBody": "Ti guido passo passo: aggiungi una cosa alla tua lista e la metti anche su una seconda lista. Ci vuole un minuto e puoi fermarti quando vuoi.",
+    "showMe": "Mostrami come",
+    "onMyOwn": "Faccio da solo"
+  },
+  "guide": {
+    "label": "Primi passi · passo {{step}} di 4",
+    "stop": "Interrompi la guida",
+    "openList": "Apri la tua lista principale per iniziare.",
+    "tapAdd": "Tocca “Aggiungi un elemento” qui sotto per mettere il tuo primo desiderio in questa lista.",
+    "fillForm": "Incolla il link di un negozio e tocca “Compila dal link”, oppure scrivi solo un nome. Poi tocca Salva in fondo.",
+    "secondList": "Bene, “{{name}}” è nella tua lista. Una cosa può stare su più liste. Creane una seconda:",
+    "secondListName": "Nome della seconda lista",
+    "createList": "Crea la lista",
+    "openItem": "Ora tocca “{{name}}” per aprirlo, spunta “{{list}}” sotto Liste e tocca Salva.",
+    "openItemAny": "Ora tocca “{{name}}” per aprirlo, spunta un’altra delle tue liste sotto Liste e tocca Salva.",
+    "tick": "Spunta “{{list}}” sotto Liste, poi tocca Salva.",
+    "tickAny": "Spunta un’altra delle tue liste sotto Liste, poi tocca Salva.",
+    "done": "Fatto! “{{name}}” ora è su più di una lista. Per mostrare una lista agli amici, aprila e tocca “Condividi questa lista…”. Puoi rivedere questa guida dalle Impostazioni.",
+    "finish": "Fine"
   }
 }

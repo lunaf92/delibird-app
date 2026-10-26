@@ -1899,6 +1899,10 @@
                     },
                     "plain_font": {
                         "type": "boolean"
+                    },
+                    "tour_seen": {
+                        "type": "boolean",
+                        "title": "Welcome tour seen"
                     }
                 }
             },
@@ -2228,6 +2232,10 @@
                     },
                     "plain_font": {
                         "type": "boolean"
+                    },
+                    "tour_seen": {
+                        "type": "boolean",
+                        "title": "Welcome tour seen"
                     }
                 },
                 "required": [
@@ -2237,7 +2245,8 @@
                     "id",
                     "language",
                     "plain_font",
-                    "theme"
+                    "theme",
+                    "tour_seen"
                 ]
             },
             "VerifyRequest": {

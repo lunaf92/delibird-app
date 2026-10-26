@@ -17,6 +17,7 @@ import { useAuth } from '@/auth/context';
 import { MoveButtons, moved } from '@/components/move-buttons';
 import { Body, Button, Card, Heading, Message, Screen, TextField, Title } from '@/components/ui';
 import { useLook } from '@/theme/context';
+import { HomeGuide } from '@/tour/guide';
 
 /** Home: the signed-in person's lists, in their order. */
 export default function ListsScreen() {
@@ -83,6 +84,7 @@ export default function ListsScreen() {
         }}
       />
       <Title>{name ? t('home.greeting', { name }) : t('home.greetingNoName')}</Title>
+      <HomeGuide />
       <Heading>{t('lists.title')}</Heading>
 
       {lists === null && !error && <ActivityIndicator />}
